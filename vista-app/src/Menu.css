@@ -1,0 +1,127 @@
+#root {
+  text-align: center;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+p{
+  font-size: 14px;
+  color: #0071a9ff;
+}
+
+
+#menu{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.text{
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#dateAndTime{
+  display: flex;
+  justify-content: space-between;
+  background-color: #0071a9ff;
+  color: white;
+}
+
+.dateTime{
+  font-weight: bold;
+}
+
+.dateTimeText{
+  color: white;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#info{
+  font-size: 10px;
+  color: gray;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.nadpis{
+  font-weight: bold;
+  font-size: 17px;
+}
+
+
+.mainCourses{
+  display: flex;
+  flex-direction: column;
+}
+
+.option{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+.number{
+  padding-left: 10px;
+  font-weight: bold;
+}
+
+.meal{
+  max-width: 75%;
+}
+
+.mealDescription{
+  color: black;
+  font-size: 11px;
+}
+
+.price{
+  padding-right: 10px;
+}
+
+.soups{
+  display: flex;
+  flex-direction: column;
+}
+
+.soupOption{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-top-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+
+.soupDay{
+  font-weight: bold;
+  padding-left: 10px;
+}
+
+.soupDescription{
+  color: black;
+  font-size: 11px;
+  padding-right: 10px;
+  max-width: 50%;
+}
+
+
+.lastOption{
+  border-bottom-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
