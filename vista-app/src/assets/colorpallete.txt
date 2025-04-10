@@ -1,0 +1,7 @@
+/* CSS HEX */
+--bice-blue: #0071a9ff;
+--alice-white: #effaffff;
+--safety-orange: #f17300ff;
+--saffron: #eac435ff;
+--tiffany-blue: #b2dfdbff;
+

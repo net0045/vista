@@ -1,29 +1,50 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.content {
+  display: flex; /* Enable flexbox */
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center; /* Center items vertically */
+  align-items: center; /* Center items horizontally */
+  text-align: center;
+  height: 100vh; /* Full viewport height for centering */
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.logo-image-vista {
+  height: 75%;
+  margin-bottom: 20px; /* Space between logo and progress bar */
+  animation: glow 1s infinite alternate; /* Add glow animation */
+}
+
+
+
+.progress-bar-container {
+  width: 100%; /* Adjust width as needed */
+  height: 10px;
+  background-color: #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 20px; /* Space above the progress bar */
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #f17300ff; /* Light blue color */
+  transition: width 0.04s linear; /* Smooth transition */
+}
+
+
+/* Keyframes for glowing effect */
+@keyframes glow {
+  0% {
+    filter: drop-shadow(0 0 0em #646cffaa);
   }
-  to {
-    transform: rotate(360deg);
+  100% {
+    filter: drop-shadow(0 0 2em #646cffaa);
   }
 }
 
@@ -33,10 +54,3 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}

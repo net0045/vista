@@ -1,0 +1,41 @@
+
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .logo-login{
+    height: 10rem;
+    margin-bottom: 20px; /* Space between logo and progress bar */
+    animation: glow 1s infinite alternate; /* Add glow animation */
+  }
+
+  .input-bar {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid;
+    border-color: #0071a9ff;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #0071a9ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #eac435ff;
+  }
