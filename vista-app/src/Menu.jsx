@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
-import './App.css'
+import './Menu.css'
 
-function App() {
+function Menu() {
   const [data, setData] = useState({})
   const [dateRange, setDateRange] = useState({ from: '', to: '' })
 
@@ -121,4 +121,4 @@ function App() {
   )
 }
 
-export default App
+export default Menu
