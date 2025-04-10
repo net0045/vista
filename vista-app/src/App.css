@@ -1,4 +1,5 @@
 #root {
+  text-align: center;
   max-width: 1280px;
   margin: 0 auto;
   padding: 0rem;
@@ -45,12 +46,6 @@
   }
   100% {
     filter: drop-shadow(0 0 2em #646cffaa);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
   }
 }
 
