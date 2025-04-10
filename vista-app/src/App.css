@@ -1,127 +1,51 @@
 #root {
   text-align: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0rem;
+  text-align: center;
 }
 
-body{
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.content {
+  display: flex; /* Enable flexbox */
+  flex-direction: column; /* Stack items vertically */
+  justify-content: center; /* Center items vertically */
+  align-items: center; /* Center items horizontally */
+  text-align: center;
+  height: 100vh; /* Full viewport height for centering */
 }
 
-p{
-  font-size: 14px;
-  color: #0071a9ff;
-}
-
-
-#menu{
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.text{
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#dateAndTime{
-  display: flex;
-  justify-content: space-between;
-  background-color: #0071a9ff;
-  color: white;
-}
-
-.dateTime{
-  font-weight: bold;
-}
-
-.dateTimeText{
-  color: white;
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-#info{
-  font-size: 10px;
-  color: gray;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.nadpis{
-  font-weight: bold;
-  font-size: 17px;
+.logo-image-vista {
+  height: 75%;
+  margin-bottom: 20px; /* Space between logo and progress bar */
+  animation: glow 1s infinite alternate; /* Add glow animation */
 }
 
 
-.mainCourses{
-  display: flex;
-  flex-direction: column;
+
+.progress-bar-container {
+  width: 100%; /* Adjust width as needed */
+  height: 10px;
+  background-color: #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 20px; /* Space above the progress bar */
 }
 
-.option{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top-style: solid;
-  border-color: black;
-  border-width: 1px;
-}
-
-.number{
-  padding-left: 10px;
-  font-weight: bold;
-}
-
-.meal{
-  max-width: 75%;
-}
-
-.mealDescription{
-  color: black;
-  font-size: 11px;
-}
-
-.price{
-  padding-right: 10px;
-}
-
-.soups{
-  display: flex;
-  flex-direction: column;
-}
-
-.soupOption{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-top-style: solid;
-  border-color: black;
-  border-width: 1px;
-}
-
-.soupDay{
-  font-weight: bold;
-  padding-left: 10px;
-}
-
-.soupDescription{
-  color: black;
-  font-size: 11px;
-  padding-right: 10px;
-  max-width: 50%;
+.progress-bar {
+  height: 100%;
+  background-color: #f17300ff; /* Light blue color */
+  transition: width 0.04s linear; /* Smooth transition */
 }
 
 
-.lastOption{
-  border-bottom-style: solid;
-  border-color: black;
-  border-width: 1px;
+/* Keyframes for glowing effect */
+@keyframes glow {
+  0% {
+    filter: drop-shadow(0 0 0em #646cffaa);
+  }
+  100% {
+    filter: drop-shadow(0 0 2em #646cffaa);
+  }
 }
+
