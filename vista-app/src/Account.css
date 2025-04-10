@@ -1,0 +1,29 @@
+.account-options {
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    justify-content: center; /* Center items vertically */
+    align-items: center; /* Center items horizontally */
+    gap: 10px; /* Add spacing between buttons */
+    width: 100%; /* Optional: Adjust width */
+  }
+  
+  .account-button-menu,
+  .account-button-orders {
+    width: 100%; /* Adjust button width */
+    padding: 10px;
+    margin: 5px 0; /* Optional: Add vertical spacing */
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+
+  .account-button-menu{
+    background-color: #0071a9ff;
+    color: #b2dfdbff;
+    border: 1px solid #b2dfdbff; 
+  }
+  .account-button-orders {
+    background-color: #b2dfdbff;
+    color: #0071a9ff;
+    border: 1px solid #0071a9ff; 
+  }
+  
