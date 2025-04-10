@@ -1,3 +1,0 @@
-# vista
-Hello World!
-negbagr
