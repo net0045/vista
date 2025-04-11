@@ -5,6 +5,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
+import Test from './Test';
 
 function App() {
   const [progress, setProgress] = useState(0);
@@ -55,6 +56,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/account" element={<Account />} />
       <Route path="/menu" element={<Menu />} />
+      <Route path="/test" element={<Test />} />
     </Routes>
   );
 }
