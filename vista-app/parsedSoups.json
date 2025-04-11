@@ -1,0 +1,32 @@
+[
+  {
+    "item": "Bramborová polévka / Potato soup",
+    "cost": 0,
+    "allergens": "1, 3, 7, 9",
+    "issoup": true
+  },
+  {
+    "item": "Čočková polévka s párkem / Lentil soup with sausages",
+    "cost": 0,
+    "allergens": "1, 3, 7, 9",
+    "issoup": true
+  },
+  {
+    "item": "Hovězí vývar s masem a nudlemi / Beef consommé with meat and noodles",
+    "cost": 0,
+    "allergens": "1, 3, 7, 9",
+    "issoup": true
+  },
+  {
+    "item": "Minestrone polévka s těstovinami / Minestrone soup with pasta",
+    "cost": 0,
+    "allergens": "1, 3, 7, 9",
+    "issoup": true
+  },
+  {
+    "item": "Státní svátek. Denní menu nepodáváme. / Bank holiday. We do not serve daily menu.",
+    "cost": 0,
+    "allergens": "",
+    "issoup": true
+  }
+]
