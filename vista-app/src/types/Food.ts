@@ -4,5 +4,6 @@ export type Food = {
     item: string;
     cost: number;
     menuID: string;
-    isSoup: boolean;
+    issoup: boolean;
+    allergens: string;
   };
