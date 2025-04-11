@@ -1,4 +1,18 @@
 
+  .message-popup{
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f17300ff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    width: 300px; /* Set a fixed width for the popup */
+    text-align: center; /* Center the text inside the popup */
+  }
+
 
   .form {
     display: flex;
