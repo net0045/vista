@@ -1,0 +1,59 @@
+#myOrders{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#back{
+  width: 100%;
+  display: flex;
+  margin-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#backButton{
+  width: 150px;
+  background-color: #f17300ff;
+  color: white;
+  font-weight: bold;
+  border-style: none;
+  border-radius: 5px;
+  height: 40px;
+  margin-left: 10px;
+}
+
+#email{
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+#orders{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.order{
+  background-color: #0071a9ff;
+  height: 350px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom-style: solid;
+  border-color: #f17300ff;
+}
+
+
+.orderText{
+  color: white;
+  font-size: 15px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.qrCode{
+  width: 230px;
+}
