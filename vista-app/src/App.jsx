@@ -6,6 +6,7 @@ import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
 import Test from './Test';
+import MyOrders from './MyOrders';
 
 function App() {
   const [progress, setProgress] = useState(0);
@@ -57,6 +58,7 @@ function App() {
       <Route path="/account" element={<Account />} />
       <Route path="/menu" element={<Menu />} />
       <Route path="/test" element={<Test />} />
+      <Route path="/myorders" element={<MyOrders />} />
     </Routes>
   );
 }
