@@ -3,6 +3,7 @@ import './App.css';
 import './Account.css'; // Import Account-specific styles
 
 function Account() {
+    
     return (
         <div className="content">
            
