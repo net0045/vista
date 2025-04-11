@@ -8,14 +8,20 @@ function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [messageType, setMessageType] = useState('');
     const [showPopup, setShowPopup] = useState(false);
 
     const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
+    const showMessage = (text, type = 'info') => {
+        setMessage(text);
+        setMessageType(type);
+        setShowPopup(true);
+    };
+
     const handleSubmit = async () => {
         if (!email.includes('@')) {
-            setMessage('Neplatný email.');
-            setShowPopup(true);
+            showMessage('Neplatný email.', 'error');
             return;
         }
 
@@ -23,23 +29,20 @@ function Login() {
 
         // Zjisti, jestli existuje uživatel
         if (!user) {
-            console.log('Uživatel s tímto emailem neexistuje.');
-            setMessage('Uživatel s tímto emailem neexistuje.');
-            setShowPopup(true);
+            showMessage('Uživatel s tímto emailem neexistuje.', 'warning');
             return;
         }
 
         if (isUserVerified(user)) {
-            setMessage('Účet je již ověřen. Přesměrování...');
-            setShowPopup(true);
+            showMessage('Uživatel je již ověřen.', 'success');
             setTimeout(() => navigate('/account'), 1000);
             return;
         }
         
-        setShowPopup(true);
+        
         //TODO: Vygeneruj ověřovací kód
         const code = generateCode();
-        setMessage('Ověřovací kód byl odeslán na váš email.');
+        showMessage(`Ověřovací kód: ${code}`, 'success');
     };
 
     // Automatické skrytí popupu
@@ -75,7 +78,7 @@ function Login() {
                 <p style={{ color: 'white' }}>{message}</p>
             </div>
             {showPopup && (
-                <div className="message-popup">
+                <div className={`message-popup ${messageType}`} >
                     {message}
                 </div>
             )}

@@ -31,7 +31,8 @@ rows.forEach((row) => {
     const foodPrice = row['Cena'];
     const foodAllergens = row['Alergen_Jidlo'];
     const soup = row['Polivka'];
-    const soupAllergens = row['Alergen_Polivka']; // někdy bývá duplikovaná hlavička
+    const soupAllergens = row['Alergen_Polivka']; 
+    const dayOfWeek = row['Cislo_dne']; 
 
     const dateFrom = parseExcelDate(dateRawFrom);
     const dateTo = parseExcelDate(dateRawTo);
@@ -49,6 +50,7 @@ rows.forEach((row) => {
             cost: parseFloat(foodPrice),
             allergens: foodAllergens,
             issoup: false,
+            dayOfWeek: dayOfWeek, 
         });
     }
 
@@ -58,6 +60,7 @@ rows.forEach((row) => {
             cost: 0, 
             allergens: soupAllergens,
             issoup: true,
+            dayOfWeek: dayOfWeek,
         });
     }
 });
