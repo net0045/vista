@@ -27,7 +27,7 @@ function Menu() {
         .from('Food')
         .select('*')
         .eq('menuid', currentMenu.id)
-        .order('cost', { ascending: true })
+        .order('dayOfWeek', { ascending: true })
 
       if (foodError) {
         console.error('Chyba při načítání jídel:', foodError)
