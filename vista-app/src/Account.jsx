@@ -1,8 +1,17 @@
 import React from 'react';
 import './App.css';
 import './Account.css'; // Import Account-specific styles
+import { useNavigate } from 'react-router-dom';
 
 function Account() {
+    const navigate = useNavigate();
+    const navigateToOrders = async () => {
+       navigate('/myorders');
+    }
+
+    const navigateToMenu = async () => {
+        navigate('/menu');
+    }
     
     return (
         <div className="content">
@@ -16,8 +25,8 @@ function Account() {
                 />
             </div>
             <div className="account-options">
-                <button className="account-button-menu">Týdenní Menu / Weekly Menu</button>
-                <button className="account-button-orders">Moje Objednávky / My Orders</button>
+                <button className="account-button-menu" onClick={navigateToMenu}>Týdenní Menu / Weekly Menu</button>
+                <button className="account-button-orders" onClick={navigateToOrders}>Moje Objednávky / My Orders</button>
             </div>
         </div>
     );

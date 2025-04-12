@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import './MyOrders.css'
+import { useNavigate } from 'react-router-dom'
 
 function MyOrders() {
+  const navigate = useNavigate();
+
+  const navigateBackToAccount = async () => {
+    navigate('/account');
+  }
   
   return (
     <>
       <div id='myOrders'>
         <div id='back'>
-          <button id='backButton'>ZPĚT / BACK</button>
+          <button id='backButton' onClick={navigateBackToAccount}>ZPĚT / BACK</button>
           <p id='email'>weber.dan@email.cz</p>
         </div>
         <br />
