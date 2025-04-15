@@ -16,6 +16,19 @@ p{
   color: #0071a9ff;
 }
 
+.button{
+  width: 150px;
+  background-color: #f17300ff;
+  color: white;
+  font-weight: bold;
+  border-style: none;
+  border-radius: 5px;
+  height: 40px;
+  margin: 10px;
+  border-style: solid;
+  border-color: #eac435ff;
+}
+
 
 #menu{
   width: 100%;

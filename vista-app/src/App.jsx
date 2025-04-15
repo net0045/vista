@@ -5,8 +5,9 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
-import Test from './Test';
 import MyOrders from './MyOrders';
+import Order from './Order';
+
 
 function App() {
   const [progress, setProgress] = useState(0);
@@ -57,8 +58,8 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/account" element={<Account />} />
       <Route path="/menu" element={<Menu />} />
-      <Route path="/test" element={<Test />} />
       <Route path="/myorders" element={<MyOrders />} />
+      <Route path="/order" element={<Order />} />
     </Routes>
   );
 }

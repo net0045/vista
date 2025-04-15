@@ -1,8 +1,23 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import './Menu.css'
+import { useNavigate } from 'react-router-dom'
 
 function Menu() {
+  //
+  const navigate = useNavigate();
+
+  const navigateBackToAccount = async () => 
+  {
+    navigate('/account');
+  }
+
+  const navigateToOrder = async () => 
+  {
+    navigate('/order');
+  }
+
+
   const [data, setData] = useState({ mains: [], soups: [] })
   const [dateRange, setDateRange] = useState({ from: '', to: '' })
 
@@ -51,8 +66,8 @@ function Menu() {
   return (
     <>
       <div id='menu'>
-        <p className='text'>VISTA</p>
-        <p className='text'>Objednání obědů</p>
+        <button className='button' onClick={navigateBackToAccount}>ZPĚT / BACK</button>
+        <button className='button' onClick={navigateToOrder}>OBJEDNAT / ORDER</button>
       </div>
 
       <div id='dateAndTime'>
@@ -60,12 +75,11 @@ function Menu() {
         <p className='dateTimeText'>|</p>
         <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
       </div>
-
       <p id='info'>
         Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena zahrnuje polévku dle denní nabídky. <br />
         Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.
       </p>
-
+      <p>JÍDLO LZE OBJEDNÁVAT DO 21:00 <br /> FOOD CAN BE ORDERED UNTIL 9:00 PM</p>
       <p className='nadpis'>Hlavní chody / Main courses</p>
       <div className='mainCourses'>
         {data.mains.map((meal, index) => (
@@ -94,4 +108,4 @@ function Menu() {
   )
 }
 
-export default Menu
+export default Menu;
