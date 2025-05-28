@@ -59,7 +59,7 @@ function Verify() {
                 const token = await createToken(payloadToken);
                 document.cookie = `authToken=${token}; path=/; secure; samesite=strict`; // Uložení tokenu do cookie
                 showMessage('Uživatel byl úspěšně ověřen.', 'success');
-                //setTimeout(() => navigate('/account'), 1000); //TODO: Přesměrování na vytvoření hesla a pak předělání loginu s JWT atd...Zde se musí vytvořit JWT token s emailem a verification statusem uživatele
+                setTimeout(() => navigate('/login'), 1000); //TODO: Přesměrování na vytvoření hesla a pak předělání loginu s JWT atd...Zde se musí vytvořit JWT token s emailem a verification statusem uživatele
             }
         } else {
             showMessage('Uživatel je již ověřen.', 'info');
