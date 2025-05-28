@@ -29,7 +29,7 @@ function App() {
 
       return () => clearInterval(interval); // bude se volat jen, pokud jsme byli na '/'
     }
-    // pokud nejsme na '/', nic se nevrací a není co rušit
+   
     return;
   }, [location.pathname, navigate]);
 
