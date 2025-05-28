@@ -7,6 +7,7 @@ import Account from './Account';
 import Menu from './Menu';
 import MyOrders from './MyOrders';
 import Order from './Order';
+import Verify from './Verify';
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
       <Route path="/menu" element={<Menu />} />
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/order" element={<Order />} />
+      <Route path="/verify" element={<Verify />} />
     </Routes>
   );
 }

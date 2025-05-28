@@ -2,7 +2,7 @@ import React, { useState, useEffect} from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
-import { getUserByEmail, isUserVerified } from './api/userApi';
+import { getUserByEmail, isUserVerified, saveVerifyCode } from './api/userApi';
 
 function Login() {
     const navigate = useNavigate();
@@ -39,10 +39,17 @@ function Login() {
             return;
         }
         
-        
         //TODO: Vygeneruj ověřovací kód
         const code = generateCode();
-        showMessage(`Ověřovací kód: ${code}`, 'success');
+        
+        if(code) {
+            const success_code = await saveVerifyCode(email, code)
+            if(success_code) {
+                showMessage('Ověřovací kód byl odeslán na tvůj email.', 'success');
+                setTimeout(() => navigate(`/verify?email=${email}`), 2000);
+            }
+        }
+        
     };
 
     // Automatické skrytí popupu
