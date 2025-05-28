@@ -1,0 +1,88 @@
+.message-popup {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+/* Typy zpráv */
+.message-popup.success {
+  background-color: #b2dfdbff; /* modrá */
+  color: #0071a9ff; 
+}
+
+.message-popup.error {
+  background-color: #f17300ff; /* červená */
+  color: #effaffff;
+}
+
+.message-popup.warning {
+  background-color: #eac435ff; 
+  color: #0071a9ff; 
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+}
+
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .logo-login{
+    height: 10rem;
+    margin-bottom: 20px; /* Space between logo and progress bar */
+    animation: glow 1s infinite alternate; /* Add glow animation */
+  }
+
+  .input-bar {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid;
+    border-color: #0071a9ff;
+    border-radius: 5px;
+    font-size: 1rem;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #0071a9ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #eac435ff;
+  }

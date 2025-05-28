@@ -9,6 +9,7 @@ lerna-debug.log*
 
 #keys
 .env
+node-email-backend/.env
 
 node_modules
 dist
