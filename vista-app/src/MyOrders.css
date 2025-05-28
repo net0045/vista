@@ -1,59 +1,109 @@
-#myOrders{
-  width: 100%;
+#myOrders {
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
   display: flex;
   flex-direction: column;
+  min-width: 300px;
 }
 
-#back{
-  width: 100%;
+#back {
   display: flex;
-  margin-top: 10px;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
-#backButton{
-  width: 150px;
+#backButton {
   background-color: #f17300ff;
   color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
   font-weight: bold;
-  border-style: none;
-  border-radius: 5px;
-  height: 40px;
-  margin-left: 10px;
+  font-size: 14px;
 }
 
-#email{
-  margin-right: 10px;
+
+#email {
+  font-size: 14px;
+  color: #0071a9ff;
   font-weight: bold;
 }
 
-#orders{
-  width: 100%;
+#orders {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  gap: 20px;
   align-items: center;
 }
 
-.order{
-  background-color: #0071a9ff;
-  height: 350px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-bottom-style: solid;
-  border-color: #f17300ff;
+.order {
+  background-color: #b2dfdbff;;
+  border-radius: 12px;
+  padding: 20px;
+  width: 260px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
+  text-align: center;
 }
 
+.qrCode {
+  margin-bottom: 15px;
+}
 
-.orderText{
+.orderInfo {
+  text-align: left;
+}
+
+.orderTitle {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+.orderDate {
+  font-size: 14px;
+  color: #006699;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #006699;
+}
+
+.orderMeal {
+  font-size: 14px;
+}
+
+.orderEmail {
+  font-size: 13px;
+}
+
+.emptyText {
+  font-size: 20px;
+  color: #777;
+  font-style: italic;
+  text-align: center;
+  
+}
+
+#menuButton{
+  background-color: #b2dfdbff;
+  color: #0071a9ff;
+  border: none;
+  padding: 10px 18px;
+  margin-top: 50px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  width: 150px;
+  height: 50px;
+}
+
+#warningText{
+  font-weight: bold;
   color: white;
-  font-size: 15px;
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.qrCode{
-  width: 230px;
+  background-color: red;
+  padding: 10px;
+  border-radius: 6px;
 }
