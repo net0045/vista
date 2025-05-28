@@ -57,6 +57,19 @@ export const saveVerifyCode = async (email: string, code: string): Promise<boole
     return true;
 }
 
+export const saveUserPassword = async (email: string, password: string): Promise<boolean> => {
+    const { error } = await supabase 
+        .from('User')
+        .update({ password })
+        .eq('email', email); 
+    
+    if (error) {
+        console.error('Chyba při ukládání hesla:', error.message);
+        return false;
+    }
+    return true;
+}
+
 /**
  * Vrací ověřovací kód pro daný email
  * @param email 
