@@ -72,7 +72,7 @@
   }
   
   .submit-button {
-    width: 90%;
+    width: 100%;
     padding: 10px;
     margin: 10px 0;
     background-color: #0071a9ff;
@@ -86,35 +86,3 @@
   .submit-button:hover {
     background-color: #eac435ff;
   }
-.input-wrapper-email {
-  position: relative;
-  width: 95%;
-  margin: 2px 0;
-  display: flex;
-  align-items: center;
-}
-.input-wrapper {
-  position: relative;
-  width: 95%;
-  margin: 2px 0;
-  display: flex;
-  align-items: center;
-}
-
-.input-wrapper .input-bar {
-  width: 100%;
-  padding-right: 40px; /* rezerva na očko */
-  padding-left: 10px;
-}
-
-.eye-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.2rem;
-  color: #0071a9ff;
-  cursor: pointer;
-  user-select: none;
-  line-height: 1;
-}

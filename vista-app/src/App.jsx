@@ -8,6 +8,8 @@ import Menu from './Menu';
 import MyOrders from './MyOrders';
 import Order from './Order';
 import QrView from './QrView';
+import Verify from './Verify';
+
 
 
 function App() {
@@ -30,7 +32,7 @@ function App() {
 
       return () => clearInterval(interval); // bude se volat jen, pokud jsme byli na '/'
     }
-    // pokud nejsme na '/', nic se nevrací a není co rušit
+   
     return;
   }, [location.pathname, navigate]);
 
@@ -61,7 +63,11 @@ function App() {
       <Route path="/menu" element={<Menu />} />
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/order" element={<Order />} />
+
       <Route path="/qr" element={<QrView />} />
+
+      <Route path="/verify" element={<Verify />} />
+
     </Routes>
   );
 }

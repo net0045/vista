@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Vlož vlastní klíče z https://app.supabase.com/project/_/settings/api
-const supabaseUrl = 'https://zxsvajhcstsrptvcpolx.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4c3Zhamhjc3RzcnB0dmNwb2x4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQzNTk0ODMsImV4cCI6MjA1OTkzNTQ4M30.u60kHlQAd0gP2P4GHDZyXqbe3Xq2FP2iXvZoJ5i5fcY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+
+if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Chybí Supabase URL nebo klíč! Zkontroluj .env soubor.');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+
+
