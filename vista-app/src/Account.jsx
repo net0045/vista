@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import './Account.css'; // Import Account-specific styles
 import { useNavigate } from 'react-router-dom';
 

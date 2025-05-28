@@ -1,0 +1,79 @@
+#block{
+  width: 100%;
+  display: flex;
+  align-items: start;
+}
+
+.backButton{
+  width: 150px;
+  background-color: #f17300ff;
+  color: white;
+  font-weight: bold;
+  border-style: none;
+  border-radius: 5px;
+  height: 40px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-style: solid;
+  border-color: #eac435ff;
+}
+
+
+
+#page{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nadpis{
+  font-weight: bold;
+  font-size: 17px;
+}
+
+#howManyCheck{
+  display: flex;
+  flex-direction: row;
+}
+
+.rb{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: ce;
+  height: 40px;
+}
+
+#whatMeal{
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.whatMenu{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input[type="text"] {
+  align-items: center;
+  width: 9px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+#orderButton{
+  width: 75%;
+  height: 50px;
+  background-color: #f17300ff;
+  color: white;
+  font-weight: bold;
+  border-style: none;
+  border-radius: 5px;
+  font-size: 20px;
+  margin-top: 50px;
+  border-style: solid;
+  border-color: #eac435ff;
+}
