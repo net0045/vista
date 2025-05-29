@@ -54,7 +54,7 @@ function QrView() {
   if (status === 'used') {
     return (
       <div className="qrCard">
-        <h2>⚠️ NUH UH</h2>
+        <h2>⚠️ Objednávka byla již potvrzena</h2>
         <img src="/images/used.png" alt="Potvrzeno" className="orderImage"/>
         <p><strong>Datum:</strong> {order?.date}</p>
         <p className="warningText">QR kód je možné ověřit pouze jednou denně.</p>
@@ -63,15 +63,28 @@ function QrView() {
   }
 
   return (
-    <div className="qrCard">
-      <h2>✅ Potvrzení objednávky</h2>
-      <img src="/images/success.png" alt="Potvrzeno" className="orderImage"/>
-      <p><strong>Datum:</strong> {order?.date}</p>
-      <p><strong>Menu 1:</strong> {order?.menu1}</p>
-      {order?.menu2 && <p><strong>Menu 2:</strong> {order.menu2}</p>}
-      <p><strong>E-mail:</strong> {order?.email}</p>
+  <div className="qrCard">
+    <h2>✅ Potvrzení objednávky</h2>
+    <img src="/images/success.png" alt="Potvrzeno" className="orderImage" />
+    <p><strong>Datum:</strong> {order?.date}</p>
+    <p><strong>Menu 1:</strong> {order?.menu1}</p>
+    {order?.menu2 && <p><strong>Menu 2:</strong> {order.menu2}</p>}
+    <p><strong>E-mail:</strong> {order?.email}</p>
+
+   
+    <div className="rainContainer">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <img
+          key={i}
+          src="/images/approved.png" 
+          alt=""
+          className="rainDrop"
+          style={{ left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 3}s` }}
+        />
+      ))}
     </div>
-  );
+  </div>
+);
 }
 
 export default QrView;
