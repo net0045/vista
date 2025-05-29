@@ -119,19 +119,3 @@ export const changeVerifiedStatus = async (email: string, status: boolean): Prom
     return true;
 }
 
-export const sendVerificationEmail = async (email: string, code: string): Promise<boolean> => {
-  try {
-    const res = await fetch('http://localhost:3000/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, code }),
-    });
-
-    return res.ok;
-  } catch (err) {
-    console.error('Chyba při odesílání emailu:', err);
-    return false;
-  }
-};

@@ -1,6 +1,6 @@
 export const sendEmail = async (email, code) => {
     try {
-        const res = await fetch("https://backend-vista.vercel.app/api/sendEmail", {
+        const res = await fetch("https://backend-vista-nbsnmts1w-stepans-projects-630a42fc.vercel.app/api/sendEmail", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
