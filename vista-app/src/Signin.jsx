@@ -3,7 +3,7 @@ import './Signin.css';
 import { useNavigate } from 'react-router-dom';
 import { getUserHashedPassword } from './api/userApi';
 import bcrypt from 'bcryptjs';
-import { createToken } from './lib/jwtHandler';
+import { createToken, getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 
 function Signin() {
     const navigate = useNavigate();
@@ -22,8 +22,12 @@ function Signin() {
 
     const handleSubmitLogin = async () => {
         if (!email || !password) {
-            showMessage('Vyplňte prosím všechny údaje.', 'error');
+            showMessage('Vyplňte prosím všechny údaje.', 'warning');
             return;
+        }
+
+        if (!email.includes('@')) {
+            showMessage('Zadejte platný email.', 'warning');
         }
 
         const storedUserHashedPassword = await getUserHashedPassword(email);
@@ -49,7 +53,7 @@ function Signin() {
                     navigate('/account');
                 }, 3000);
             } else {
-                showMessage('Nesprávné heslo. Zkuste to znovu.', 'warning');
+                showMessage('Nesprávné heslo nebo email. Zkuste to znovu.', 'warning');
             }
         } catch (err) {
             console.error('[HASH] Chyba při hashování hesla:', err.message);
@@ -57,6 +61,34 @@ function Signin() {
 
 
     };
+
+    // Kontrola tokenu při načtení
+        useEffect(() => {
+            const checkToken = async () => {
+                const token = getCookie('authToken');
+    
+                if (!token) return;
+    
+                const payload = await verifyToken(token, getSecretKey());
+    
+                if (!payload) {
+                    console.warn('[JWT] Žádný payload (token neplatný)');
+                    return;
+                }
+    
+                if (payload.email && payload.isPassword && payload.verified === true) {
+                        showMessage('Jste již přihlášeni. Přesměrování na váš účet.', 'info');
+                        setTimeout(() => {
+                            navigate('/account');
+                        }, 1500);
+                   
+                } else {
+                    console.warn('[JWT] Payload nemá platné údaje, vyžaduje přihlášení.');
+                }
+            };
+    
+            checkToken();
+        }, []);
 
     useEffect(() => {
         if (showPopup) {

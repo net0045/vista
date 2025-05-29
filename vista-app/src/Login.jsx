@@ -46,7 +46,7 @@ function Login() {
             const success = await saveUserPassword(email, hashedPassword);
             if (success) {
                 showMessage('Heslo bylo nastaveno.', 'success');
-                setTimeout(() => navigate('/account'), 1500);
+                setTimeout(() => navigate('/signin'), 1500); //Signin
             } else {
                 showMessage('Nepodařilo se uložit heslo.', 'error');
             }
@@ -70,8 +70,8 @@ function Login() {
         }
 
         if (user.verified) {
-            showMessage('Uživatel je již ověřen.', 'success');
-            setTimeout(() => navigate('/account'), 1000);
+            showMessage('Email je již ověřen. Můžeš se přihlásit!', 'success');
+            setTimeout(() => navigate('/signin'), 1000); //Signin
             return;
         }
 
@@ -142,7 +142,6 @@ function Login() {
 
             {isUserVerified ? (
                 <div className="form">
-
                     <input
                         className="input-bar"
                         type="email"
@@ -150,8 +149,6 @@ function Login() {
                         value={email}
                         disabled
                     />
-
-
                     <div className="input-wrapper">
                         <input
                             className="input-bar"
@@ -233,6 +230,9 @@ function Login() {
                         Potvrdit
                     </button>
                     <p style={{ color: 'white' }}>{message}</p>
+                    <p className="info-text">
+                        Máš ověřený účet? <a href="/signin">Zde</a> se můžeš přihlásit.
+                    </p>
                 </div>
             )}
 

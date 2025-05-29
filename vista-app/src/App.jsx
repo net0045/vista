@@ -11,7 +11,7 @@ import Order from './Order';
 import QrView from './QrView';
 import Verify from './Verify';
 import Signin from './Signin';
-
+import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
 
 
 function App() {
@@ -19,24 +19,53 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
+   useEffect(() => {
+    const checkToken = async () => {
+      const token = getCookie('authToken');
+
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const payload = await verifyToken(token, getSecretKey());
+      if (!payload || !payload.email) {
+        console.warn('[JWT] Neplatný token nebo chybějící email.');
+        navigate('/login');
+        return;
+      }
+
+      if (payload.verified !== true) {
+        console.log('[JWT] Email není verifikován.');
+        navigate('/login');
+        return;
+      }
+
+      if (!payload.isPassword) {
+        console.log('[JWT] Verifikován, ale není zadáno heslo.');
+        navigate('/signin');
+        return;
+      }
+
+      navigate('/account');
+    };
+
     if (location.pathname === '/') {
       const interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(interval);
-            navigate('/login');
+            checkToken();
             return 100;
           }
           return prev + 1;
         });
       }, 20);
 
-      return () => clearInterval(interval); // bude se volat jen, pokud jsme byli na '/'
+      return () => clearInterval(interval);
     }
-   
-    return;
   }, [location.pathname, navigate]);
+   
 
   return (
     <Routes>
@@ -65,7 +94,6 @@ function App() {
       <Route path="/menu" element={<Menu />} />
       <Route path="/myorders" element={<MyOrders />} />
       <Route path="/order" element={<Order />} />
-
       <Route path="/qr" element={<QrView />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
