@@ -10,6 +10,7 @@ import MyOrders from './MyOrders';
 import Order from './Order';
 import QrView from './QrView';
 import Verify from './Verify';
+import Signin from './Signin';
 
 
 
@@ -66,7 +67,7 @@ function App() {
       <Route path="/order" element={<Order />} />
 
       <Route path="/qr" element={<QrView />} />
-
+      <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
 
     </Routes>

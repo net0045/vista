@@ -142,15 +142,15 @@ function Login() {
 
             {isUserVerified ? (
                 <div className="form">
-                    <div className="input-wrapper-email">
-                        <input
-                            className="input-bar"
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            disabled
-                        />
-                    </div>
+
+                    <input
+                        className="input-bar"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        disabled
+                    />
+
 
                     <div className="input-wrapper">
                         <input

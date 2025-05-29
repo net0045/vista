@@ -70,6 +70,21 @@ export const saveUserPassword = async (email: string, password: string): Promise
     return true;
 }
 
+export const getUserHashedPassword = async (email: string): Promise<string | null> => {
+    const { data, error } = await supabase
+        .from('User')
+        .select('password')
+        .eq('email', email)
+        .single();
+    
+     if (error) {
+        console.error('Chyba při získávání Hesla uživatele', error.message);
+        return null;
+    }
+
+    return data?.password || null;
+}
+
 /**
  * Vrací ověřovací kód pro daný email
  * @param email 
