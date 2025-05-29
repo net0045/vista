@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import logo from './assets/logo-vista.png';
 import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
@@ -44,7 +45,7 @@ function App() {
           <div className="content">
             <div className="logo">
               <img
-                src="./src/assets/logo-vista.png"
+                src={logo}
                 alt="Logo studentské koleje Vista"
                 className="logo-image-vista"
               />
