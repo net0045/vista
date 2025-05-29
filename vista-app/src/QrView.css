@@ -22,15 +22,28 @@
   margin: 8px 0;
 }
 
+.menuSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.menuSection label {
+  margin-left: 1rem;
+  font-weight: bold;
+  color: black;
+}
+
 .rainContainer {
-  position: fixed; /* Přes celou obrazovku */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   pointer-events: none;
   overflow: hidden;
-  z-index: -1; /* nebo třeba 999, pokud chceš efekt NAD obsahem */
+  z-index: 0;
 }
 
 .rainDrop {
