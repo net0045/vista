@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { getUserByEmail, saveVerifyCode, saveUserPassword } from './api/userApi';
+import { sendEmail } from './api/emailApi';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import bcrypt from 'bcryptjs';
 
@@ -79,7 +80,7 @@ function Login() {
         const success_code = await saveVerifyCode(email, code);
 
         if (success_code) {
-            const sent = true; // simulace odeslání e-mailu
+            const sent = await sendEmail(email, code); // simulace odeslání e-mailu
             if (sent) {
                 showMessage('Ověřovací kód byl odeslán na tvůj email.', 'success');
                 setTimeout(() => navigate(`/verify?email=${email}`), 2000);
