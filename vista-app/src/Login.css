@@ -55,6 +55,11 @@
     width: 100%;
   }
 
+  .login-container {
+    width: 80%;
+    background-color: transparent; /* Light background color */
+  }
+
   .logo-login{
     height: 10rem;
     margin-bottom: 20px; /* Space between logo and progress bar */

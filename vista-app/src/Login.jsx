@@ -213,27 +213,36 @@ function Login() {
                             Vytvořit heslo
                         </button>
                     </div>
+                   
 
                     <p style={{ color: 'white' }}>{message}</p>
                 </div>
 
             ) : (
-                <div className="form">
-                    <input
-                        className="input-bar"
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button type="submit" className="submit-button" onClick={handleSubmit}>
-                        Potvrdit
-                    </button>
-                    <p style={{ color: 'white' }}>{message}</p>
-                    <p className="info-text">
-                        Máš ověřený účet? <a href="/signin">Zde</a> se můžeš přihlásit.
-                    </p>
+                <div className='login-container'>
+                     <div className="form">
+                        <input
+                            className="input-bar"
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <button type="submit" className="submit-button" onClick={handleSubmit}>
+                            Potvrdit
+                        </button>
+                        <p style={{ color: 'white' }}>{message}</p>
+                    </div>
+                    <div className='info-text-container'>
+                        <p className="info-text">
+                            Máš ověřený účet? <a href="/signin">Zde</a> se můžeš přihlásit.
+                        </p>
+                        <p className='info-text'>
+                            Zase nevíš co by sis dal? Mrkni sem na <a href="/menu">Menu</a> a vyber si z naší nabídky jídel.
+                        </p>
+                    </div>
                 </div>
+               
             )}
 
             {showPopup && (

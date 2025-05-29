@@ -51,7 +51,7 @@ function Signin() {
 
                 setTimeout(() => {
                     navigate('/account');
-                }, 3000);
+                }, 1500);
             } else {
                 showMessage('Nesprávné heslo nebo email. Zkuste to znovu.', 'warning');
             }

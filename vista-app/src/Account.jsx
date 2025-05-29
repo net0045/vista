@@ -1,12 +1,17 @@
 import React, { useState, useEffect} from 'react';
 import './Account.css'; // Import Account-specific styles
 import { useNavigate} from 'react-router-dom';
-import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
+import { getCookie, verifyToken, getSecretKey, deleteCookie } from './lib/jwtHandler';
 
 function Account() {
     const navigate = useNavigate();
     const [isUserVerified, setIsUserVerified] = useState(false);
     const [email, setEmail] = useState('');
+
+    const logout = () => {
+        deleteCookie('authToken'); 
+        navigate('/login');   
+    }
 
     const navigateToOrders = async () => {
        navigate('/myorders');
@@ -43,12 +48,15 @@ function Account() {
     
     return (
         <div className="content">
-             <div className="email-top">
-                <b>{email}</b>
+             <div className="header-bar">
+                <button className="logout-button" onClick={logout}>
+                    Odhlásit se / Logout
+                </button>
+                
             </div>
+            <b className="email-label">{email}</b>
 
             <div className="logo">
-                <h3>Vítej na stránce účtu!</h3>
                 <img
                     src="./src/assets/account-icon.png"
                     alt="Icon Account"

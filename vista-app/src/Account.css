@@ -24,19 +24,42 @@
   font-size: 1rem;
 }
 
-.email-top {
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
   position: absolute;
-  top: 30px;
-  right: 15px;
+  top: 10px;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.logout-button {
+  background-color:#eac435ff ;
+  border-radius: 10px;
+  padding: 10px;
+  border: #0071a9 solid 1px;
   color: #0071a9;
-  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.email-label {
+  color: #0071a9;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
 @media (min-width: 768px) {
-  .email-top {
+  .logout-button,
+  .email-label {
     font-size: 1rem;
   }
 }
+
 
 .account-button-menu {
   background-color: #0071a9ff;

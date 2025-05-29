@@ -11,6 +11,7 @@ import Order from './Order';
 import QrView from './QrView';
 import Verify from './Verify';
 import Signin from './Signin';
+import ProtectedRoute from './ProtectedRoute';
 import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
 
 
@@ -90,14 +91,14 @@ function App() {
         }
       />
       <Route path="/login" element={<Login />} />
-      <Route path="/account" element={<Account />} />
-      <Route path="/menu" element={<Menu />} />
-      <Route path="/myorders" element={<MyOrders />} />
-      <Route path="/order" element={<Order />} />
-      <Route path="/qr" element={<QrView />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
-
+      <Route path="/menu" element={<Menu/>} />
+      <Route path="/qr" element={<ProtectedRoute><QrView /></ProtectedRoute>} />
+      <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+      
+      <Route path="/myorders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+      <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
     </Routes>
   );
 }
