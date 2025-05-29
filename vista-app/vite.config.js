@@ -8,6 +8,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt'],
+      devOptions: {enabled: true},
       manifest: {
         name: 'Moje PWA',
         short_name: 'PWA',
