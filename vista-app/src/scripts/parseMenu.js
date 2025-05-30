@@ -1,4 +1,3 @@
-// utils/parseMenu.js
 import * as XLSX from 'xlsx';
 import { supabase } from '../lib/supabaseClient';
 
@@ -13,10 +12,13 @@ export const parseAndUploadMenu = async (file) => {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
+        // Přesný převod Excel datumu bez chyby -1 den
         const parseExcelDate = (serial) => {
           if (!serial || typeof serial !== 'number') return '';
-          const excelEpoch = new Date(1899, 11, 30);
-          return new Date(excelEpoch.getTime() + serial * 86400000).toISOString().split('T')[0];
+          const parsed = XLSX.SSF.parse_date_code(serial);
+          if (!parsed) return '';
+          const date = new Date(parsed.y, parsed.m - 1, parsed.d);
+          return date.toISOString().split('T')[0]; // formát YYYY-MM-DD
         };
 
         const mainDishes = [], soups = [], menu = [];
@@ -48,7 +50,7 @@ export const parseAndUploadMenu = async (file) => {
 
         const selectedMenu = menu[0];
         if (!selectedMenu) {
-          return reject('Menu nenalezeno v Excelu');
+          return reject('Menu nenalezeno v Excelu.');
         }
 
         const { data: menuInsert, error: menuError } = await supabase
@@ -57,7 +59,9 @@ export const parseAndUploadMenu = async (file) => {
           .select()
           .single();
 
-        if (menuError) return reject('Chyba při vkládání menu: ' + menuError.message);
+        if (menuError) {
+          return reject('Chyba při vkládání menu: ' + menuError.message);
+        }
 
         const foods = [...mainDishes, ...soups].map((f) => ({
           ...f,
@@ -66,9 +70,11 @@ export const parseAndUploadMenu = async (file) => {
 
         const { error: foodError } = await supabase.from('Food').insert(foods);
 
-        if (foodError) return reject('Chyba při vkládání položek: ' + foodError.message);
+        if (foodError) {
+          return reject('Chyba při vkládání položek: ' + foodError.message);
+        }
 
-        return resolve(`Vloženo ${foods.length} položek, menu ID ${menuInsert.id}`);
+        return resolve(`Vloženo ${foods.length} položek, Menu bylo vytvořeno.`);
       } catch (err) {
         return reject('Chyba při zpracování souboru: ' + err.message);
       }
