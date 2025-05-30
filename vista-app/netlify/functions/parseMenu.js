@@ -1,42 +1,130 @@
-import formidable from 'formidable';
-import fs from 'fs';
-import xlsx from 'xlsx';
+// netlify/functions/parseMenu.js
 import { supabase } from '../../src/lib/supabaseClient.js';
+import xlsx from 'xlsx';
+import path from 'path';
+import fs from 'fs';
+import formidable from 'formidable';
 
 export const config = {
   bodyParser: false,
 };
 
-export const handler = async (event, context) => {
-  return new Promise((resolve, reject) => {
-    const form = formidable({ multiples: false });
+export async function handler(event) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: 'Method Not Allowed' }),
+    };
+  }
 
+  const form = formidable({ multiples: false });
+
+  return new Promise((resolve, reject) => {
     form.parse(event, async (err, fields, files) => {
       if (err) {
-        return resolve({
+        resolve({
           statusCode: 500,
-          body: JSON.stringify({ message: 'Chyba při parsování formuláře' }),
+          body: JSON.stringify({ message: 'Formulář nešel zpracovat', detail: err.message }),
         });
+        return;
+      }
+
+      const file = files.file;
+      if (!file || !file.filepath) {
+        resolve({
+          statusCode: 400,
+          body: JSON.stringify({ message: 'Chybí soubor' }),
+        });
+        return;
       }
 
       try {
-        const file = files.file[0];
         const workbook = xlsx.readFile(file.filepath);
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const parseExcelDate = (serial) => {
+          if (!serial || typeof serial !== 'number') return '';
+          const excelEpoch = new Date(1899, 11, 30);
+          return new Date(excelEpoch.getTime() + serial * 86400000).toISOString().split('T')[0];
+        };
+
         const rows = xlsx.utils.sheet_to_json(sheet, { defval: '' });
+        const mainDishes = [], soups = [], menu = [];
 
-        // --- Sem vlož svoji logiku Supabase INSERT ---
+        rows.forEach((row) => {
+          const dateFrom = parseExcelDate(row['Od']);
+          const dateTo = parseExcelDate(row['Do']);
+          if (dateFrom && dateTo) menu.push({ dateFrom, dateTo });
 
-        return resolve({
-          statusCode: 200,
-          body: JSON.stringify({ message: 'Soubor zpracován' }),
+          if (row['Jidlo']) {
+            mainDishes.push({
+              item: row['Jidlo'],
+              cost: parseFloat(row['Cena']),
+              allergens: row['Alergen_Jidlo'],
+              issoup: false,
+              dayOfWeek: row['Cislo_dne'],
+            });
+          }
+          if (row['Polivka']) {
+            soups.push({
+              item: row['Polivka'],
+              cost: 0,
+              allergens: row['Alergen_Polivka'],
+              issoup: true,
+              dayOfWeek: row['Cislo_dne'],
+            });
+          }
         });
-      } catch (error) {
-        return resolve({
+
+        const selectedMenu = menu[0];
+        if (!selectedMenu) {
+          resolve({
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Menu nenalezeno v Excelu' }),
+          });
+          return;
+        }
+
+        const { data: menuInsert, error: menuError } = await supabase
+          .from('Menu')
+          .insert([{ datefrom: selectedMenu.dateFrom, dateto: selectedMenu.dateTo }])
+          .select()
+          .single();
+
+        if (menuError) {
+          resolve({
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Chyba pri vkládání menu', detail: menuError.message }),
+          });
+          return;
+        }
+
+        const foods = [...mainDishes, ...soups].map((f) => ({
+          ...f,
+          menuid: menuInsert.id,
+        }));
+
+        const { error: foodError } = await supabase.from('Food').insert(foods);
+
+        if (foodError) {
+          resolve({
+            statusCode: 500,
+            body: JSON.stringify({ message: 'Chyba pri vkládání polozek', detail: foodError.message }),
+          });
+          return;
+        }
+
+        resolve({
+          statusCode: 200,
+          body: JSON.stringify({
+            message: `Vloženo ${foods.length} polozek, menuId: ${menuInsert.id}`,
+          }),
+        });
+      } catch (e) {
+        resolve({
           statusCode: 500,
-          body: JSON.stringify({ message: 'Chyba při zpracování souboru', detail: error.message }),
+          body: JSON.stringify({ message: 'Chyba pri zpracování Excelu', error: e.message }),
         });
       }
     });
   });
-};
+}

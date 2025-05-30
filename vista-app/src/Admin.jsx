@@ -57,7 +57,7 @@ function Admin() {
       <div className="form">
         <input type="file" accept=".xlsx" onChange={handleFileChange} />
         <button className="submit-button" onClick={handleUpload} disabled={loading}>
-          {loading ? 'Nahrávám...' : 'Nahrát jídelníček'}
+          {loading ? 'Nahrávám...' : 'Nahrát Menu'}
         </button>
         {message && <p style={{ color: 'white', marginTop: '10px' }}>{message}</p>}
       </div>
