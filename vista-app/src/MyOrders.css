@@ -18,7 +18,7 @@
   color: white;
   font-weight: bold;
   border-style: none;
-  border-radius: 5px;
+  border-radius: 10px;
   height: 40px;
   border-style: solid;
   border-color: #eac435ff;
@@ -95,7 +95,7 @@
   border: none;
   padding: 10px 18px;
   margin-top: 50px;
-  border-radius: 6px;
+  border-radius: 10px;
   font-weight: bold;
   font-size: 14px;
   width: 150px;

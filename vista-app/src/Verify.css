@@ -78,7 +78,7 @@
     background-color: #0071a9ff;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 1rem;
     transition: background-color 0.3s ease;
   }
