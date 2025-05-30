@@ -55,6 +55,11 @@
     width: 100%;
   }
 
+  .login-container {
+    width: 80%;
+    background-color: transparent; /* Light background color */
+  }
+
   .logo-login{
     height: 10rem;
     margin-bottom: 20px; /* Space between logo and progress bar */
@@ -88,14 +93,14 @@
   }
 .input-wrapper-email {
   position: relative;
-  width: 95%;
+  width: 100%;
   margin: 2px 0;
   display: flex;
   align-items: center;
 }
 .input-wrapper {
   position: relative;
-  width: 95%;
+  width: 90%;
   margin: 2px 0;
   display: flex;
   align-items: center;

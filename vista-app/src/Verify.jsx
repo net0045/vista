@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Verify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from './lib/supabaseClient';
 import { getUserByEmail, isUserVerified, getVerifyCode, changeVerifiedStatus } from './api/userApi';
 import { createToken } from './lib/jwtHandler';
 

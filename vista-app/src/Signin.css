@@ -1,0 +1,25 @@
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 2px 0;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper .input-bar {
+  width: 100%;
+  padding-right: 40px; /* rezerva na očko */
+  padding-left: 10px;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #0071a9ff;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+}

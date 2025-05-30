@@ -8,6 +8,10 @@ export const getSecretKey = () => {
   return new TextEncoder().encode(secret); // ✅ každý volání nový encoder
 };
 
+export function deleteCookie(name) {
+  document.cookie = `${name}=; Max-Age=0; path=/; secure; samesite=strict`;
+}
+
 
 /**
  * Vytvoří JWT token

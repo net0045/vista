@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import { getUserByEmail, saveVerifyCode, saveUserPassword } from './api/userApi';
+import { sendEmail } from './api/emailApi';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import bcrypt from 'bcryptjs';
 
@@ -46,7 +47,7 @@ function Login() {
             const success = await saveUserPassword(email, hashedPassword);
             if (success) {
                 showMessage('Heslo bylo nastaveno.', 'success');
-                setTimeout(() => navigate('/account'), 1500);
+                setTimeout(() => navigate('/signin'), 1500); //Signin
             } else {
                 showMessage('Nepodařilo se uložit heslo.', 'error');
             }
@@ -70,8 +71,8 @@ function Login() {
         }
 
         if (user.verified) {
-            showMessage('Uživatel je již ověřen.', 'success');
-            setTimeout(() => navigate('/account'), 1000);
+            showMessage('Email je již ověřen. Můžeš se přihlásit!', 'success');
+            setTimeout(() => navigate('/signin'), 1000); //Signin
             return;
         }
 
@@ -79,7 +80,7 @@ function Login() {
         const success_code = await saveVerifyCode(email, code);
 
         if (success_code) {
-            const sent = true; // simulace odeslání e-mailu
+            const sent = true // simulace odeslání e-mailu, real....const sent = await sendEmail(email, code);
             if (sent) {
                 showMessage('Ověřovací kód byl odeslán na tvůj email.', 'success');
                 setTimeout(() => navigate(`/verify?email=${email}`), 2000);
@@ -142,16 +143,13 @@ function Login() {
 
             {isUserVerified ? (
                 <div className="form">
-                    <div className="input-wrapper-email">
-                        <input
-                            className="input-bar"
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            disabled
-                        />
-                    </div>
-
+                    <input
+                        className="input-bar"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        disabled
+                    />
                     <div className="input-wrapper">
                         <input
                             className="input-bar"
@@ -216,24 +214,36 @@ function Login() {
                             Vytvořit heslo
                         </button>
                     </div>
+                   
 
                     <p style={{ color: 'white' }}>{message}</p>
                 </div>
 
             ) : (
-                <div className="form">
-                    <input
-                        className="input-bar"
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button type="submit" className="submit-button" onClick={handleSubmit}>
-                        Potvrdit
-                    </button>
-                    <p style={{ color: 'white' }}>{message}</p>
+                <div className='login-container'>
+                     <div className="form">
+                        <input
+                            className="input-bar"
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <button type="submit" className="submit-button" onClick={handleSubmit}>
+                            Potvrdit
+                        </button>
+                        <p style={{ color: 'white' }}>{message}</p>
+                    </div>
+                    <div className='info-text-container'>
+                        <p className="info-text">
+                            Máš ověřený účet? <a href="/signin">Zde</a> se můžeš přihlásit.
+                        </p>
+                        <p className='info-text'>
+                            Zase nevíš co by sis dal? Mrkni sem na <a href="/menu">Menu</a> a vyber si z naší nabídky jídel.
+                        </p>
+                    </div>
                 </div>
+               
             )}
 
             {showPopup && (
