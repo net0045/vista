@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import './Admin.css'; 
-import { useNavigate } from 'react-router-dom';
+import './Admin.css';
+import { parseAndUploadMenu } from './scripts/parseMenu';
 
 function Admin() {
-  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,27 +17,14 @@ function Admin() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     setLoading(true);
     setMessage('');
 
     try {
-      const res = await fetch('/.netlify/functions/parseMenu', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        setMessage(`✅ ${result.message || 'Soubor úspěšně zpracován'}`);
-      } else {
-        setMessage(`❌ Chyba: ${result.message}`);
-      }
+      const result = await parseAndUploadMenu(file);
+      setMessage(`✅ ${result}`);
     } catch (err) {
-      setMessage('❌ Chyba při odesílání souboru');
+      setMessage(`❌ ${err}`);
     } finally {
       setLoading(false);
     }
@@ -47,11 +33,7 @@ function Admin() {
   return (
     <div className="content">
       <div className="logo">
-        <img
-          src="/images/excel.png"
-          alt="Excel logo"
-          className="account-icon"
-        />
+        <img src="/images/excel.png" alt="Excel logo" className="account-icon" />
       </div>
 
       <div className="excel-form">
