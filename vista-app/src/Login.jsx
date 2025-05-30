@@ -135,7 +135,7 @@ function Login() {
         <div className="content">
             <div className="logo-login">
                 <img
-                    src="./src/assets/logo-vista.png"
+                    src="/images/logo-vista.png"
                     alt="Logo studentské koleje Vista"
                     className="logo-image-vista"
                 />

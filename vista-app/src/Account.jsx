@@ -58,7 +58,7 @@ function Account() {
 
             <div className="logo">
                 <img
-                    src="./src/assets/account-icon.png"
+                    src="/images/account-icon.png"
                     alt="Icon Account"
                     className="account-icon"
                 />

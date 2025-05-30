@@ -111,7 +111,7 @@ function Signin() {
             <div className="logo">
                 <h3>Vítej na stránce účtu!</h3>
                 <img
-                    src="./src/assets/account-icon.png"
+                    src="/images/account-icon.png"
                     alt="Icon Account"
                     className="account-icon"
                 />
