@@ -1,7 +1,7 @@
-export type Order = {
+export type OrderObject = {
     id: string;
     userId: string;
-    eng_name: string;
-    datetime: string;
+    date: string;
+    dateOfOrder: Date;
     ispaid: boolean;
   };

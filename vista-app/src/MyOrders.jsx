@@ -26,7 +26,7 @@ function MyOrders() {
         </div>
         <br />
         <div id='orders'>
-          <p id='warningText'>QR KÓD LZE NASKENOVAT POUZE JEDNOU!<br/>(Ochrana proti zneužití)</p>
+          <p id='warningText'>NEZAŠKRTÁVEJTE VYZVEDNUTO!<br/>Přišli byste tím o objednávku</p>
           {orders.length === 0 ? (
             <div className="emptySection">
               <p className='emptyText'>Asi nemáš hlad, bo tu nic nemáš</p>
