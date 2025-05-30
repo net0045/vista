@@ -10,7 +10,7 @@
   color: white;
   font-weight: bold;
   border-style: none;
-  border-radius: 5px;
+  border-radius: 10px;
   height: 40px;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -58,8 +58,8 @@
 }
 
 input[type="text"] {
-  align-items: center;
-  width: 9px;
+  text-align: center;
+  width: 15px;
   padding: 10px;
   font-size: 16px;
 }
@@ -71,7 +71,7 @@ input[type="text"] {
   color: white;
   font-weight: bold;
   border-style: none;
-  border-radius: 5px;
+  border-radius: 10px;
   font-size: 20px;
   margin-top: 50px;
   border-style: solid;

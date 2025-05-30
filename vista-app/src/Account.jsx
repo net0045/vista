@@ -65,8 +65,8 @@ function Account() {
             </div>
             
             <div className="account-options">
-                <button className="account-button-menu" onClick={navigateToMenu}>Týdenní Menu / Weekly Menu</button>
-                <button className="account-button-orders" onClick={navigateToOrders}>Moje Objednávky / My Orders</button>
+                <button className="account-button-menu" onClick={navigateToMenu}>Týdenní Menu <br/> Weekly Menu</button>
+                <button className="account-button-orders" onClick={navigateToOrders}>Moje Objednávky <br/> My Orders</button>
             </div>
         </div>
     );
