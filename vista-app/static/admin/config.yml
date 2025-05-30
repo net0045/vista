@@ -1,0 +1,16 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "menu"
+    label: "Menu týdne"
+    files:
+      - label: "Excel jídelníčku"
+        name: "menu_excel"
+        file: "public/menu.xlsx"
+        fields:
+          - { label: "Jídelníček", name: "file", widget: "file", required: true }
