@@ -13,6 +13,7 @@ import Verify from './Verify';
 import Signin from './Signin';
 import ProtectedRoute from './ProtectedRoute';
 import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
+import Admin from './Admin';
 
 
 function App() {
@@ -91,6 +92,7 @@ function App() {
         }
       />
       <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={<Admin />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/menu" element={<Menu/>} />

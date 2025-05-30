@@ -4,11 +4,3 @@
 
 [functions]
   node_bundler = "esbuild"
-
-[functions."parseMenu"]
-  schedule = "0 12 * * 6" # každou sobotu ve 12:00
-
-[[redirects]]
-  from = "/admin/*"
-  to = "/admin/index.html"
-  status = 200
