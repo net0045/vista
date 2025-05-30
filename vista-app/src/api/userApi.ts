@@ -70,6 +70,21 @@ export const saveUserPassword = async (email: string, password: string): Promise
     return true;
 }
 
+export const getUserHashedPassword = async (email: string): Promise<string | null> => {
+    const { data, error } = await supabase
+        .from('User')
+        .select('password')
+        .eq('email', email)
+        .single();
+    
+     if (error) {
+        console.error('Chyba při získávání Hesla uživatele', error.message);
+        return null;
+    }
+
+    return data?.password || null;
+}
+
 /**
  * Vrací ověřovací kód pro daný email
  * @param email 
@@ -104,19 +119,3 @@ export const changeVerifiedStatus = async (email: string, status: boolean): Prom
     return true;
 }
 
-export const sendVerificationEmail = async (email: string, code: string): Promise<boolean> => {
-  try {
-    const res = await fetch('http://localhost:3000/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, code }),
-    });
-
-    return res.ok;
-  } catch (err) {
-    console.error('Chyba při odesílání emailu:', err);
-    return false;
-  }
-};
