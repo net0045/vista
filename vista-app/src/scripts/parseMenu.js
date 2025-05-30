@@ -1,6 +1,11 @@
 import * as XLSX from 'xlsx';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient.js';
 
+/**
+ * Parsuje Excel soubor a uloží data do Supabase.
+ * @param {File} file - Excel soubor z <input type="file" />
+ * @returns {Promise<string>} - Výsledek operace (nebo chyba).
+ */
 export const parseAndUploadMenu = async (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -12,46 +17,59 @@ export const parseAndUploadMenu = async (file) => {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-        // Přesný převod Excel datumu bez chyby -1 den
+        // Přesnější převod Excel datumu
         const parseExcelDate = (serial) => {
           if (!serial || typeof serial !== 'number') return '';
           const parsed = XLSX.SSF.parse_date_code(serial);
           if (!parsed) return '';
           const date = new Date(parsed.y, parsed.m - 1, parsed.d);
-          return date.toISOString().split('T')[0]; // formát YYYY-MM-DD
+          return date.toISOString().split('T')[0];
         };
 
-        const mainDishes = [], soups = [], menu = [];
+        const mainDishes = [];
+        const soups = [];
+        const menu = [];
 
         rows.forEach((row) => {
-          const dateFrom = parseExcelDate(row['Od']);
-          const dateTo = parseExcelDate(row['Do']);
-          if (dateFrom && dateTo) menu.push({ dateFrom, dateTo });
+          const dateRawFrom = row['Od'];
+          const dateRawTo = row['Do'];
+          const food = row['Jidlo'];
+          const foodPrice = row['Cena'];
+          const foodAllergens = row['Alergen_Jidlo'];
+          const soup = row['Polivka'];
+          const soupAllergens = row['Alergen_Polivka'];
+          const dayOfWeek = row['Cislo_dne'];
 
-          if (row['Jidlo']) {
+          const dateFrom = parseExcelDate(dateRawFrom);
+          const dateTo = parseExcelDate(dateRawTo);
+
+          if (dateFrom && dateTo) {
+            menu.push({ dateFrom, dateTo });
+          }
+
+          if (food) {
             mainDishes.push({
-              item: row['Jidlo'],
-              cost: parseFloat(row['Cena']),
-              allergens: row['Alergen_Jidlo'],
+              item: food,
+              cost: parseFloat(foodPrice),
+              allergens: foodAllergens,
               issoup: false,
-              dayOfWeek: row['Cislo_dne'],
+              dayOfWeek,
             });
           }
-          if (row['Polivka']) {
+
+          if (soup) {
             soups.push({
-              item: row['Polivka'],
+              item: soup,
               cost: 0,
-              allergens: row['Alergen_Polivka'],
+              allergens: soupAllergens,
               issoup: true,
-              dayOfWeek: row['Cislo_dne'],
+              dayOfWeek,
             });
           }
         });
 
         const selectedMenu = menu[0];
-        if (!selectedMenu) {
-          return reject('Menu nenalezeno v Excelu.');
-        }
+        if (!selectedMenu) return reject('Menu není k dispozici v Excelu.');
 
         const { data: menuInsert, error: menuError } = await supabase
           .from('Menu')
@@ -63,20 +81,22 @@ export const parseAndUploadMenu = async (file) => {
           return reject('Chyba při vkládání menu: ' + menuError.message);
         }
 
-        const foods = [...mainDishes, ...soups].map((f) => ({
+        const foodsWithMenuId = [...mainDishes, ...soups].map((f) => ({
           ...f,
           menuid: menuInsert.id,
         }));
 
-        const { error: foodError } = await supabase.from('Food').insert(foods);
+        const { error: foodError } = await supabase
+          .from('Food')
+          .insert(foodsWithMenuId);
 
         if (foodError) {
-          return reject('Chyba při vkládání položek: ' + foodError.message);
+          return reject('Chyba při vkládání jídel: ' + foodError.message);
         }
 
-        return resolve(`Vloženo ${foods.length} položek, Menu bylo vytvořeno.`);
+        resolve(`Vloženo ${foodsWithMenuId.length} položek do menu ID ${menuInsert.id}`);
       } catch (err) {
-        return reject('Chyba při zpracování souboru: ' + err.message);
+        reject('Chyba při zpracování souboru: ' + err.message);
       }
     };
 
