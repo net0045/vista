@@ -8,21 +8,40 @@ import { getCurrentMenuId, getFoodIdByNumberAndMenuID } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 
+function isOrderingDisabled() {
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
+
+  return (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
+}
+
 function getUpcomingWeekdays() {
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-  const dates = [];
+  const now = new Date();
+  const day = now.getDay();
+  const hour = now.getHours();
 
-  let start = new Date(today);
-  start.setHours(0, 0, 0, 0);
-
-  const currentTime = today.getHours();
-  if (currentTime >= 21) {
-    start.setDate(today.getDate() + 1);
+  // Zakázané období: čtvrtek 21:00 až neděle 15:00
+  const isAfterThursday21 = (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
+  if (isAfterThursday21) {
+    return [{
+      label: 'Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.',
+      date: null,
+      disabled: true
+    }];
   }
 
-  if (dayOfWeek === 6 || dayOfWeek === 0) {
-    const offset = 8 - dayOfWeek;
+  // Normální výpočet pracovních dnů
+  const dates = [];
+  let start = new Date(now);
+  start.setHours(0, 0, 0, 0);
+
+  if (hour >= 21) {
+    start.setDate(start.getDate() + 1);
+  }
+
+  if (start.getDay() === 6 || start.getDay() === 0) {
+    const offset = 8 - start.getDay(); // pondělí
     start.setDate(start.getDate() + offset);
   } else {
     start.setDate(start.getDate() + 1);
@@ -69,8 +88,10 @@ function Order() {
   const [value2, setValue2] = useState('');
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
+
   const [emailToken, setEmailToken] = useState('');
   const [user_Id, setUserId] = useState('');
+
 
   useEffect(() => {
     setDates(getUpcomingWeekdays());
@@ -134,11 +155,13 @@ function Order() {
       ispaid: false
     };
 
+
     const menuId = await getCurrentMenuId();
     if (!menuId) {
       console.error('Aktuální menu nebylo nalezeno.');
       return alert('Menu nebylo nalezeno.');
     }
+
 
     const foodsInOrder = [];
 
@@ -223,12 +246,16 @@ function Order() {
 
         <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
         <div id='whatDateRB'>
-          {dates.map((item, index) => (
-            <div key={index} className='rb'>
-              <input type="radio" name='day' />
-              <p style={{ fontSize: '18px' }}>{item.label}</p>
-            </div>
-          ))}
+          {dates.length === 1 && dates[0].disabled ? (
+            <p style={{ fontSize: '18px', fontStyle: 'italic', color: 'gray' }}>{dates[0].label}</p>
+            ) : (
+              dates.map((item, index) => (
+                <div key={index} className='rb'>
+                  <input type="radio" name='day' />
+                  <p style={{ fontSize: '18px' }}>{item.label}</p>
+                </div>
+              ))
+            )}
         </div>
 
         <div id='whatMeal'>
@@ -245,7 +272,7 @@ function Order() {
           )}
         </div>
 
-        <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>
+        <button id='orderButton' onClick={handleOrder} disabled={orderingDisabled} style={orderingDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>OBJEDNAT / ORDER</button>
       </div>
     </>
   );
