@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './Admin.css';
 import { parseAndUploadMenu } from './scripts/parseMenu';
 
 function Admin() {
