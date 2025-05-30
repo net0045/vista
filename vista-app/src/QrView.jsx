@@ -60,7 +60,8 @@ function QrView() {
     return (
       <div className="qrCard">
         <h2>Order not found</h2>
-        <p>Please check the QR code.</p>
+        <img src="/images/nuh.png" alt="Confirmed" className="orderImage" />
+        <p>Zkuste QR kód naskenovat znovu.</p>
       </div>
     );
   }

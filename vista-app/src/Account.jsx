@@ -52,10 +52,8 @@ function Account() {
                 <button className="logout-button" onClick={logout}>
                     Odhlásit se / Logout
                 </button>
-                
             </div>
             <b className="email-label">{email}</b>
-
             <div className="logo">
                 <img
                     src="/images/account-icon.png"
@@ -63,10 +61,9 @@ function Account() {
                     className="account-icon"
                 />
             </div>
-            
             <div className="account-options">
-                <button className="account-button-menu" onClick={navigateToMenu}>Týdenní Menu <br/> Weekly Menu</button>
-                <button className="account-button-orders" onClick={navigateToOrders}>Moje Objednávky <br/> My Orders</button>
+                <button className="account-button-menu" onClick={navigateToMenu}>Týdenní Menu <br/> <span className='weekly-menu-my-orders'>Weekly Menu</span></button>
+                <button className="account-button-orders" onClick={navigateToOrders}>Moje Objednávky <br/> <span className='weekly-menu-my-orders'>My Orders</span></button>
             </div>
         </div>
     );

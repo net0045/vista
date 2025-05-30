@@ -19,17 +19,7 @@ function isOrderingDisabled() {
 function getUpcomingWeekdays() {
   const now = new Date();
   const day = now.getDay();
-  const hour = now.getHours();
-
-  // Zakázané období: čtvrtek 21:00 až neděle 15:00
-  const isAfterThursday21 = (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
-  if (isAfterThursday21) {
-    return [{
-      label: 'Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.',
-      date: null,
-      disabled: true
-    }];
-  }
+  const hour = now.getHours(); 
 
   // Normální výpočet pracovních dnů
   const dates = [];
@@ -91,10 +81,11 @@ function Order() {
 
   const [emailToken, setEmailToken] = useState('');
   const [user_Id, setUserId] = useState('');
-
+  const [orderingDisabled, setOrderingDisabled] = useState(false);
 
   useEffect(() => {
     setDates(getUpcomingWeekdays());
+    setOrderingDisabled(isOrderingDisabled());
   }, []);
 
   // Kontrola tokenu při načtení
@@ -219,7 +210,7 @@ function Order() {
         foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
         `E-mail: ${newOrder.email}`;
 
-      qrViewOrder.qrText = `http://localhost:5173/qr?id=${orderId}`;
+      qrViewOrder.qrText = `${window.location.origin}/qr?id=${orderId}`;
       qrViewOrder.qrContent = qrContent;
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));
@@ -239,40 +230,45 @@ function Order() {
       </div>
 
       <div id='page'>
-        <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
-        <div id='howManyCheck'>
-          <input style={{ marginLeft: '20px' }} type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} /> <p style={{ fontSize: '18px' }}>Ano / Yes</p>
-        </div>
+        {orderingDisabled ? (
+          <p style={{ fontSize: '18px', color: 'gray', fontStyle: 'italic' }}>
+            <br /><br />Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.<br /><br />
+            Orders are currently closed. Try again after Sunday 3 PM.
+          </p>
+        ) : (
+          <>
+            <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
+            <div id='howManyCheck'>
+              <input style={{ marginLeft: '20px' }} type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} /> <p style={{ fontSize: '18px' }}>Ano / Yes</p>
+            </div>
 
-        <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
-        <div id='whatDateRB'>
-          {dates.length === 1 && dates[0].disabled ? (
-            <p style={{ fontSize: '18px', fontStyle: 'italic', color: 'gray' }}>{dates[0].label}</p>
-            ) : (
-              dates.map((item, index) => (
+            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
+            <div id='whatDateRB'>
+              {dates.map((item, index) => (
                 <div key={index} className='rb'>
                   <input type="radio" name='day' />
                   <p style={{ fontSize: '18px' }}>{item.label}</p>
                 </div>
-              ))
-            )}
-        </div>
-
-        <div id='whatMeal'>
-          <div className='whatMenu'>
-            <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
-            <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
-          </div>
-
-          {checked === true && (
-            <div className='whatMenu'>
-              <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
-              <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
+              ))}
             </div>
-          )}
-        </div>
 
-        <button id='orderButton' onClick={handleOrder} disabled={orderingDisabled} style={orderingDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>OBJEDNAT / ORDER</button>
+            <div id='whatMeal'>
+              <div className='whatMenu'>
+                <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
+                <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
+              </div>
+
+              {checked === true && (
+                <div className='whatMenu'>
+                  <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
+                  <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
+                </div>
+              )}
+            </div>
+
+            <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>
+          </>
+        )}
       </div>
     </>
   );

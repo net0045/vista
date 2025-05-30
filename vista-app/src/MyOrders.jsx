@@ -26,7 +26,7 @@ function MyOrders() {
         </div>
         <br />
         <div id='orders'>
-          <p id='warningText'>NEZAŠKRTÁVEJTE VYZVEDNUTO!<br/>Přišli byste tím o objednávku</p>
+          <p id='warningText'>NEZAŠKRTÁVEJTE VYZVEDNUTO!<br/>Přišli byste tím o objednávku<br/><br/>DO NOT CHECK "VYZVEDNUTO"!<br/>You would lose your order.</p>
           {orders.length === 0 ? (
             <div className="emptySection">
               <p className='emptyText'>Asi nemáš hlad, bo tu nic nemáš</p>
@@ -39,12 +39,12 @@ function MyOrders() {
                 <QRCodeCanvas className='qrCode' value={order.qrText} size={160} level="H" />
                 <div className='orderInfo'>
                   <p className='orderTitle'>Objednávka:</p>
-                  <p className='orderDate'>Datum: <span className='highlight'>{order.date}</span></p>
-                  <p className='orderMeal'>Menu 1: <span className='highlight'>{order.menu1}</span></p>
+                  <p className='orderDate'><span className='highlight'>Datum: </span>{order.date}</p>
+                  <p className='orderMeal'><span className='highlight'>Menu 1: </span>{order.menu1}</p>
                   {order.menu2 && (
-                    <p className='orderMeal'>Menu 2: <span className='highlight'>{order.menu2}</span></p>
+                    <p className='orderMeal'><span className='highlight'>Menu 2: </span>{order.menu2}</p>
                   )}
-                  <p className='orderEmail'>E-mail: <span className='highlight'>{order.email}</span></p>
+                  <p className='orderEmail'><span className='highlight'>E-mail: </span>{order.email}</p>
                 </div>
               </div>
             ))
