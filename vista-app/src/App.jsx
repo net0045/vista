@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import logo from './assets/logo-vista.png';
+import logo from '/images/logo-vista.png';
 import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
