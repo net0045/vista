@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'robots.txt'],
       devOptions: {enabled: true},
       manifest: {
-        name: 'Moje PWA',
+        name: 'Vista Food Ordering',
         short_name: 'PWA',
         start_url: '/',
         display: 'standalone',
