@@ -37,6 +37,7 @@ export const createToken = async (payload) => {
 export const verifyToken = async (token, secretKeyBytes) => {
     try {
         const { payload } = await jwtVerify(token, secretKeyBytes);
+        //console.log('[verifyToken] SECRET:', token);
         return payload;
     } catch (err) {
         console.warn('[verifyToken] Neplatný nebo expirovaný token:', err.message);

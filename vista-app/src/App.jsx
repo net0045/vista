@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import logo from './assets/logo-vista.png';
+import logo from '/images/logo-vista.png';
 import Login from './Login';
 import Account from './Account';
 import Menu from './Menu';
@@ -13,6 +13,7 @@ import Verify from './Verify';
 import Signin from './Signin';
 import ProtectedRoute from './ProtectedRoute';
 import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
+import Admin from './Admin';
 
 
 function App() {
@@ -91,6 +92,7 @@ function App() {
         }
       />
       <Route path="/login" element={<Login />} />
+      <Route path="/admin" element={<Admin />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/menu" element={<Menu/>} />

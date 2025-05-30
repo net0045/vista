@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Signin.css';
 import { useNavigate } from 'react-router-dom';
-import { getUserHashedPassword } from './api/userApi';
+import { getUserByEmail, getUserHashedPassword } from './api/userApi';
 import bcrypt from 'bcryptjs';
 import { createToken, getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 
@@ -13,6 +13,7 @@ function Signin() {
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
     const [showPopup, setShowPopup] = useState(false);
+    const [user, setUser] = useState('');
 
     const showMessage = (text, type = 'info') => {
         setMessage(text);
@@ -38,9 +39,14 @@ function Signin() {
 
         try {
             const isMatch = await bcrypt.compare(password, storedUserHashedPassword);
+            const userData = await getUserByEmail(email);
+            if (userData) {
+                setUser(userData);
+            }
 
             if (isMatch) {
                 const payloadToken = {
+                    userId: userData.id,
                     email: email,
                     verified: true, 
                     isPassword: true, 
@@ -105,7 +111,7 @@ function Signin() {
             <div className="logo">
                 <h3>Vítej na stránce účtu!</h3>
                 <img
-                    src="./src/assets/account-icon.png"
+                    src="/images/account-icon.png"
                     alt="Icon Account"
                     className="account-icon"
                 />

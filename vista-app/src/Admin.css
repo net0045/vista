@@ -1,0 +1,80 @@
+/* Kontejner */
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.excelogo img {
+  width: 100px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Formulář */
+.excelform {
+  background: #000037;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Input */
+.excelform input[type="file"] {
+  display: block;
+  margin: 0 auto 20px;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: #0071a9ff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.excelform input[type="file"]:hover {
+  background-color: #10b981;
+}
+
+/* Tlačítko */
+.excelBtnSubmit {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  background-color: #10b981; /* zelená */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.excelBtnSubmit:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.excelBtnSubmit:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Zpráva */
+.excelform p {
+  font-size: 14px;
+  margin-top: 15px;
+  color: #374151;
+}

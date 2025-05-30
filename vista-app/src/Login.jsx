@@ -80,7 +80,7 @@ function Login() {
         const success_code = await saveVerifyCode(email, code);
 
         if (success_code) {
-            const sent = true // simulace odeslání e-mailu, real....const sent = await sendEmail(email, code);
+            const sent = await sendEmail(email, code);
             if (sent) {
                 showMessage('Ověřovací kód byl odeslán na tvůj email.', 'success');
                 setTimeout(() => navigate(`/verify?email=${email}`), 2000);
@@ -135,7 +135,7 @@ function Login() {
         <div className="content">
             <div className="logo-login">
                 <img
-                    src="./src/assets/logo-vista.png"
+                    src="/images/logo-vista.png"
                     alt="Logo studentské koleje Vista"
                     className="logo-image-vista"
                 />
