@@ -2,9 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Admin</title>
+    <title>Vista CMS</title>
     <script src="https://unpkg.com/netlify-cms@^2.10.0/dist/netlify-cms.js"></script>
   </head>
   <body>
+    <!-- Tohle je kriticky důležité: -->
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script>
+      CMS.init();
+    </script>
   </body>
 </html>
