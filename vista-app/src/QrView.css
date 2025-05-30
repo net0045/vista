@@ -2,11 +2,14 @@
   max-width: 400px;
   margin: 50px auto;
   padding: 30px;
-  background: white;
+  background: transparent;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0,0,0,0.1);
   font-family: 'Segoe UI', sans-serif;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .qrCard h2 {
@@ -17,4 +20,47 @@
 .qrCard p {
   font-size: 16px;
   margin: 8px 0;
+}
+
+.menuSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.menuSection label {
+  margin-left: 1rem;
+  font-weight: bold;
+  color: black;
+}
+
+.rainContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.rainDrop {
+  position: absolute;
+  top: -50px;
+  width: 30px;
+  height: 30px;
+  animation: fall 3s linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
 }

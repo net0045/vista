@@ -9,10 +9,11 @@ function QrView() {
 
   const [status, setStatus] = useState('loading');
   const [order, setOrder] = useState(null);
+  const [pickedMenus, setPickedMenus] = useState({ menu1: false, menu2: false });
 
-  const todayKey = `used-${id}-${new Date().toISOString().slice(0, 10)}`;
+  const menu1Key = `picked-${id}-menu1`;
+  const menu2Key = `picked-${id}-menu2`;
 
-  // Najdeme objednávku a zjistíme, jestli byla použita
   useEffect(() => {
     const orders = JSON.parse(localStorage.getItem('orders')) || [];
     const found = orders.find(o => o.id.toString() === id);
@@ -24,29 +25,42 @@ function QrView() {
 
     setOrder(found);
 
-    const alreadyUsedToday = localStorage.getItem(todayKey);
-    if (alreadyUsedToday) {
-      setStatus('used');
-    } else {
-      setStatus('valid'); // použijeme až v dalším kroku
-    }
+    const picked1 = localStorage.getItem(menu1Key) === 'true';
+    const picked2 = localStorage.getItem(menu2Key) === 'true';
+
+    setPickedMenus({ menu1: picked1, menu2: picked2 });
+
+    const allPicked = !found.menu2 ? picked1 : picked1 && picked2;
+    setStatus(allPicked ? 'used' : 'valid');
   }, [id]);
 
-  // Označíme QR jako použité AŽ PO zobrazení
   useEffect(() => {
     if (status === 'valid') {
-      localStorage.setItem(todayKey, 'true');
+      const audio = new Audio('/success.mp3');
+      audio.play().catch(e => {
+        console.warn('Nepodařilo se přehrát zvuk:', e);
+      });
     }
-  }, [status, todayKey]);
+  }, [status]);
 
-  // Různé stavy výstupu
+  const handleCheckboxChange = (menuKey) => {
+    const updated = { ...pickedMenus, [menuKey]: true };
+    localStorage.setItem(`picked-${id}-${menuKey}`, 'true');
+    setPickedMenus(updated);
+
+    const allPicked = !order?.menu2 ? updated.menu1 : updated.menu1 && updated.menu2;
+    if (allPicked) {
+      setStatus('used');
+    }
+  };
+
   if (status === 'loading') return null;
 
   if (status === 'notfound') {
     return (
       <div className="qrCard">
-        <h2>Objednávka nenalezena</h2>
-        <p>Zkontrolujte prosím QR kód.</p>
+        <h2>Order not found</h2>
+        <p>Please check the QR code.</p>
       </div>
     );
   }
@@ -54,10 +68,9 @@ function QrView() {
   if (status === 'used') {
     return (
       <div className="qrCard">
-        <h2>⚠️ NUH UH</h2>
-        <img src="/images/used.png" alt="Potvrzeno" className="orderImage"/>
-        <p><strong>Datum:</strong> {order?.date}</p>
-        <p className="warningText">QR kód je možné ověřit pouze jednou denně.</p>
+        <h2>✅ Objednávka byla již vyzvednuta</h2>
+        <img src="/images/collected.png" alt="Confirmed" className="orderImage" />
+        <p><strong>Date:</strong> {order?.date}</p>
       </div>
     );
   }
@@ -65,11 +78,51 @@ function QrView() {
   return (
     <div className="qrCard">
       <h2>✅ Potvrzení objednávky</h2>
-      <img src="/images/success.png" alt="Potvrzeno" className="orderImage"/>
-      <p><strong>Datum:</strong> {order?.date}</p>
-      <p><strong>Menu 1:</strong> {order?.menu1}</p>
-      {order?.menu2 && <p><strong>Menu 2:</strong> {order.menu2}</p>}
-      <p><strong>E-mail:</strong> {order?.email}</p>
+      <img src="/images/success.png" alt="Confirmed" className="orderImage" />
+      <p><strong>Date:</strong> {order?.date}</p>
+
+      {!pickedMenus.menu1 && (
+        <div className="menuSection">
+          <p><strong>{order?.menu1}</strong></p>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() => handleCheckboxChange('menu1')}
+            />
+            Vyzvednuto
+          </label>
+        </div>
+      )}
+
+      {!pickedMenus.menu2 && order?.menu2 && (
+        <div className="menuSection">
+          <p><strong>{order?.menu2}</strong></p>
+          <label>
+            <input
+              type="checkbox"
+              onChange={() => handleCheckboxChange('menu2')}
+            />
+            Vyzvednuto
+          </label>
+        </div>
+      )}
+
+      <p><strong>Email:</strong> {order?.email}</p>
+
+      <div className="rainContainer">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <img
+            key={i}
+            src="/images/approved.png"
+            alt=""
+            className="rainDrop"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
