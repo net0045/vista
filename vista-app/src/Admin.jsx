@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Admin.css'; 
 import { parseAndUploadMenu } from './scripts/parseMenu';
 
 function Admin() {
@@ -30,14 +31,14 @@ function Admin() {
   };
 
   return (
-    <div className="content">
-      <div className="logo">
+    <div className="admin-container">
+      <div className="excelogo">
         <img src="/images/excel.png" alt="Excel logo" className="account-icon" />
       </div>
 
-      <div className="excel-form">
+      <div className="excelform">
         <input type="file" accept=".xlsx" onChange={handleFileChange} />
-        <button className="excel-btn-submit" onClick={handleUpload} disabled={loading}>
+        <button className="excelBtnSubmit" onClick={handleUpload} disabled={loading}>
           {loading ? 'Nahrávám...' : 'Nahrát Menu'}
         </button>
         {message && <p style={{ color: 'white', marginTop: '10px' }}>{message}</p>}
