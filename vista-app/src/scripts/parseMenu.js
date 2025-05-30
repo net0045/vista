@@ -23,6 +23,7 @@ export const parseAndUploadMenu = async (file) => {
           const parsed = XLSX.SSF.parse_date_code(serial);
           if (!parsed) return '';
           const date = new Date(parsed.y, parsed.m - 1, parsed.d);
+          date.setDate(date.getDate() + 1); // přičtení 1 dne, bo parser jebe 
           return date.toISOString().split('T')[0];
         };
 
