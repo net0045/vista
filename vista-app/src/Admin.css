@@ -21,7 +21,7 @@
   100% { transform: translateY(0); }
 }
 
-.form {
+.form-excel {
   background-color: #2a2a40;
   padding: 30px 40px;
   border-radius: 12px;
@@ -31,7 +31,7 @@
   align-items: center;
 }
 
-.form input[type="file"] {
+.form-excel input[type="file"] {
   margin-bottom: 20px;
   background-color: #444;
   color: #ccc;
@@ -41,7 +41,7 @@
   width: 100%;
 }
 
-.submit-button {
+.submit-button-excel {
   background-color: #3dbf87;
   color: #fff;
   padding: 12px 30px;
