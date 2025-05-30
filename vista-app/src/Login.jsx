@@ -80,7 +80,7 @@ function Login() {
         const success_code = await saveVerifyCode(email, code);
 
         if (success_code) {
-            const sent = true // simulace odeslání e-mailu, real....const sent = await sendEmail(email, code);
+            const sent = await sendEmail(email, code);
             if (sent) {
                 showMessage('Ověřovací kód byl odeslán na tvůj email.', 'success');
                 setTimeout(() => navigate(`/verify?email=${email}`), 2000);
