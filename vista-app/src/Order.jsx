@@ -13,7 +13,7 @@ function isOrderingDisabled() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5  || day ===6 || (day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5  ||  (day === 0 && hour < 15);
 }
 
 function getUpcomingWeekdays() {

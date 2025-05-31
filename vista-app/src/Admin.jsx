@@ -1,19 +1,27 @@
 import React, { useState } from 'react';
 import './Admin.css'; 
+import { useNavigate } from 'react-router-dom';
 import { parseAndUploadMenu } from './scripts/parseMenu';
+import { uploadUsersFromExcel } from './scripts/uploadUsersFromExcel';
 
 function Admin() {
-  const [file, setFile] = useState(null);
+  const navigate = useNavigate();
+  const [menuFile, setMenuFile] = useState(null);
+  const [userFile, setUserFile] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+  const handleMenuChange = (e) => {
+    setMenuFile(e.target.files[0]);
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      setMessage('Prosím vyber soubor.');
+  const handleUserChange = (e) => {
+    setUserFile(e.target.files[0]);
+  };
+
+  const handleUploadMenu = async () => {
+    if (!menuFile) {
+      setMessage('Prosím vyber soubor s menu.');
       return;
     }
 
@@ -21,28 +29,67 @@ function Admin() {
     setMessage('');
 
     try {
-      const result = await parseAndUploadMenu(file);
-      setMessage(`✅ ${result}`);
+      const result = await parseAndUploadMenu(menuFile);
+      setMessage(`✅ Menu: ${result}`);
     } catch (err) {
-      setMessage(`❌ ${err}`);
+      setMessage(`❌ Menu: ${err}`);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleUploadUsers = async () => {
+    if (!userFile) {
+      setMessage('Prosím vyber soubor s uživateli.');
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const result = await uploadUsersFromExcel(userFile);
+      setMessage(`✅ Uživatele: ${result}`);
+    } catch (err) {
+      setMessage(`❌ Uživatele: ${err}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goBack = () => {
+    navigate('/account');
+  };
+
   return (
     <div className="admin-container">
-      <div className="excelogo">
-        <img src="/images/excel.png" alt="Excel logo" className="account-icon" />
+      <div className="top-bar">
+        <button onClick={goBack}>ZPĚT</button>
       </div>
 
-      <div className="excelform">
-        <input type="file" accept=".xlsx" onChange={handleFileChange} />
-        <button className="excelBtnSubmit" onClick={handleUpload} disabled={loading}>
-          {loading ? 'Nahrávám...' : 'Nahrát Menu'}
-        </button>
-        {message && <p style={{ color: 'white', marginTop: '10px' }}>{message}</p>}
+      <div className="logo-wrapper">
+        <img src="/images/excel.png" alt="Excel logo" className="excel-logo" />
       </div>
+
+      <div className="content-row">
+        <div className="excelform">
+          <h3>Nahrát menu (.xlsx)</h3>
+          <input type="file" accept=".xlsx" onChange={handleMenuChange} />
+          <button className="excelBtnSubmit" onClick={handleUploadMenu} disabled={loading}>
+            {loading ? 'Nahrávám...' : 'Nahrát Menu'}
+          </button>
+        </div>
+
+        <div className="excelform">
+          <h3>Nahrát seznam uživatelů (.xlsx)</h3>
+          <input type="file" accept=".xlsx" onChange={handleUserChange} />
+          <button className="excelBtnSubmit" onClick={handleUploadUsers} disabled={loading}>
+            {loading ? 'Nahrávám...' : 'Nahrát E-maily'}
+          </button>
+        </div>
+      </div>
+
+      {message && <p style={{ color: 'black', marginTop: '20px' }}>{message}</p>}
     </div>
   );
 }
