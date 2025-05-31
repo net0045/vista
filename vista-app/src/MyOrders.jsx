@@ -2,19 +2,30 @@ import { useEffect, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import './MyOrders.css';
 import { useNavigate } from 'react-router-dom';
-
-function extractLine(text, lineNumber) {
-  const lines = text.split('\n');
-  return lines[lineNumber] || '';
-}
+import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 
 function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("orders")) || [];
     setOrders(stored);
+  }, []);
+
+  useEffect(() => {
+    const fetchEmail = async () => {
+      const token = getCookie('authToken');
+      if (!token) return;
+
+      const payload = await verifyToken(token, getSecretKey());
+      if (payload?.email) {
+        setEmail(payload.email);
+      }
+    };
+
+    fetchEmail();
   }, []);
 
   return (
@@ -22,7 +33,7 @@ function MyOrders() {
       <div id='myOrders'>
         <div id='back'>
           <button id='backButton' onClick={() => navigate('/account')}>ZPĚT / BACK</button>
-          <p id='email'>weber.dan@email.cz</p>
+          <p id='email'>{email}</p>
         </div>
         <br />
         <div id='orders'>

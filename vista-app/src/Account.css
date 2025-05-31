@@ -1,25 +1,17 @@
 .account-options {
   display: flex;
-  /* Enable flexbox */
   flex-direction: column;
-  /* Stack items vertically */
   justify-content: center;
-  /* Center items vertically */
   align-items: center;
-  /* Center items horizontally */
   gap: 10px;
-  /* Add spacing between buttons */
   width: 100%;
-  /* Optional: Adjust width */
 }
 
 .account-button-menu,
 .account-button-orders {
-  width: 100%;
-  /* Adjust button width */
+  width: 75%;
   padding: 10px;
   margin: 5px 0;
-  /* Optional: Add vertical spacing */
   border-radius: 10px;
   font-size: 1rem;
 }
@@ -53,6 +45,8 @@
   font-weight: bold;
 }
 
+
+
 @media (min-width: 768px) {
   .logout-button,
   .email-label {
@@ -65,15 +59,18 @@
   background-color: #0071a9ff;
   color: #b2dfdbff;
   border: 1px solid #b2dfdbff;
+  font-weight: bold;
 }
 
 .account-button-orders {
   background-color: #b2dfdbff;
   color: #0071a9ff;
   border: 1px solid #0071a9ff;
+    font-weight: bold;
 }
 
 .weekly-menu-my-orders{
   font-style: italic;
   color: grey;
+  font-weight: normal;
 }

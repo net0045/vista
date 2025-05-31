@@ -1,171 +1,146 @@
-#root {
-  text-align: center;
-}
-
-body{
+/* GLOBAL RESET & BASE */
+body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: white;
+  color: #333;
 }
 
-p{
+p {
   font-size: 14px;
-  color: #0071a9ff;
+  color: #0071a9;
 }
 
-.button{
-  width: 150px;
-  background-color: #f17300ff;
+/* BUTTONS */
+.button {
+  padding: 10px 20px;
+  background-color: #f17300;
   color: white;
+  border: 2px solid #eac435;
+  border-radius: 12px;
   font-weight: bold;
-  border-style: none;
-  border-radius: 10px;
-  height: 40px;
+  cursor: pointer;
   margin: 10px;
-  border-style: solid;
-  border-color: #eac435ff;
+  transition: 0.2s ease-in-out;
 }
 
+.button:hover {
+  background-color: #e86c00;
+}
 
-#menu{
+/* HEADER BAR */
+#menu {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 10px 0px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.text{
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#dateAndTime{
+/* DATE & TIME */
+#dateAndTime {
   display: flex;
-  justify-content: space-between;
-  background-color: #0071a9ff;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  background-color: #0071a9;
+  padding: 10px;
+  color: white;
+  font-weight: bold;
+}
+
+.dateTimeText {
+  font-size: 12px;
   color: white;
 }
 
-.dateTime{
+#info {
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+  margin: 15px;
+}
+
+.nadpis {
+  font-size: 18px;
   font-weight: bold;
+  color: #1e3a5f;
+  margin-top: 20px;
 }
 
-.dateTimeText{
-  color: white;
-  padding-left: 10px;
-  padding-right: 10px;
-  font-size: 10px;
-  font-weight: bold;
-}
-
-#info{
-  font-size: 10px;
-  color: gray;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.nadpis{
-  font-weight: bold;
-  font-size: 17px;
-}
-
-
-.mainCourses{
+/* MEAL LISTS */
+.mainCourses, .soups {
+  margin: 0 15px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-.option{
+.option, .soupOption {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top-style: solid;
-  border-color: black;
-  border-width: 1px;
+  padding: 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.number{
-  padding-left: 10px;
+.number, .soupDay {
   font-weight: bold;
+  color: #0071a9;
+  width: 80px;
+  text-align: left;
 }
 
-.meal{
-  max-width: 75%;
+.meal, .soupDescription {
+  flex-grow: 1;
+  text-align: left;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #222;
 }
 
-.mealDescription{
-  color: black;
-  font-size: 11px;
-}
-
-.price{
-  padding-right: 10px;
+.price {
   font-weight: bold;
+  color: #f17300;
+  width: 60px;
+  text-align: right;
 }
 
-.soups{
-  display: flex;
-  flex-direction: column;
-}
-
-.soupOption{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-top-style: solid;
-  border-color: black;
-  border-width: 1px;
-}
-
-.soupDay{
-  font-weight: bold;
-  padding-left: 10px;
-}
-
-.soupDescription{
-  color: black;
-  font-size: 11px;
-  padding-right: 10px;
-  max-width: 50%;
-}
-
-
-.lastOption{
-  border-bottom-style: solid;
-  border-color: black;
-  border-width: 1px;
-}
+/* ALLERGENS */
 .allergens {
-  padding: 0.5rem;
-  font-size: 10px;
-  color: #444;
+  margin: 20px;
+  padding: 15px;
+  background-color: #e6f2f8;
+  border-radius: 10px;
+  font-size: 12px;
   text-align: center;
 }
 
 .allergen-heading {
-  color: #0052cc;
-  font-size: 13px;
-  margin-bottom: 0.5rem;
+  color: #0071a9ff;
+  font-size: 14px;
+  margin-bottom: 10px;
   font-weight: 600;
 }
 
 .allergen-list {
-  margin-bottom: 1.5rem;
-  line-height: 1.8;
+  line-height: 1.6;
 }
 
 .allergen-list span {
-  display: inline;
+  display: inline-block;
   margin-right: 6px;
+  color: #333;
 }
 
-.allergen-list-en {
-  color: #444;
-}
 .allergen-list-en em {
   color: #007399;
 }
