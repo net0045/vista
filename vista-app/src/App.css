@@ -24,7 +24,7 @@
 
 
 .progress-bar-container {
-  width: 100%; /* Adjust width as needed */
+  width: 70%; /* Adjust width as needed */
   height: 10px;
   background-color: #ccc;
   border-radius: 5px;
