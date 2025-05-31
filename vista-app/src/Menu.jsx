@@ -15,7 +15,6 @@ function Menu() {
   const [data, setData] = useState({ mains: [], soups: [] });
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
 
-// Kontrola tokenu při načtení
  useEffect(() => {
     const checkToken = async () => {
       const token = getCookie('authToken');
@@ -65,9 +64,7 @@ function Menu() {
         <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
       </div>
 
-      <p id='info'>
-        Kterékoliv z jídel lze objednat každý den v průběhu týdne...
-      </p>
+      <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</p>
 
       <p className='nadpis'>Hlavní chody / Main courses</p>
       <div className='mainCourses'>

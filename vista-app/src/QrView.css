@@ -1,10 +1,10 @@
 .qrCard {
   max-width: 400px;
-  margin: 50px auto;
+  margin-top: 10px;
   padding: 30px;
-  background: transparent;
+  background-color: #b2dfdbff;
   border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  box-shadow: 0 0 20px rgba(0,0,0,1);
   font-family: 'Segoe UI', sans-serif;
   text-align: center;
   display: flex;
@@ -14,7 +14,7 @@
 
 .qrCard h2 {
   margin-bottom: 20px;
-  color: #007bff;
+  color: black;
 }
 
 .qrCard p {

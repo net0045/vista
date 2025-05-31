@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Order.css';
+import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
+import { v4 as uuidv4 } from 'uuid';
+import { storeOrder, storeFoodsInOrder } from './api/orderApi';
+import { getCurrentMenuId, getFoodIdByNumberAndMenuID } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 
@@ -15,17 +19,7 @@ function isOrderingDisabled() {
 function getUpcomingWeekdays() {
   const now = new Date();
   const day = now.getDay();
-  const hour = now.getHours();
-
-  // Zakázané období: čtvrtek 21:00 až neděle 15:00
-  const isAfterThursday21 = (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
-  if (isAfterThursday21) {
-    return [{
-      label: 'Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.',
-      date: null,
-      disabled: true
-    }];
-  }
+  const hour = now.getHours(); 
 
   // Normální výpočet pracovních dnů
   const dates = [];
@@ -66,17 +60,59 @@ function dayNameEN(index) {
   return en[index];
 }
 
+async function storeDataToDatabase(order, foodsInOrder) {
+  const successOrderStorage = await storeOrder(order);
+  if (!successOrderStorage) {
+    throw new Error('Chyba při ukládání objednávky.');
+  }
+
+  const successFoodsStorage = await storeFoodsInOrder(foodsInOrder);
+  if (!successFoodsStorage) {
+    throw new Error('Chyba při ukládání jídel v objednávce.');
+  }
+}
+
 function Order() {
   const navigate = useNavigate();
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
-  const orderingDisabled = isOrderingDisabled();
+
+  const [emailToken, setEmailToken] = useState('');
+  const [user_Id, setUserId] = useState('');
+  const [orderingDisabled, setOrderingDisabled] = useState(false);
 
   useEffect(() => {
     setDates(getUpcomingWeekdays());
+    setOrderingDisabled(isOrderingDisabled());
   }, []);
+
+  // Kontrola tokenu při načtení
+  useEffect(() => {
+    const checkToken = async () => {
+      const token = getCookie('authToken');
+
+      if (!token) return;
+
+      const payload = await verifyToken(token, getSecretKey());
+
+      if (!payload) {
+        console.warn('[JWT] Žádný payload (token neplatný)');
+        return;
+      }
+
+      if (payload.email && payload.verified && payload.userId) {
+        setEmailToken(payload.email);
+        setUserId(payload.userId);
+      } else {
+        console.warn('[JWT] Payload nemá email nebo verified');
+      }
+    };
+
+    checkToken();
+  }, []);
+
 
   const handleChange1 = (e) => {
     const val = e.target.value;
@@ -92,33 +128,99 @@ function Order() {
     }
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     const selectedDate = document.querySelector('input[name="day"]:checked');
     if (!selectedDate) return alert("Vyberte datum objednávky.");
     if (!value1) return alert("Zadejte aspoň jedno číslo jídla.");
 
-    const email = 'weber.dan@email.cz';
+    const user_email = emailToken;
     const dateText = selectedDate.nextSibling.textContent;
-
-    const orderId = Date.now(); // jednoduché unikátní ID
-
+    const orderId = uuidv4();
 
     const newOrder = {
       id: orderId,
       date: dateText,
-      menu1: value1,
-      menu2: checked ? value2 : null,
-      email: email,
+      dateOfOrder: new Date(),
+      userId: user_Id,
+      email: user_email,
+      ispaid: false
     };
-    const qrContent = `Objednávka:\nDatum: ${newOrder.date}\nMenu 1: ${newOrder.menu1}\n${newOrder.menu2 ? `Menu 2: ${newOrder.menu2}\n` : ''}E-mail: ${newOrder.email}`;
 
-    newOrder.qrText = `https://ephemeral-kleicha-80352a.netlify.app/qr?id=${orderId}`;
 
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    localStorage.setItem('orders', JSON.stringify([...orders, newOrder]));
+    const menuId = await getCurrentMenuId();
+    if (!menuId) {
+      console.error('Aktuální menu nebylo nalezeno.');
+      return alert('Menu nebylo nalezeno.');
+    }
 
-    alert('Objednávka byla uložena.');
-    navigate('/myorders');
+
+    const foodsInOrder = [];
+
+    if (checked) {
+      const foodId1 = await getFoodIdByNumberAndMenuID(value1, menuId);
+      const foodId2 = await getFoodIdByNumberAndMenuID(value2, menuId);
+
+      if (foodId1 && foodId2) {
+        foodsInOrder.push(
+          {
+            id: uuidv4(),
+            foodId: foodId1,
+            orderId,
+            mealNumber: value1,
+          },
+          {
+            id: uuidv4(),
+            foodId: foodId2,
+            orderId,
+            mealNumber: value2,
+          }
+        );
+      } else {
+        return alert('Nepodařilo se načíst jídla podle menu.');
+      }
+    } else {
+      const foodId1 = await getFoodIdByNumberAndMenuID(value1, menuId);
+      if (foodId1) {
+        foodsInOrder.push({
+          id: uuidv4(),
+          foodId: foodId1,
+          orderId,
+          mealNumber: value1,
+        });
+      } else {
+        return alert('Nepodařilo se najít vybrané jídlo.');
+      }
+    }
+
+    try {
+      await storeDataToDatabase(newOrder, foodsInOrder);
+
+      //záznam pro QrView
+      const qrViewOrder = {
+        id: newOrder.id,
+        date: newOrder.date,
+        menu1: value1,
+        menu2: checked ? value2 : null,
+        email: newOrder.email,
+      };
+
+      // QR info (pro případné vykreslení QR obsahu i odkazu)
+      const qrContent =
+        `Objednávka:\nDatum: ${newOrder.date}\n` +
+        foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
+        `E-mail: ${newOrder.email}`;
+
+      qrViewOrder.qrText = `${window.location.origin}/qr?id=${orderId}`;
+      qrViewOrder.qrContent = qrContent;
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));
+
+      alert('Objednávka byla uložena.');
+      navigate('/myorders');
+    } catch (err) {
+      console.error('Chyba při ukládání do databáze:', err);
+      alert('Ukládání selhalo. Zkuste to prosím znovu.');
+    }
   };
 
   return (
@@ -128,40 +230,45 @@ function Order() {
       </div>
 
       <div id='page'>
-        <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
-        <div id='howManyCheck'>
-          <input style={{marginLeft: '20px'}} type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} /> <p style={{fontSize: '18px'}}>Ano / Yes</p>
-        </div>
+        {orderingDisabled ? (
+          <p style={{ fontSize: '18px', color: 'gray', fontStyle: 'italic' }}>
+            <br /><br />Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.<br /><br />
+            Orders are currently closed. Try again after Sunday 3 PM.
+          </p>
+        ) : (
+          <>
+            <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
+            <div id='howManyCheck'>
+              <input style={{ marginLeft: '20px' }} type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} /> <p style={{ fontSize: '18px' }}>Ano / Yes</p>
+            </div>
 
-        <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
-        <div id='whatDateRB'>
-          {dates.length === 1 && dates[0].disabled ? (
-            <p style={{ fontSize: '18px', fontStyle: 'italic', color: 'gray' }}>{dates[0].label}</p>
-            ) : (
-              dates.map((item, index) => (
+            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
+            <div id='whatDateRB'>
+              {dates.map((item, index) => (
                 <div key={index} className='rb'>
                   <input type="radio" name='day' />
                   <p style={{ fontSize: '18px' }}>{item.label}</p>
                 </div>
-              ))
-            )}
-        </div>
-
-        <div id='whatMeal'>
-          <div className='whatMenu'>
-            <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
-            <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
-          </div>
-
-          {checked === true && (
-            <div className='whatMenu'>
-              <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
-              <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
+              ))}
             </div>
-          )}
-        </div>
 
-        <button id='orderButton' onClick={handleOrder} disabled={orderingDisabled} style={orderingDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>OBJEDNAT / ORDER</button>
+            <div id='whatMeal'>
+              <div className='whatMenu'>
+                <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
+                <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
+              </div>
+
+              {checked === true && (
+                <div className='whatMenu'>
+                  <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
+                  <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
+                </div>
+              )}
+            </div>
+
+            <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>
+          </>
+        )}
       </div>
     </>
   );
