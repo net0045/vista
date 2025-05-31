@@ -103,6 +103,7 @@ p{
 
 .price{
   padding-right: 10px;
+  font-weight: bold;
 }
 
 .soups{
@@ -137,4 +138,34 @@ p{
   border-bottom-style: solid;
   border-color: black;
   border-width: 1px;
+}
+.allergens {
+  padding: 0.5rem;
+  font-size: 10px;
+  color: #444;
+  text-align: center;
+}
+
+.allergen-heading {
+  color: #0052cc;
+  font-size: 13px;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.allergen-list {
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+}
+
+.allergen-list span {
+  display: inline;
+  margin-right: 6px;
+}
+
+.allergen-list-en {
+  color: #444;
+}
+.allergen-list-en em {
+  color: #007399;
 }

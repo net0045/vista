@@ -59,7 +59,7 @@ function QrView() {
   if (status === 'notfound') {
     return (
       <div className="qrCard">
-        <h2>Order not found</h2>
+        <h2>Objednávka nenalezena</h2>
         <img src="/images/nuh.png" alt="Confirmed" className="orderImage" />
         <p>Zkuste QR kód naskenovat znovu.</p>
       </div>

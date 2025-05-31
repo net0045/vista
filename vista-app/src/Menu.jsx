@@ -4,6 +4,7 @@ import './Menu.css'
 import { useNavigate } from 'react-router-dom'
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { fetchMenuWithFoods } from './api/foodApi'; 
+import { fetchAllergens } from './api/foodApi'; 
 
 function formatDateCz(dateStr) {
   if (!dateStr) return '';
@@ -24,6 +25,7 @@ function Menu() {
   const [tokenOk, setTokenOk] = useState(false);
   const [data, setData] = useState({ mains: [], soups: [] });
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
+  const [allergens, setAllergens] = useState([]);
 
  useEffect(() => {
     const checkToken = async () => {
@@ -43,30 +45,30 @@ function Menu() {
   const loadMenu = async () => {
     try {
       const now = new Date();
-      const currentDay = now.getDay(); // 0 = neděle
+      const currentDay = now.getDay();
       const currentHour = now.getHours();
 
       let baseDate = new Date(now);
-      
-      // Pokud je neděle a čas >= 15:00 → příští týden
+
       if (currentDay === 0 && currentHour >= 15) {
-        baseDate.setDate(baseDate.getDate() + 1); // posuň na pondělí příštího týdne
+        baseDate.setDate(baseDate.getDate() + 1);
       }
 
-      // Zjisti pondělí daného týdne
-      const day = baseDate.getDay(); // 0 = neděle, 1 = pondělí, ...
+      const day = baseDate.getDay();
       const monday = new Date(baseDate);
-      monday.setDate(baseDate.getDate() - ((day + 6) % 7)); // posun na pondělí
-
+      monday.setDate(baseDate.getDate() - ((day + 6) % 7));
       const friday = new Date(monday);
-      friday.setDate(monday.getDate() + 4); // posun na pátek
+      friday.setDate(monday.getDate() + 4);
 
       const from = monday.toISOString().split('T')[0];
       const to = friday.toISOString().split('T')[0];
 
       const { data } = await fetchMenuWithFoods();
+      const allergensData = await fetchAllergens();
+
       setDateRange({ from, to });
       setData(data);
+      setAllergens(allergensData);
     } catch (err) {
       console.error(err.message);
     }
@@ -106,7 +108,12 @@ function Menu() {
           <div className={`option ${index === data.mains.length - 1 ? 'lastOption' : ''}`} key={meal.id}>
             <p className='number'>{index + 1}.</p>
             <div className='meal'>
-              <p className='mealDescription'>{meal.item}</p>
+              <p className='mealDescription'>
+                {meal.item}
+                {meal.allergens && meal.allergens.trim() !== '' && (
+                  <span style={{ fontStyle: 'italic', color: '#666' }}> ({meal.allergens})</span>
+                )}
+              </p>
             </div>
             <p className='price'>{meal.cost}Kč</p>
           </div>
@@ -120,10 +127,36 @@ function Menu() {
             <p className='soupDay'>
               {['Pondělí / Monday', 'Úterý / Tuesday', 'Středa / Wednesday', 'Čtvrtek / Thursday', 'Pátek / Friday'][index] || 'Další den'}
             </p>
-            <p className='soupDescription'>{soup.item}</p>
+            <p className='soupDescription'>
+              {soup.item}
+              {soup.allergens && soup.allergens.trim() !== '' && (
+                <span style={{ fontStyle: 'italic', color: '#666' }}> ({soup.allergens})</span>
+              )}
+            </p>
           </div>
         ))}
       </div>
+     {allergens.length > 0 && (
+      <div id="allergens" className="allergens">
+        <h3 className="allergen-heading">Alergeny</h3>
+        <div className="allergen-list">
+          {allergens.map((a, i) => (
+            <span key={a.number}>
+              <strong>{a.number}</strong> – {a.name}{i !== allergens.length - 1 && ', '}
+            </span>
+          ))}
+        </div>
+
+        <h3 className="allergen-heading">Allergens</h3>
+        <div className="allergen-list allergen-list-en">
+          {allergens.map((a, i) => (
+            <span key={a.number}>
+              <strong>{a.number}</strong> – <em>{a.eng_name}</em>{i !== allergens.length - 1 && ', '}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
     </>
   );
 }

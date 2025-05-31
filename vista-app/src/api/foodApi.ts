@@ -90,6 +90,16 @@ export async function fetchCurrentWeekMenuWithFoods() {
   };
 }
 
+export async function fetchAllergens() {
+  const { data, error } = await supabase
+    .from('Allergen')
+    .select('*')
+    .order('number', { ascending: true }); 
+
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchMenuWithFoods() {
   // Získání nejnovějšího menu
   const { data: menus, error: menuError } = await supabase
