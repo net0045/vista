@@ -238,9 +238,9 @@ function Login() {
                         <p className="info-text">
                             Máš ověřený účet? <a href="/signin">ZDE</a> se můžeš přihlásit.
                         </p>
-                        {/*<p className='info-text'>
-                            Zase nevíš co by sis dal? Mrkni sem na <a href="/menu">Menu</a> a vyber si z naší nabídky jídel.
-                        </p>*/}
+                        <p className='info-text'>
+                            Klikni <a href="/menu">SEM</a> jestli se chceš rychle podívat na menu.
+                        </p>
                     </div>
                 </div>
                
