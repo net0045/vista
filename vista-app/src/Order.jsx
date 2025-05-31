@@ -13,7 +13,7 @@ function isOrderingDisabled() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5  || (day === 0 && hour < 15);
 }
 
 function getUpcomingWeekdays() {
@@ -131,7 +131,10 @@ function Order() {
   const handleOrder = async () => {
     const selectedDate = document.querySelector('input[name="day"]:checked');
     if (!selectedDate) return alert("Vyberte datum objednávky.");
-    if (!value1) return alert("Zadejte aspoň jedno číslo jídla.");
+    if (!value1) return alert("Zadejte číslo prvního jídla.");
+    if (checked && !value2) {
+      return alert("Zadejte číslo druhého jídla.");
+    }
 
     const user_email = emailToken;
     const dateText = selectedDate.nextSibling.textContent;
@@ -239,7 +242,7 @@ function Order() {
           <>
             <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
             <div id='howManyCheck'>
-              <input style={{ marginLeft: '20px' }} type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} /> <p style={{ fontSize: '18px' }}>Ano / Yes</p>
+              <input type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} />Ano / Yes
             </div>
 
             <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
@@ -247,7 +250,7 @@ function Order() {
               {dates.map((item, index) => (
                 <div key={index} className='rb'>
                   <input type="radio" name='day' />
-                  <p style={{ fontSize: '18px' }}>{item.label}</p>
+                  <p style={{ fontSize: '18px', color:'#f17300ff' }}>{item.label}</p>
                 </div>
               ))}
             </div>

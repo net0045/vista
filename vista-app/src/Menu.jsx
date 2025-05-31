@@ -5,6 +5,16 @@ import { useNavigate } from 'react-router-dom'
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { fetchMenuWithFoods } from './api/foodApi'; 
 
+function formatDateCz(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  });
+}
+
 function Menu() {
   const navigate = useNavigate();
 
@@ -30,18 +40,40 @@ function Menu() {
   }, []);
 
   useEffect(() => {
-    const loadMenu = async () => {
-      try {
-        const { dateRange, data } = await fetchMenuWithFoods();
-        setDateRange(dateRange);
-        setData(data);
-      } catch (err) {
-        console.error(err.message);
-      }
-    };
+  const loadMenu = async () => {
+    try {
+      const now = new Date();
+      const currentDay = now.getDay(); // 0 = neděle
+      const currentHour = now.getHours();
 
-    loadMenu();
-  }, []);
+      let baseDate = new Date(now);
+      
+      // Pokud je neděle a čas >= 15:00 → příští týden
+      if (currentDay === 0 && currentHour >= 15) {
+        baseDate.setDate(baseDate.getDate() + 1); // posuň na pondělí příštího týdne
+      }
+
+      // Zjisti pondělí daného týdne
+      const day = baseDate.getDay(); // 0 = neděle, 1 = pondělí, ...
+      const monday = new Date(baseDate);
+      monday.setDate(baseDate.getDate() - ((day + 6) % 7)); // posun na pondělí
+
+      const friday = new Date(monday);
+      friday.setDate(monday.getDate() + 4); // posun na pátek
+
+      const from = monday.toISOString().split('T')[0];
+      const to = friday.toISOString().split('T')[0];
+
+      const { data } = await fetchMenuWithFoods();
+      setDateRange({ from, to });
+      setData(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  loadMenu();
+}, []);
 
   return (
     <>
@@ -59,7 +91,9 @@ function Menu() {
       </div>
 
       <div id='dateAndTime'>
-        <p className='dateTimeText'>{dateRange.from} - {dateRange.to}</p>
+        <p className='dateTimeText'>
+          {formatDateCz(dateRange.from)} - {formatDateCz(dateRange.to)}
+        </p>
         <p className='dateTimeText'>|</p>
         <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
       </div>

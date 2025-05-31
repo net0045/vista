@@ -14,6 +14,7 @@
   height: 40px;
   margin-top: 10px;
   margin-bottom: 10px;
+  margin-left: 10px;
   border-style: solid;
   border-color: #eac435ff;
 }
@@ -35,13 +36,13 @@
 #howManyCheck{
   display: flex;
   flex-direction: row;
+  color: #0071a9ff;
 }
 
 .rb{
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: ce;
   height: 40px;
 }
 
@@ -59,9 +60,18 @@
 
 input[type="text"] {
   text-align: center;
-  width: 15px;
+  width: 20px;
   padding: 10px;
-  font-size: 16px;
+  font-size: 20px;
+  border-radius: 10px;
+}
+
+input[type="radio"] {
+  accent-color: #ff6600;
+}
+
+input[type="checkbox"] {
+  accent-color: #ff6600;
 }
 
 #orderButton{
