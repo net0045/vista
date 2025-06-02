@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { supabase } from './lib/supabaseClient'
 import './Menu.css'
 import { useNavigate } from 'react-router-dom'
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
-import { fetchMenuWithFoods } from './api/foodApi'; 
-import { fetchAllergens } from './api/foodApi'; 
+import { fetchCurrentWeekMenuWithFoods, fetchAllergens } from './api/foodApi'; 
 
 function formatDateCz(dateStr) {
   if (!dateStr) return '';
@@ -26,6 +24,7 @@ function Menu() {
   const [data, setData] = useState({ mains: [], soups: [] });
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
   const [allergens, setAllergens] = useState([]);
+  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
     const checkToken = async () => {
@@ -42,40 +41,51 @@ function Menu() {
   }, []);
 
   useEffect(() => {
-  const loadMenu = async () => {
-    try {
-      const now = new Date();
-      const currentDay = now.getDay();
-      const currentHour = now.getHours();
+    const loadMenu = async () => {
+      try {
+        const now = new Date();
+        const currentDay = now.getDay();
+        const currentHour = now.getHours();
 
-      let baseDate = new Date(now);
+        let baseDate = new Date(now);
 
-      if (currentDay === 0 && currentHour >= 15) {
-        baseDate.setDate(baseDate.getDate() + 1);
+        if (currentDay === 0 && currentHour >= 15) {
+          baseDate.setDate(baseDate.getDate() + 1);
+        }
+
+        const day = baseDate.getDay();
+        const monday = new Date(baseDate);
+        monday.setDate(baseDate.getDate() - ((day + 6) % 7));
+        const friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+
+        const from = monday.toISOString().split('T')[0];
+        const to = friday.toISOString().split('T')[0];
+
+        const { data } = await fetchCurrentWeekMenuWithFoods();
+        const allergensData = await fetchAllergens();
+
+        setDateRange({ from, to });
+        setData(data);
+        setAllergens(allergensData);
+      } catch (err) {
+        console.error(err.message);
+      } finally {
+        setLoading(false); 
       }
+    };
 
-      const day = baseDate.getDay();
-      const monday = new Date(baseDate);
-      monday.setDate(baseDate.getDate() - ((day + 6) % 7));
-      const friday = new Date(monday);
-      friday.setDate(monday.getDate() + 4);
+    loadMenu();
+  }, []);
 
-      const from = monday.toISOString().split('T')[0];
-      const to = friday.toISOString().split('T')[0];
-
-      const { data } = await fetchMenuWithFoods();
-      const allergensData = await fetchAllergens();
-
-      setDateRange({ from, to });
-      setData(data);
-      setAllergens(allergensData);
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  loadMenu();
-}, []);
+  if (loading) {
+    return (
+      <div className="loadingSection">
+        <p className='loadingText'>Načítám menu...</p>
+        <img src="images/loading.gif" alt="Načítání..." className="loading-img" />
+      </div>
+    );
+  }
 
   return (
     <>
