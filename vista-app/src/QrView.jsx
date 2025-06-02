@@ -138,7 +138,7 @@ function QrView() {
         </div>
       )}
 
-      {!pickedMenus.menu2 && (
+      {!pickedMenus.menu2 && order?.foods[1] && (
         <div className="menuSection">
           <p><strong>Menu {order?.foods[1].mealNumber}:</strong></p>
           <label>
