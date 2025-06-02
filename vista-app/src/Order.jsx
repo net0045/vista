@@ -146,7 +146,8 @@ function Order() {
       dateOfOrder: new Date(),
       userId: user_Id,
       email: user_email,
-      ispaid: false
+      ispaid: false,
+      qrText: `${window.location.origin}/qr?id=${orderId}`
     };
 
 
@@ -213,7 +214,6 @@ function Order() {
         foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
         `E-mail: ${newOrder.email}`;
 
-      qrViewOrder.qrText = `${window.location.origin}/qr?id=${orderId}`;
       qrViewOrder.qrContent = qrContent;
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));

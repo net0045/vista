@@ -13,6 +13,8 @@ export const getFoodIdByNumberAndMenuID = async (number: number, menuId: string)
     .select('id')
     .eq('dayOfWeek', number)
     .eq('menuid', menuId)
+    .eq('issoup', false)
+    .limit(1)
     .single();
 
   if (error) {
