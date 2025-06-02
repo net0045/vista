@@ -3,7 +3,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import './MyOrders.css';
 import { useNavigate } from 'react-router-dom';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
-import { getOrdersForUser, getFoodsInOrder } from './api/orderApi';
+import { getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
 
 function MyOrders() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ function MyOrders() {
 
         setEmail(payload.email);
 
-        const realOrders = await getOrdersForUser(payload.userId);
+        const realOrders = await getAllOrdersForUser(payload.userId); //TODO PAK ZMĚNIT NA ZAPLACENÉ OBJEDNÁVKY
 
         const ordersWithFoods = await Promise.all(
           realOrders.map(async (order) => {

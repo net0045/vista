@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Order.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { v4 as uuidv4 } from 'uuid';
-import { storeOrder, storeFoodsInOrder } from './api/orderApi';
+import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
 import { getCurrentMenuId, getFoodIdByNumberAndMenuID } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
@@ -13,13 +13,13 @@ function isOrderingDisabled() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5  ||  (day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5 || (day === 0 && hour < 15);
 }
 
 function getUpcomingWeekdays() {
   const now = new Date();
   const day = now.getDay();
-  const hour = now.getHours(); 
+  const hour = now.getHours();
 
   // Normální výpočet pracovních dnů
   const dates = [];
@@ -83,6 +83,9 @@ function Order() {
   const [user_Id, setUserId] = useState('');
   const [orderingDisabled, setOrderingDisabled] = useState(false);
 
+  const [usedDates, setUsedDates] = useState(new Map());
+  const [selectedDate, setSelectedDate] = useState(null);
+
   useEffect(() => {
     setDates(getUpcomingWeekdays());
     setOrderingDisabled(isOrderingDisabled());
@@ -92,22 +95,25 @@ function Order() {
   useEffect(() => {
     const checkToken = async () => {
       const token = getCookie('authToken');
-
       if (!token) return;
 
       const payload = await verifyToken(token, getSecretKey());
+      if (!payload?.email || !payload?.verified || !payload?.userId) return;
 
-      if (!payload) {
-        console.warn('[JWT] Žádný payload (token neplatný)');
-        return;
+      setEmailToken(payload.email);
+      setUserId(payload.userId);
+
+      const orders = await getAllOrdersForUser(payload.userId);
+
+      const mealsPerDate = new Map();
+
+      for (const order of orders) {
+        const foods = await getFoodsInOrder(order.id);
+        const count = mealsPerDate.get(order.date) || 0;
+        mealsPerDate.set(order.date, count + foods.length);
       }
 
-      if (payload.email && payload.verified && payload.userId) {
-        setEmailToken(payload.email);
-        setUserId(payload.userId);
-      } else {
-        console.warn('[JWT] Payload nemá email nebo verified');
-      }
+      setUsedDates(mealsPerDate); // např. Map { 'Úterý...': 2, 'Pátek...': 1 }
     };
 
     checkToken();
@@ -241,18 +247,50 @@ function Order() {
         ) : (
           <>
             <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
-            <div id='howManyCheck'>
-              <input type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} />Ano / Yes
+            <div id="howManyCheck">
+              {usedDates.get(dates.find(d => d.date.toISOString() === selectedDate)?.label) >= 1 ? (
+                <p style={{ fontSize: '14px', color: 'gray' }}>
+                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další.
+                </p>
+              ) : (
+                <>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <input
+                      type="checkbox"
+                      name="howMany"
+                      onChange={(e) => setChecked(e.target.checked)}
+                    />
+                    <span style={{ color: '#f17300ff' }}>Ano / Yes</span>
+                  </label>
+                </>
+              )}
             </div>
+
 
             <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
             <div id='whatDateRB'>
-              {dates.map((item, index) => (
-                <div key={index} className='rb'>
-                  <input type="radio" name='day' />
-                  <p style={{ fontSize: '18px', color:'#f17300ff' }}>{item.label}</p>
-                </div>
-              ))}
+              {dates.map((item, index) => {
+                const mealCount = usedDates.get(item.label) || 0;
+                const isUsed = mealCount >= 2;
+
+                return (
+                  <div key={index} className='rb'>
+                    {!isUsed ? (
+                      <>
+                        <input type="radio" name="day" onChange={() => setSelectedDate(item.date.toISOString())}/>
+                        <div>
+                          <p style={{ fontSize: '18px', color: '#f17300ff', margin: 0 }}>{item.label}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <div>
+                        <p style={{ fontSize: '18px', color: 'gray', margin: 0 }}>{item.label}</p>
+                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>Na tento den už máte 2 jídla</p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div id='whatMeal'>

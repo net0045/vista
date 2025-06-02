@@ -42,7 +42,26 @@ export const getFoodsInOrder = async (orderId: string) => {
     }
 };
 
-export const getOrdersForUser = async (userId: string) => {
+export const getPaidOrdersForUser = async (userId: string) => {
+    try {
+        const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('userId', userId)       // správné jméno sloupce
+        .eq('ispaid', true)         // pouze zaplacené objednávky (volitelné)
+
+        if (error) {
+        throw error;
+        }
+
+        return data;
+    } catch (err) {
+        console.error('Chyba při načítání zaplacených objednávek uživatele:', err);
+        return [];
+    }
+};
+
+export const getAllOrdersForUser = async (userId: string) => {
     try {
         const { data, error } = await supabase
         .from('orders')
