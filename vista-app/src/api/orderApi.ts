@@ -131,3 +131,14 @@ export const storeFoodsInOrder = async (foodsInOrder: any[]) => {
         throw error;
     }
 }
+
+export const deleteOrder = async (orderId) => {
+  const { error } = await supabase
+    .from('orders')
+    .delete()
+    .eq('id', orderId);
+
+  if (error) {
+    console.error('Chyba při mazání objednávky:', error);
+  }
+};

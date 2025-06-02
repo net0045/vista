@@ -12,35 +12,52 @@ function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = getCookie('authToken');
-        if (!token) return;
+  const fetchData = async () => {
+    try {
+      const token = getCookie('authToken');
+      if (!token) return;
 
-        const payload = await verifyToken(token, getSecretKey());
-        if (!payload?.userId || !payload?.email) return;
+      const payload = await verifyToken(token, getSecretKey());
+      if (!payload?.userId || !payload?.email) return;
 
-        setEmail(payload.email);
+      setEmail(payload.email);
 
-        const realOrders = await getAllOrdersForUser(payload.userId); //TODO PAK ZMĚNIT NA ZAPLACENÉ OBJEDNÁVKY
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-        const ordersWithFoods = await Promise.all(
-          realOrders.map(async (order) => {
-            const foods = await getFoodsInOrder(order.id);
-            return { ...order, foods };
+      const allOrders = await getAllOrdersForUser(payload.userId);
+
+      // 🗑️ Smazání starých objednávek
+      await Promise.all(
+        allOrders
+          .filter(order => {
+            const orderDate = new Date(order.date);
+            orderDate.setHours(0, 0, 0, 0);
+            return orderDate < today;
           })
-        );
+          .map(order => deleteOrder(order.id))
+      );
 
-        setOrders(ordersWithFoods);
-      } catch (err) {
-        console.error('Chyba při načítání objednávek:', err);
-      } finally {
-        setLoading(false); // 🟢 načítání dokončeno
-      }
-    };
+      // 📦 Znovu načteme aktuální objednávky po smazání
+      const updatedOrders = await getAllOrdersForUser(payload.userId);
 
-    fetchData();
-  }, []);
+      const ordersWithFoods = await Promise.all(
+        updatedOrders.map(async (order) => {
+          const foods = await getFoodsInOrder(order.id);
+          return { ...order, foods };
+        })
+      );
+
+      setOrders(ordersWithFoods);
+    } catch (err) {
+      console.error('Chyba při načítání objednávek:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
 
   return (
     <>
