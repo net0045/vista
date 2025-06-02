@@ -66,7 +66,7 @@ function MyOrders() {
           ) : orders.length === 0 ? (
             <div className="emptySection">
               <p className='emptyText'>Asi nemáš hlad, bo tu nic nemáš</p>
-              <img src="images/hungry.gif" className='food-hungry-img' alt="" />
+              <img src="images/no-orders.gif" className='food-hungry-img' alt="" />
               <p className='emptyText'>Zkus zčekovat týdenní meníčko, třeba si vybereš nějakej gáblik</p>
               <button id='menuButton' onClick={() => navigate('/menu')}>MENU</button>
             </div>
