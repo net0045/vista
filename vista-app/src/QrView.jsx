@@ -1,38 +1,66 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { getOrderById, getFoodsInOrder, updateFoodPickedToTrue} from './api/orderApi';
+import { getUserById} from './api/userApi';
 import './QrView.css';
 
 function QrView() {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
-  const id = query.get('id');
+  const orderIdURL = query.get('id');
 
   const [status, setStatus] = useState('loading');
   const [order, setOrder] = useState(null);
+  const [user, setUser] = useState(null);
   const [pickedMenus, setPickedMenus] = useState({ menu1: false, menu2: false });
 
-  const menu1Key = `picked-${id}-menu1`;
-  const menu2Key = `picked-${id}-menu2`;
-
   useEffect(() => {
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    const found = orders.find(o => o.id.toString() === id);
+    const fetchOrder = async () => {
+      try {
+        const orderData = await getOrderById(orderIdURL);
+        const foods = await getFoodsInOrder(orderIdURL);
+        const userData = await getUserById(orderData?.userId);
+        setUser(userData);
 
-    if (!found) {
-      setStatus('notfound');
-      return;
-    }
+        if (!orderData) {
+          setStatus('notfound');
+          return;
+        } 
+        
+        if(foods.length === 0) {
+          setStatus('used');
+          return;
+        }
+        
+        const combinedOrder = {
+          ...orderData,
+          foods,
+        };
 
-    setOrder(found);
+        setOrder(combinedOrder);
 
-    const picked1 = localStorage.getItem(menu1Key) === 'true';
-    const picked2 = localStorage.getItem(menu2Key) === 'true';
+        if (foods.length === 2) {
+          const picked1 = foods[0]?.picked || false;
+          const picked2 = foods[1]?.picked || false;
+          const allPicked =  picked1 && picked2;
+          setPickedMenus({ menu1: picked1, menu2: picked2 });
+          setStatus(allPicked ? 'used' : 'valid');
+        }
+        else {
+          const picked1 = foods[0]?.picked || false;
+          setPickedMenus({ menu1: picked1 });
+          setStatus(picked1 ? 'used' : 'valid');
+          
+        }       
 
-    setPickedMenus({ menu1: picked1, menu2: picked2 });
+      } catch (error) {
+        console.error('Chyba při načítání objednávky:', error);
+        setStatus('notfound');
+      }
+    };
 
-    const allPicked = !found.menu2 ? picked1 : picked1 && picked2;
-    setStatus(allPicked ? 'used' : 'valid');
-  }, [id]);
+    if (orderIdURL) fetchOrder();
+  }, [orderIdURL]);
 
   useEffect(() => {
     if (status === 'valid') {
@@ -43,16 +71,31 @@ function QrView() {
     }
   }, [status]);
 
-  const handleCheckboxChange = (menuKey) => {
+  const handleCheckboxChange = async (menuKey) => {
+  // Zjisti index jídla (menu1 = 0, menu2 = 1)
+  const index = menuKey === 'menu1' ? 0 : 1;
+  const foodInOrder = order.foods[index];
+  if (!foodInOrder) return;
+
+  try {
+    // Aktualizuj v databázi
+    await updateFoodPickedToTrue(foodInOrder.id);
+
+    // Aktualizuj lokální stav
     const updated = { ...pickedMenus, [menuKey]: true };
-    localStorage.setItem(`picked-${id}-${menuKey}`, 'true');
     setPickedMenus(updated);
 
-    const allPicked = !order?.menu2 ? updated.menu1 : updated.menu1 && updated.menu2;
+    const allPicked = order.foods.length === 1
+      ? updated.menu1
+      : updated.menu1 && updated.menu2;
+
     if (allPicked) {
       setStatus('used');
     }
-  };
+  } catch (err) {
+    console.error('Chyba při aktualizaci jídla:', err);
+  }
+};
 
   if (status === 'loading') return null;
 
@@ -84,7 +127,7 @@ function QrView() {
 
       {!pickedMenus.menu1 && (
         <div className="menuSection">
-          <p><strong>{order?.menu1}</strong></p>
+          <p><strong>Menu {order?.foods[0].mealNumber}:</strong></p>
           <label>
             <input
               type="checkbox"
@@ -95,9 +138,9 @@ function QrView() {
         </div>
       )}
 
-      {!pickedMenus.menu2 && order?.menu2 && (
+      {!pickedMenus.menu2 && (
         <div className="menuSection">
-          <p><strong>{order?.menu2}</strong></p>
+          <p><strong>Menu {order?.foods[1].mealNumber}:</strong></p>
           <label>
             <input
               type="checkbox"
@@ -108,7 +151,7 @@ function QrView() {
         </div>
       )}
 
-      <p><strong>Email:</strong> {order?.email}</p>
+      <p><strong>Email:</strong> {user.email}</p>
 
       <div className="rainContainer">
         {Array.from({ length: 20 }).map((_, i) => (

@@ -2,6 +2,28 @@ import { supabase } from '../lib/supabaseClient'
 import { OrderObject } from '../types/order'
 import { FoodsInOrder } from '../types/FoodsInOrder';
 
+export const getOrderById = async (orderId) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const updateFoodPickedToTrue = async (foodInOrderId) => {
+  const { error } = await supabase
+    .from('FoodsInOrder')
+    .update({ picked: true })
+    .eq('id', foodInOrderId);
+
+  if (error) throw error;
+};
+
+
+
 export const getFoodsInOrder = async (orderId: string) => {
     try {
         const { data, error } = await supabase

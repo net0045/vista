@@ -1,6 +1,26 @@
 import { supabase } from '../lib/supabaseClient'
 import { User } from '../types/User'; 
 
+
+export const getUserById = async (userId: string): Promise<User | null> => {
+    try {
+        const { data, error } = await supabase
+            .from('User') 
+            .select('*')
+            .eq('id', userId)
+            .single()
+
+        if (error) {
+            console.error('Uživatel s tímto ID neexistuje!', error.message)
+            return null
+        }
+
+        return data as User
+    } catch (error) {
+        console.error('Nečekaná chyba:', error)
+        return null
+    }
+}
 /**
  * Získá uživatele podle émailu
  * @param email - email uživatele
