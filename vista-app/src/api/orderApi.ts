@@ -131,3 +131,4 @@ export const storeFoodsInOrder = async (foodsInOrder: any[]) => {
         throw error;
     }
 }
+

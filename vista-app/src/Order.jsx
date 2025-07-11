@@ -86,10 +86,24 @@ function Order() {
   const [usedDates, setUsedDates] = useState(new Map());
   const [selectedDate, setSelectedDate] = useState(null);
 
+  const [canOrderTwoMeals, setCanOrderTwoMeals] = useState(true);
+
+
   useEffect(() => {
     setDates(getUpcomingWeekdays());
     setOrderingDisabled(isOrderingDisabled());
   }, []);
+
+  useEffect(() => {
+  if (!selectedDate) return;
+
+  const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+  if (!label) return;
+
+  const mealsAlready = usedDates.get(label) || 0;
+  setCanOrderTwoMeals(mealsAlready === 0);
+  if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
+  }, [selectedDate, usedDates]);
 
   // Kontrola tokenu při načtení
   useEffect(() => {
@@ -246,46 +260,50 @@ function Order() {
           </p>
         ) : (
           <>
-            <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
+            <p className='nadpis'>Chcete si objednat dvě jídla?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Do you want to order two meals?</span></p>
             <div id="howManyCheck">
-              {usedDates.get(dates.find(d => d.date.toISOString() === selectedDate)?.label) >= 1 ? (
+              {selectedDate && !canOrderTwoMeals ? (
                 <p style={{ fontSize: '14px', color: 'gray' }}>
-                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další.
+                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další. <br/>
+                  <span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 1 meal for this day, you can order only one more.</span>
                 </p>
               ) : (
-                <>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="checkbox"
-                      name="howMany"
-                      onChange={(e) => setChecked(e.target.checked)}
-                    />
-                    <span style={{ color: '#f17300ff' }}>Ano / Yes</span>
-                  </label>
-                </>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    name="howMany"
+                    checked={checked}
+                    disabled={!canOrderTwoMeals}
+                    onChange={(e) => setChecked(e.target.checked)}
+                  />
+                  <span style={{ color: '#f17300ff' }}>Ano / Yes</span>
+                </label>
               )}
             </div>
 
 
-            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
+            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>What date would you like to order food for?</span></p>
             <div id='whatDateRB'>
               {dates.map((item, index) => {
                 const mealCount = usedDates.get(item.label) || 0;
                 const isUsed = mealCount >= 2;
 
                 return (
-                  <div key={index} className='rb'>
+                  <div key={index}>
                     {!isUsed ? (
-                      <>
-                        <input type="radio" name="day" onChange={() => setSelectedDate(item.date.toISOString())}/>
-                        <div>
-                          <p style={{ fontSize: '18px', color: '#f17300ff', margin: 0 }}>{item.label}</p>
-                        </div>
-                      </>
+                      <label className='rb'>
+                        <input
+                          type="radio"
+                          name="day"
+                          onChange={() => setSelectedDate(item.date.toISOString())}
+                          style={{ margin: 0 }}
+                        />
+                        <p style={{ fontSize: '18px', color: '#f17300ff', margin: 0 }}>{item.label}</p>
+                      </label>
                     ) : (
-                      <div>
+                      <div className='rb' style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                         <p style={{ fontSize: '18px', color: 'gray', margin: 0 }}>{item.label}</p>
-                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>Na tento den už máte 2 jídla</p>
+                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>Na tento den už máte 2 jídla<br/><span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 2 meals for this day.</span></p>
                       </div>
                     )}
                   </div>

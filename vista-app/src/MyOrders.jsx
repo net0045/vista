@@ -12,35 +12,35 @@ function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = getCookie('authToken');
-        if (!token) return;
+  const fetchData = async () => {
+    try {
+      const token = getCookie('authToken');
+      if (!token) return;
 
-        const payload = await verifyToken(token, getSecretKey());
-        if (!payload?.userId || !payload?.email) return;
+      const payload = await verifyToken(token, getSecretKey());
+      if (!payload?.userId || !payload?.email) return;
 
-        setEmail(payload.email);
+      setEmail(payload.email);
 
-        const realOrders = await getAllOrdersForUser(payload.userId); //TODO PAK ZMĚNIT NA ZAPLACENÉ OBJEDNÁVKY
+      const realOrders = await getAllOrdersForUser(payload.userId); //TODO PAK ZMĚNIT NA ZAPLACENÉ OBJEDNÁVKY
 
-        const ordersWithFoods = await Promise.all(
-          realOrders.map(async (order) => {
-            const foods = await getFoodsInOrder(order.id);
-            return { ...order, foods };
-          })
-        );
+      const ordersWithFoods = await Promise.all(
+        realOrders.map(async (order) => {
+          const foods = await getFoodsInOrder(order.id);
+          return { ...order, foods };
+        })
+      );
 
-        setOrders(ordersWithFoods);
-      } catch (err) {
-        console.error('Chyba při načítání objednávek:', err);
-      } finally {
-        setLoading(false); // 🟢 načítání dokončeno
-      }
-    };
+      setOrders(ordersWithFoods);
+    } catch (err) {
+      console.error('Chyba při načítání objednávek:', err);
+    } finally {
+      setLoading(false); // 🟢 načítání dokončeno
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   return (
     <>
@@ -66,7 +66,6 @@ function MyOrders() {
           ) : orders.length === 0 ? (
             <div className="emptySection">
               <p className='emptyText'>Asi nemáš hlad, bo tu nic nemáš</p>
-              <img src="images/hungry.gif" className='food-hungry-img' alt="" />
               <p className='emptyText'>Zkus zčekovat týdenní meníčko, třeba si vybereš nějakej gáblik</p>
               <button id='menuButton' onClick={() => navigate('/menu')}>MENU</button>
             </div>
