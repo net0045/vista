@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { supabase } from './lib/supabaseClient';
 import './QrView.css';
 
 function QrView() {
@@ -11,44 +12,53 @@ function QrView() {
   const [order, setOrder] = useState(null);
   const [pickedMenus, setPickedMenus] = useState({ menu1: false, menu2: false });
 
-  const menu1Key = `picked-${id}-menu1`;
-  const menu2Key = `picked-${id}-menu2`;
-
   useEffect(() => {
-    const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    const found = orders.find(o => o.id.toString() === id);
+    const fetchOrder = async () => {
+      // Načti objednávku z databáze podle ID
+      const { data, error } = await supabase
+        .from('Orders') // <- Změň na svůj název tabulky
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (!found) {
-      setStatus('notfound');
+      if (error || !data) {
+        console.error('Chyba při načítání objednávky:', error);
+        setStatus('notfound');
+        return;
+      }
+
+      setOrder(data);
+
+      const allPicked = data.menu2 ? data.picked_menu1 && data.picked_menu2 : data.picked_menu1;
+      setPickedMenus({
+        menu1: data.picked_menu1,
+        menu2: data.picked_menu2,
+      });
+      setStatus(allPicked ? 'used' : 'valid');
+    };
+
+    fetchOrder();
+  }, [id]);
+
+  const handleCheckboxChange = async (menuKey) => {
+    const updated = { ...pickedMenus, [menuKey]: true };
+
+    // Ulož do databáze, že bylo vyzvednuto
+    const { error } = await supabase
+      .from('Orders')
+      .update({
+        [`picked_${menuKey}`]: true,
+      })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Chyba při aktualizaci:', error);
       return;
     }
 
-    setOrder(found);
-
-    const picked1 = localStorage.getItem(menu1Key) === 'true';
-    const picked2 = localStorage.getItem(menu2Key) === 'true';
-
-    setPickedMenus({ menu1: picked1, menu2: picked2 });
-
-    const allPicked = !found.menu2 ? picked1 : picked1 && picked2;
-    setStatus(allPicked ? 'used' : 'valid');
-  }, [id]);
-
-  useEffect(() => {
-    if (status === 'valid') {
-      const audio = new Audio('/success.mp3');
-      audio.play().catch(e => {
-        console.warn('Nepodařilo se přehrát zvuk:', e);
-      });
-    }
-  }, [status]);
-
-  const handleCheckboxChange = (menuKey) => {
-    const updated = { ...pickedMenus, [menuKey]: true };
-    localStorage.setItem(`picked-${id}-${menuKey}`, 'true');
     setPickedMenus(updated);
 
-    const allPicked = !order?.menu2 ? updated.menu1 : updated.menu1 && updated.menu2;
+    const allPicked = order?.menu2 ? updated.menu1 && updated.menu2 : updated.menu1;
     if (allPicked) {
       setStatus('used');
     }
@@ -60,7 +70,7 @@ function QrView() {
     return (
       <div className="qrCard">
         <h2>Objednávka nenalezena</h2>
-        <img src="/images/nuh.png" alt="Confirmed" className="orderImage" />
+        <img src="/images/nuh.png" alt="Nenalezeno" className="orderImage" />
         <p>Zkuste QR kód naskenovat znovu.</p>
       </div>
     );
@@ -70,8 +80,10 @@ function QrView() {
     return (
       <div className="qrCard">
         <h2>✅ Objednávka byla již vyzvednuta</h2>
-        <img src="/images/collected.png" alt="Confirmed" className="orderImage" />
+        <p><strong>--------{order?.surname}--------</strong></p>
+        <img src="/images/collected.png" alt="Potvrzeno" className="orderImage" />
         <p><strong>Date:</strong> {order?.date}</p>
+        <p><strong>Email:</strong> {order?.email}</p>
       </div>
     );
   }
@@ -79,7 +91,8 @@ function QrView() {
   return (
     <div className="qrCard">
       <h2>✅ Potvrzení objednávky</h2>
-      <img src="/images/success.png" alt="Confirmed" className="orderImage" />
+      <p><strong>--------{order?.surname}--------</strong></p>
+      <img src="/images/success.png" alt="Potvrzeno" className="orderImage" />
       <p><strong>Date:</strong> {order?.date}</p>
 
       {!pickedMenus.menu1 && (
@@ -119,7 +132,7 @@ function QrView() {
             className="rainDrop"
             style={{
               left: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`
+              animationDelay: `${Math.random() * 3}s`,
             }}
           />
         ))}
