@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Order.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { v4 as uuidv4 } from 'uuid';
-import { storeOrder, storeFoodsInOrder } from './api/orderApi';
+import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
 import { getCurrentMenuId, getFoodIdByNumberAndMenuID } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
@@ -13,47 +13,55 @@ function isOrderingDisabled() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5  ||  (day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5 || (day === 0 && hour < 15);
 }
 
 function getUpcomingWeekdays() {
   const now = new Date();
   const day = now.getDay();
-  const hour = now.getHours(); 
+  const hour = now.getHours();
 
-  // Normální výpočet pracovních dnů
   const dates = [];
   let start = new Date(now);
   start.setHours(0, 0, 0, 0);
 
-  if (hour >= 21) {
-    start.setDate(start.getDate() + 1);
-  }
-
-  if (start.getDay() === 6 || start.getDay() === 0) {
-    const offset = 8 - start.getDay(); // pondělí
+  // Pokud je sobota nebo neděle (před 15:00), posuň se na nejbližší pondělí
+  if ((day === 6) || (day === 0 && hour < 15)) {
+    const offset = 1 - day + (day === 0 ? 7 : 0);
     start.setDate(start.getDate() + offset);
-  } else {
+  }
+
+  // Pokud je neděle 15:00 nebo víc, posuň se na zítřek (pondělí)
+  if (day === 0 && hour >= 15) {
     start.setDate(start.getDate() + 1);
   }
 
-  while (start.getDay() >= 1 && start.getDay() <= 5) {
-    const dayName = weekdays[start.getDay()];
-    const enName = dayNameEN(start.getDay());
-    const day = start.getDate();
-    const month = start.getMonth() + 1;
-    const year = start.getFullYear();
+  // Pokud jsme přeskočili na pondělí–pátek, vygeneruj celý pracovní týden
+  // start bude pondělí
+  const monday = new Date(start);
+  monday.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < 5; i++) {
+    const current = new Date(monday);
+    current.setDate(monday.getDate() + i);
+
+    const dayIndex = current.getDay();
+    const dayName = weekdays[dayIndex];
+    const enName = dayNameEN(dayIndex);
+    const day = current.getDate();
+    const month = current.getMonth() + 1;
+    const year = current.getFullYear();
 
     dates.push({
       label: `${dayName} / ${enName}: ${day}. ${month}. ${year}`,
-      date: new Date(start),
+      date: current,
     });
-
-    start.setDate(start.getDate() + 1);
   }
 
   return dates;
 }
+
+
 
 function dayNameEN(index) {
   const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -79,35 +87,57 @@ function Order() {
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
 
+  const [surnameToken, setSurnameToken] = useState('');
   const [emailToken, setEmailToken] = useState('');
   const [user_Id, setUserId] = useState('');
   const [orderingDisabled, setOrderingDisabled] = useState(false);
+
+  const [usedDates, setUsedDates] = useState(new Map());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const [canOrderTwoMeals, setCanOrderTwoMeals] = useState(true);
+
 
   useEffect(() => {
     setDates(getUpcomingWeekdays());
     setOrderingDisabled(isOrderingDisabled());
   }, []);
 
+  useEffect(() => {
+  if (!selectedDate) return;
+
+  const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+  if (!label) return;
+
+  const mealsAlready = usedDates.get(label) || 0;
+  setCanOrderTwoMeals(mealsAlready === 0);
+  if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
+  }, [selectedDate, usedDates]);
+
   // Kontrola tokenu při načtení
   useEffect(() => {
     const checkToken = async () => {
       const token = getCookie('authToken');
-
       if (!token) return;
 
       const payload = await verifyToken(token, getSecretKey());
+      if (!payload?.email || !payload?.verified || !payload?.userId || !payload?.surname) return;
 
-      if (!payload) {
-        console.warn('[JWT] Žádný payload (token neplatný)');
-        return;
+      setEmailToken(payload.email);
+      setUserId(payload.userId);
+      setSurnameToken(payload.surname);
+
+      const orders = await getAllOrdersForUser(payload.userId);
+
+      const mealsPerDate = new Map();
+
+      for (const order of orders) {
+        const foods = await getFoodsInOrder(order.id);
+        const count = mealsPerDate.get(order.date) || 0;
+        mealsPerDate.set(order.date, count + foods.length);
       }
 
-      if (payload.email && payload.verified && payload.userId) {
-        setEmailToken(payload.email);
-        setUserId(payload.userId);
-      } else {
-        console.warn('[JWT] Payload nemá email nebo verified');
-      }
+      setUsedDates(mealsPerDate); // např. Map { 'Úterý...': 2, 'Pátek...': 1 }
     };
 
     checkToken();
@@ -139,6 +169,7 @@ function Order() {
     const user_email = emailToken;
     const dateText = selectedDate.nextSibling.textContent;
     const orderId = uuidv4();
+    const user_surname = surnameToken;
 
     const newOrder = {
       id: orderId,
@@ -146,7 +177,9 @@ function Order() {
       dateOfOrder: new Date(),
       userId: user_Id,
       email: user_email,
-      ispaid: false
+      surname: user_surname,
+      ispaid: false,
+      qrText: `${window.location.origin}/qr?id=${orderId}`
     };
 
 
@@ -205,15 +238,15 @@ function Order() {
         menu1: value1,
         menu2: checked ? value2 : null,
         email: newOrder.email,
+        surname: newOrder.surname,
       };
 
       // QR info (pro případné vykreslení QR obsahu i odkazu)
       const qrContent =
         `Objednávka:\nDatum: ${newOrder.date}\n` +
         foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
-        `E-mail: ${newOrder.email}`;
+        `E-mail: ${newOrder.email}` + `Příjmení: ${newOrder.surname}`;
 
-      qrViewOrder.qrText = `${window.location.origin}/qr?id=${orderId}`;
       qrViewOrder.qrContent = qrContent;
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));
@@ -240,19 +273,55 @@ function Order() {
           </p>
         ) : (
           <>
-            <p className='nadpis'>Chcete si objednat dvě jídla?<br />Do you want to order two meals?</p>
-            <div id='howManyCheck'>
-              <input type="checkbox" name='howMany' onChange={(e) => setChecked(e.target.checked)} />Ano / Yes
+            <p className='nadpis'>Chcete si objednat dvě jídla?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Do you want to order two meals?</span></p>
+            <div id="howManyCheck">
+              {selectedDate && !canOrderTwoMeals ? (
+                <p style={{ fontSize: '14px', color: 'gray' }}>
+                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další. <br/>
+                  <span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 1 meal for this day, you can order only one more.</span>
+                </p>
+              ) : (
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    name="howMany"
+                    checked={checked}
+                    disabled={!canOrderTwoMeals}
+                    onChange={(e) => setChecked(e.target.checked)}
+                  />
+                  <span style={{ color: '#f17300ff' }}>Ano / Yes</span>
+                </label>
+              )}
             </div>
 
-            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br />What date would you like to order food for?</p>
+
+            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>What date would you like to order food for?</span></p>
             <div id='whatDateRB'>
-              {dates.map((item, index) => (
-                <div key={index} className='rb'>
-                  <input type="radio" name='day' />
-                  <p style={{ fontSize: '18px', color:'#f17300ff' }}>{item.label}</p>
-                </div>
-              ))}
+              {dates.map((item, index) => {
+                const mealCount = usedDates.get(item.label) || 0;
+                const isUsed = mealCount >= 2;
+
+                return (
+                  <div key={index}>
+                    {!isUsed ? (
+                      <label className='rb'>
+                        <input
+                          type="radio"
+                          name="day"
+                          onChange={() => setSelectedDate(item.date.toISOString())}
+                          style={{ margin: 0 }}
+                        />
+                        <p style={{ fontSize: '18px', color: '#f17300ff', margin: 0 }}>{item.label}</p>
+                      </label>
+                    ) : (
+                      <div className='rb' style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <p style={{ fontSize: '18px', color: 'gray', margin: 0 }}>{item.label}</p>
+                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>Na tento den už máte 2 jídla<br/><span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 2 meals for this day.</span></p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div id='whatMeal'>

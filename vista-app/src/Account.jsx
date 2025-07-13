@@ -38,6 +38,7 @@ function Account() {
                 return;
             }
 
+            
             if (payload.email && payload.verified) {
                 setEmail(payload.email);
                 setIsUserVerified(payload.verified);

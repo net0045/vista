@@ -96,7 +96,7 @@ function App() {
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/menu" element={<Menu/>} />
-      <Route path="/qr" element={<ProtectedRoute><QrView /></ProtectedRoute>} />
+      <Route path="/qr" element={<QrView />} />
       <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
       
       <Route path="/myorders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />

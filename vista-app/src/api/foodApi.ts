@@ -13,6 +13,8 @@ export const getFoodIdByNumberAndMenuID = async (number: number, menuId: string)
     .select('id')
     .eq('dayOfWeek', number)
     .eq('menuid', menuId)
+    .eq('issoup', false)
+    .limit(1)
     .single();
 
   if (error) {
@@ -23,13 +25,31 @@ export const getFoodIdByNumberAndMenuID = async (number: number, menuId: string)
 
 
 export const getCurrentMenuId = async (): Promise<string | null> => {
-  const today = new Date().toISOString().split('T')[0]; // např. "2025-05-30"
+  const now = new Date();
+  const day = now.getDay(); // 0 = neděle
+  const hour = now.getHours();
+
+  // Pokud je neděle odpoledne (15:00+), posuňme se na pondělí následujícího týdne
+  if (day === 0 && hour >= 15) {
+    now.setDate(now.getDate() + 1); // pondělí
+  }
+
+  // Najdi pondělí aktuálního týdne
+  const currentDay = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((currentDay + 6) % 7));
+
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const dateFrom = monday.toISOString().split('T')[0];
+  const dateTo = friday.toISOString().split('T')[0];
 
   const { data: menus, error } = await supabase
     .from('Menu')
     .select('id')
-    .lte('datefrom', today)
-    .gte('dateto', today)
+    .eq('datefrom', dateFrom)
+    .eq('dateto', dateTo)
     .limit(1);
 
   if (error) {
@@ -38,22 +58,42 @@ export const getCurrentMenuId = async (): Promise<string | null> => {
   }
 
   if (!menus || menus.length === 0) {
-    console.warn('Nebylo nalezeno žádné aktivní menu pro aktuální týden.');
+    console.warn('Nebylo nalezeno žádné aktivní menu pro tento týden.');
     return null;
   }
 
   return menus[0].id;
 };
 
-export async function fetchCurrentWeekMenuWithFoods() {
-  const today = new Date().toISOString().split('T')[0]; // "2025-05-30"
 
-  // 1. Získat menu, které pokrývá dnešní den
+export async function fetchCurrentWeekMenuWithFoods() {
+  const now = new Date();
+  const currentDay = now.getDay(); // 0 = neděle
+  const currentHour = now.getHours();
+
+  // Posun na pondělí následujícího týdne, pokud je neděle po 15:00
+  if (currentDay === 0 && currentHour >= 15) {
+    now.setDate(now.getDate() + 1);
+  }
+
+  // Nalezení pondělí aktuálního týdne
+  const day = now.getDay(); 
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((day + 6) % 7));
+  
+  //Ošetření pro pátek
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const fromDate = monday.toISOString().split('T')[0];
+  const toDate = friday.toISOString().split('T')[0];
+
+  // Načti menu pro tento rozsah
   const { data: menus, error: menuError } = await supabase
     .from('Menu')
     .select('*')
-    .lte('datefrom', today)
-    .gte('dateto', today)
+    .eq('datefrom', fromDate)
+    .eq('dateto', toDate)
     .limit(1);
 
   if (menuError || !menus?.length) {
@@ -63,7 +103,6 @@ export async function fetchCurrentWeekMenuWithFoods() {
 
   const currentMenu = menus[0];
 
-  // 2. Získat jídla podle menuid
   const { data: foods, error: foodError } = await supabase
     .from('Food')
     .select('*')

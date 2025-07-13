@@ -1,6 +1,26 @@
 import { supabase } from '../lib/supabaseClient'
 import { User } from '../types/User'; 
 
+
+export const getUserById = async (userId: string): Promise<User | null> => {
+    try {
+        const { data, error } = await supabase
+            .from('User') 
+            .select('*')
+            .eq('id', userId)
+            .single()
+
+        if (error) {
+            console.error('Uživatel s tímto ID neexistuje!', error.message)
+            return null
+        }
+
+        return data as User
+    } catch (error) {
+        console.error('Nečekaná chyba:', error)
+        return null
+    }
+}
 /**
  * Získá uživatele podle émailu
  * @param email - email uživatele
@@ -57,10 +77,10 @@ export const saveVerifyCode = async (email: string, code: string): Promise<boole
     return true;
 }
 
-export const saveUserPassword = async (email: string, password: string): Promise<boolean> => {
+export const saveUserPassword = async (email: string, surname: string, password: string): Promise<boolean> => {
     const { error } = await supabase 
         .from('User')
-        .update({ password })
+        .update({ password, surname })
         .eq('email', email); 
     
     if (error) {

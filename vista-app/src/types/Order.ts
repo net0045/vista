@@ -4,4 +4,5 @@ export type OrderObject = {
     date: string;
     dateOfOrder: Date;
     ispaid: boolean;
+    qrText: string;
   };

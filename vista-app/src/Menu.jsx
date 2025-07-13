@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { supabase } from './lib/supabaseClient'
 import './Menu.css'
 import { useNavigate } from 'react-router-dom'
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
-import { fetchMenuWithFoods } from './api/foodApi'; 
-import { fetchAllergens } from './api/foodApi'; 
+import { fetchCurrentWeekMenuWithFoods, fetchAllergens } from './api/foodApi'; 
 
 function formatDateCz(dateStr) {
   if (!dateStr) return '';
@@ -26,6 +24,10 @@ function Menu() {
   const [data, setData] = useState({ mains: [], soups: [] });
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
   const [allergens, setAllergens] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const now = new Date();
+  const currentDay = now.getDay();
+  const currentHour = now.getHours();
 
  useEffect(() => {
     const checkToken = async () => {
@@ -42,40 +44,48 @@ function Menu() {
   }, []);
 
   useEffect(() => {
-  const loadMenu = async () => {
-    try {
-      const now = new Date();
-      const currentDay = now.getDay();
-      const currentHour = now.getHours();
+    const loadMenu = async () => {
+      try {
 
-      let baseDate = new Date(now);
+        let baseDate = new Date(now);
 
-      if (currentDay === 0 && currentHour >= 15) {
-        baseDate.setDate(baseDate.getDate() + 1);
+        if (currentDay === 0 && currentHour >= 15) {
+          baseDate.setDate(baseDate.getDate() + 1);
+        }
+
+        const day = baseDate.getDay();
+        const monday = new Date(baseDate);
+        monday.setDate(baseDate.getDate() - ((day + 6) % 7));
+        const friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+
+        const from = monday.toISOString().split('T')[0];
+        const to = friday.toISOString().split('T')[0];
+
+        const { data } = await fetchCurrentWeekMenuWithFoods();
+        const allergensData = await fetchAllergens();
+
+        setDateRange({ from, to });
+        setData(data);
+        setAllergens(allergensData);
+      } catch (err) {
+        console.error(err.message);
+      } finally {
+        setLoading(false); 
       }
+    };
 
-      const day = baseDate.getDay();
-      const monday = new Date(baseDate);
-      monday.setDate(baseDate.getDate() - ((day + 6) % 7));
-      const friday = new Date(monday);
-      friday.setDate(monday.getDate() + 4);
+    loadMenu();
+  }, []);
 
-      const from = monday.toISOString().split('T')[0];
-      const to = friday.toISOString().split('T')[0];
-
-      const { data } = await fetchMenuWithFoods();
-      const allergensData = await fetchAllergens();
-
-      setDateRange({ from, to });
-      setData(data);
-      setAllergens(allergensData);
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-
-  loadMenu();
-}, []);
+  if (loading) {
+    return (
+      <div className="loadingSection">
+        <p className='loadingText'>Načítám menu...</p>
+        <img src="images/loading.gif" alt="Načítání..." className="loading-img" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -93,14 +103,22 @@ function Menu() {
       </div>
 
       <div id='dateAndTime'>
-        <p className='dateTimeText'>
-          {formatDateCz(dateRange.from)} - {formatDateCz(dateRange.to)}
-        </p>
-        <p className='dateTimeText'>|</p>
-        <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
+        {(currentDay === 6) || (currentDay === 0 && currentHour < 15) ? (
+          <p className='dateTimeText'>
+            Menu bude k dispozici v neděli po 15. hodině
+          </p>
+        ) : (
+          <>
+            <p className='dateTimeText'>
+              {formatDateCz(dateRange.from)} - {formatDateCz(dateRange.to)}
+            </p>
+            <p className='dateTimeText'>|</p>
+            <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
+          </>
+        )}
       </div>
 
-      <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</p>
+      <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/><span style={{fontStyle: 'italic'}}>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</span></p>
 
       <p className='nadpis'>Hlavní chody / Main courses</p>
       <div className='mainCourses'>
@@ -111,7 +129,7 @@ function Menu() {
               <p className='mealDescription'>
                 {meal.item}
                 {meal.allergens && meal.allergens.trim() !== '' && (
-                  <span style={{ fontStyle: 'italic', color: '#666' }}> ({meal.allergens})</span>
+                  <span style={{ fontStyle: 'italic', color: '#777' }}> ({meal.allergens})</span>
                 )}
               </p>
             </div>
@@ -130,7 +148,7 @@ function Menu() {
             <p className='soupDescription'>
               {soup.item}
               {soup.allergens && soup.allergens.trim() !== '' && (
-                <span style={{ fontStyle: 'italic', color: '#666' }}> ({soup.allergens})</span>
+                <span style={{ fontStyle: 'italic', color: '#777' }}> ({soup.allergens})</span>
               )}
             </p>
           </div>

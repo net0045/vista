@@ -49,7 +49,8 @@ function Signin() {
                     userId: userData.id,
                     email: email,
                     verified: true, 
-                    isPassword: true, 
+                    isPassword: true,
+                    surname: userData.surname, 
                 };
                 const token = await createToken(payloadToken);
                 document.cookie = `authToken=${token}; path=/; secure; samesite=strict`; // Uložení tokenu do cookie
