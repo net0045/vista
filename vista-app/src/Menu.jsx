@@ -25,6 +25,9 @@ function Menu() {
   const [dateRange, setDateRange] = useState({ from: '', to: '' });
   const [allergens, setAllergens] = useState([]);
   const [loading, setLoading] = useState(true);
+  const now = new Date();
+  const currentDay = now.getDay();
+  const currentHour = now.getHours();
 
  useEffect(() => {
     const checkToken = async () => {
@@ -43,9 +46,6 @@ function Menu() {
   useEffect(() => {
     const loadMenu = async () => {
       try {
-        const now = new Date();
-        const currentDay = now.getDay();
-        const currentHour = now.getHours();
 
         let baseDate = new Date(now);
 
@@ -103,11 +103,19 @@ function Menu() {
       </div>
 
       <div id='dateAndTime'>
-        <p className='dateTimeText'>
-          {formatDateCz(dateRange.from)} - {formatDateCz(dateRange.to)}
-        </p>
-        <p className='dateTimeText'>|</p>
-        <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
+        {(currentDay === 6) || (currentDay === 0 && currentHour < 15) ? (
+          <p className='dateTimeText'>
+            Menu bude k dispozici v neděli po 15. hodině
+          </p>
+        ) : (
+          <>
+            <p className='dateTimeText'>
+              {formatDateCz(dateRange.from)} - {formatDateCz(dateRange.to)}
+            </p>
+            <p className='dateTimeText'>|</p>
+            <p className='dateTimeText'>11:00 - 14:00 a 17:00 - 19:00</p>
+          </>
+        )}
       </div>
 
       <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/><span style={{fontStyle: 'italic'}}>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</span></p>

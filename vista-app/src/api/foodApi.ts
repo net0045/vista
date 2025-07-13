@@ -48,14 +48,33 @@ export const getCurrentMenuId = async (): Promise<string | null> => {
 };
 
 export async function fetchCurrentWeekMenuWithFoods() {
-  const today = new Date().toISOString().split('T')[0]; // "2025-05-30"
+  const now = new Date();
+  const currentDay = now.getDay(); // 0 = neděle
+  const currentHour = now.getHours();
 
-  // 1. Získat menu, které pokrývá dnešní den
+  // Posun na pondělí následujícího týdne, pokud je neděle po 15:00
+  if (currentDay === 0 && currentHour >= 15) {
+    now.setDate(now.getDate() + 1);
+  }
+
+  // Nalezení pondělí aktuálního týdne
+  const day = now.getDay(); 
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((day + 6) % 7));
+  
+  //Ošetření pro pátek
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+
+  const fromDate = monday.toISOString().split('T')[0];
+  const toDate = friday.toISOString().split('T')[0];
+
+  // Načti menu pro tento rozsah
   const { data: menus, error: menuError } = await supabase
     .from('Menu')
     .select('*')
-    .lte('datefrom', today)
-    .gte('dateto', today)
+    .eq('datefrom', fromDate)
+    .eq('dateto', toDate)
     .limit(1);
 
   if (menuError || !menus?.length) {
@@ -65,7 +84,6 @@ export async function fetchCurrentWeekMenuWithFoods() {
 
   const currentMenu = menus[0];
 
-  // 2. Získat jídla podle menuid
   const { data: foods, error: foodError } = await supabase
     .from('Food')
     .select('*')
