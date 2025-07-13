@@ -35,7 +35,7 @@ function MyOrders() {
     } catch (err) {
       console.error('Chyba při načítání objednávek:', err);
     } finally {
-      setLoading(false); // 🟢 načítání dokončeno
+      setLoading(false); 
     }
   };
 

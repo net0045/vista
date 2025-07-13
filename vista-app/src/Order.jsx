@@ -79,6 +79,7 @@ function Order() {
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
 
+  const [surnameToken, setSurnameToken] = useState('');
   const [emailToken, setEmailToken] = useState('');
   const [user_Id, setUserId] = useState('');
   const [orderingDisabled, setOrderingDisabled] = useState(false);
@@ -112,10 +113,11 @@ function Order() {
       if (!token) return;
 
       const payload = await verifyToken(token, getSecretKey());
-      if (!payload?.email || !payload?.verified || !payload?.userId) return;
+      if (!payload?.email || !payload?.verified || !payload?.userId || !payload?.surname) return;
 
       setEmailToken(payload.email);
       setUserId(payload.userId);
+      setSurnameToken(payload.surname);
 
       const orders = await getAllOrdersForUser(payload.userId);
 
@@ -159,6 +161,7 @@ function Order() {
     const user_email = emailToken;
     const dateText = selectedDate.nextSibling.textContent;
     const orderId = uuidv4();
+    const user_surname = surnameToken;
 
     const newOrder = {
       id: orderId,
@@ -166,6 +169,7 @@ function Order() {
       dateOfOrder: new Date(),
       userId: user_Id,
       email: user_email,
+      surname: user_surname,
       ispaid: false,
       qrText: `${window.location.origin}/qr?id=${orderId}`
     };
@@ -226,13 +230,14 @@ function Order() {
         menu1: value1,
         menu2: checked ? value2 : null,
         email: newOrder.email,
+        surname: newOrder.surname,
       };
 
       // QR info (pro případné vykreslení QR obsahu i odkazu)
       const qrContent =
         `Objednávka:\nDatum: ${newOrder.date}\n` +
         foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
-        `E-mail: ${newOrder.email}`;
+        `E-mail: ${newOrder.email}` + `Příjmení: ${newOrder.surname}`;
 
       qrViewOrder.qrContent = qrContent;
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
