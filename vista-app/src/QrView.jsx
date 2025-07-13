@@ -150,7 +150,7 @@ function QrView() {
           </label>
         </div>
       )}
-      <p><strong>Jméno:</strong> {order?.surname}</p>
+      <p><strong>Jméno:</strong> {user.surname}</p>
       <p><strong>Email:</strong> {user.email}</p>
 
       <div className="rainContainer">
