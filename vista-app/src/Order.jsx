@@ -21,39 +21,47 @@ function getUpcomingWeekdays() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  // Normální výpočet pracovních dnů
   const dates = [];
   let start = new Date(now);
   start.setHours(0, 0, 0, 0);
 
-  if (hour >= 21) {
-    start.setDate(start.getDate() + 1);
-  }
-
-  if (start.getDay() === 6 || start.getDay() === 0) {
-    const offset = 8 - start.getDay(); // pondělí
+  // Pokud je sobota nebo neděle (před 15:00), posuň se na nejbližší pondělí
+  if ((day === 6) || (day === 0 && hour < 15)) {
+    const offset = 1 - day + (day === 0 ? 7 : 0);
     start.setDate(start.getDate() + offset);
-  } else {
+  }
+
+  // Pokud je neděle 15:00 nebo víc, posuň se na zítřek (pondělí)
+  if (day === 0 && hour >= 15) {
     start.setDate(start.getDate() + 1);
   }
 
-  while (start.getDay() >= 1 && start.getDay() <= 5) {
-    const dayName = weekdays[start.getDay()];
-    const enName = dayNameEN(start.getDay());
-    const day = start.getDate();
-    const month = start.getMonth() + 1;
-    const year = start.getFullYear();
+  // Pokud jsme přeskočili na pondělí–pátek, vygeneruj celý pracovní týden
+  // start bude pondělí
+  const monday = new Date(start);
+  monday.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < 5; i++) {
+    const current = new Date(monday);
+    current.setDate(monday.getDate() + i);
+
+    const dayIndex = current.getDay();
+    const dayName = weekdays[dayIndex];
+    const enName = dayNameEN(dayIndex);
+    const day = current.getDate();
+    const month = current.getMonth() + 1;
+    const year = current.getFullYear();
 
     dates.push({
       label: `${dayName} / ${enName}: ${day}. ${month}. ${year}`,
-      date: new Date(start),
+      date: current,
     });
-
-    start.setDate(start.getDate() + 1);
   }
 
   return dates;
 }
+
+
 
 function dayNameEN(index) {
   const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
