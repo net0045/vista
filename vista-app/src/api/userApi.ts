@@ -77,10 +77,10 @@ export const saveVerifyCode = async (email: string, code: string): Promise<boole
     return true;
 }
 
-export const saveUserPassword = async (email: string, password: string): Promise<boolean> => {
+export const saveUserPassword = async (email: string, surname: string, password: string): Promise<boolean> => {
     const { error } = await supabase 
         .from('User')
-        .update({ password })
+        .update({ password, surname })
         .eq('email', email); 
     
     if (error) {

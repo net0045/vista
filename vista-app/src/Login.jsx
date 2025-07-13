@@ -11,6 +11,7 @@ function Login() {
     const [user, setUser] = useState();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
+    const [surname, setSurname] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -44,7 +45,7 @@ function Login() {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            const success = await saveUserPassword(email, hashedPassword);
+            const success = await saveUserPassword(email, surname, hashedPassword);
             if (success) {
                 showMessage('Heslo bylo nastaveno.', 'success');
                 setTimeout(() => navigate('/signin'), 1500); //Signin
@@ -143,14 +144,21 @@ function Login() {
 
             {isUserVerified ? (
                 <div className="form">
-                    <input
-                        className="input-bar"
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        disabled
-                    />
+                    
                     <div className="input-wrapper">
+                        <input
+                            className="input-bar"
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            disabled
+                        />
+                        <input
+                            className="input-bar"
+                            placeholder='Vaše příjmení'
+                            value={surname}
+                            onChange={(e) => setSurname(e.target.value)}
+                        />
                         <input
                             className="input-bar"
                             type={showPassword ? "text" : "password"}
