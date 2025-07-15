@@ -7,6 +7,41 @@ export async function getAllFoods(): Promise<Food[]> {
     return data;
 }
 
+
+export async function getTomorrowOrders(): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+      id,
+      date,
+      user:User (
+        surname
+      ),
+      FoodsInOrder (
+        mealNumber,
+        food:Food (
+          item,
+          cost
+        )
+      )
+    `);
+
+  if (error) throw error;
+
+  // formát - např. "3. 6. 2025"
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dateStr = `${tomorrow.getDate()}. ${tomorrow.getMonth() + 1}. ${tomorrow.getFullYear()}`;
+
+  const filtered = (data || []).filter((order) =>
+    order.date.includes(dateStr)
+  );
+
+  return filtered;
+}
+
+
+
 export async function getOverviewData(): Promise<any[]> {
   const { data, error } = await supabase
     .from('orders')
