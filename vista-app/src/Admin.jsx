@@ -89,21 +89,7 @@ function Admin() {
       </div>
 
       <div className="content-row">
-        <div className="excelform">
-          <h3>Nahrát menu (.xlsx)</h3>
-          <input type="file" accept=".xlsx" onChange={handleMenuChange} />
-          <button className="excelBtnSubmit" onClick={handleUploadMenu} disabled={loading}>
-            {loading ? 'Nahrávám...' : 'Nahrát Menu'}
-          </button>
-        </div>
-
-        <div className="excelform">
-          <h3>Nahrát seznam uživatelů (.xlsx)</h3>
-          <input type="file" accept=".xlsx" onChange={handleUserChange} />
-          <button className="excelBtnSubmit" onClick={handleUploadUsers} disabled={loading}>
-            {loading ? 'Nahrávám...' : 'Nahrát E-maily'}
-          </button>
-        </div>
+        Na této URL bude login Form pro adminy
       </div>
 
       {message && <p style={{ color: 'black', marginTop: '20px' }}>{message}</p>}

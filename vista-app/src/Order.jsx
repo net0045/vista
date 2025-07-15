@@ -18,48 +18,52 @@ function isOrderingDisabled() {
 
 function getUpcomingWeekdays() {
   const now = new Date();
-  const day = now.getDay();
-  const hour = now.getHours();
-
+  const currentDay = now.getDay(); // 0 = neděle, ..., 6 = sobota
+  const currentHour = now.getHours();
   const dates = [];
 
-  if (
-    (day === 5) || // pátek
-    (day === 6) || // sobota
-    (day === 0 && hour < 15) // neděle před 15:00
-  ) {
+  // Pátek nebo sobota → nevracet nic
+  if (currentDay === 5 || currentDay === 6) {
     return [];
   }
 
-  let start = new Date(now);
+  // Neděle před 15:00 → taky nic
+  if (currentDay === 0 && currentHour < 15) {
+    return [];
+  }
+
+  let start = new Date();
   start.setHours(0, 0, 0, 0);
 
   // Neděle po 15:00 → začít od pondělí následujícího týdne
-  if (day === 0 && hour >= 15) {
-    const offset = 1; // pondělí
-    start.setDate(start.getDate() + offset);
-  }
-  // Pondělí–pátek → vždy vracet jen následující dny
-  else if (day >= 1 && day <= 5) {
-    start = new Date(now);
-    start.setHours(0, 0, 0, 0);
+  if (currentDay === 0 && currentHour >= 15) {
+    start.setDate(start.getDate() + 1); // pondělí
   }
 
   for (let i = 0; i < 5; i++) {
     const current = new Date(start);
     current.setDate(start.getDate() + i);
 
-    const currentDay = current.getDay();
-    // Pouze pondělí–pátek
-    if (currentDay >= 1 && currentDay <= 5 && current >= now.setHours(0, 0, 0, 0)) {
-      const dayName = weekdays[currentDay]; // CZ
-      const enName = dayNameEN(currentDay); // EN
-      const day = current.getDate();
-      const month = current.getMonth() + 1;
-      const year = current.getFullYear();
+    const day = current.getDay();
+    const hourCutoff = 21;
+
+    // Přeskočit dny, které již proběhly (např. pondělí po 21:00)
+    if (
+      current.toDateString() === now.toDateString() &&
+      currentHour >= hourCutoff
+    ) {
+      continue;
+    }
+
+    if (day >= 1 && day <= 5) {
+      const dayName = weekdays[day];        // CZ
+      const enName = dayNameEN(day);        // EN
+      const d = current.getDate();
+      const m = current.getMonth() + 1;
+      const y = current.getFullYear();
 
       dates.push({
-        label: `${dayName} / ${enName}: ${day}. ${month}. ${year}`,
+        label: `${dayName} / ${enName}: ${d}. ${m}. ${y}`,
         date: current,
       });
     }
@@ -67,6 +71,7 @@ function getUpcomingWeekdays() {
 
   return dates;
 }
+
 
 
 function dayNameEN(index) {
