@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { parseAndUploadMenu } from './scripts/parseMenu';
 import { uploadUsersFromExcel } from './scripts/uploadUsersFromExcel';
 
-function Admin() {
+function ExcelImport() {
   const navigate = useNavigate();
   const [menuFile, setMenuFile] = useState(null);
   const [userFile, setUserFile] = useState(null);
@@ -84,6 +84,7 @@ function Admin() {
         <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
       </div>
 
+
       <div className="logo-wrapper">
         <img src="/images/excel.png" alt="Excel logo" className="excel-logo" />
       </div>
@@ -111,4 +112,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default ExcelImport;
