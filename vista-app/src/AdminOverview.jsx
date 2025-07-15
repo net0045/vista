@@ -1,113 +1,147 @@
-import React, { useState } from 'react';
-import './Admin.css'; 
+import React, { useState, useEffect } from 'react';
+import './Admin.css';
 import { useNavigate } from 'react-router-dom';
-import { parseAndUploadMenu } from './scripts/parseMenu';
-import { uploadUsersFromExcel } from './scripts/uploadUsersFromExcel';
+import { getOverviewData } from './api/adminApi';
 
 function AdminOverview() {
   const navigate = useNavigate();
-  const [menuFile, setMenuFile] = useState(null);
-  const [userFile, setUserFile] = useState(null);
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
 
-  const handleMenuChange = (e) => {
-    setMenuFile(e.target.files[0]);
-  };
+  const SortableHeader = ({ label, sortKey, sortConfig, onSort }) => {
+  const isSorted = sortConfig.key === sortKey;
+  const directionIcon = isSorted
+    ? sortConfig.direction === 'asc'
+      ? '↑'
+      : '↓'
+    : '⇅';
 
-  const handleUserChange = (e) => {
-    setUserFile(e.target.files[0]);
-  };
+    return (
+        <th onClick={() => onSort(sortKey)} style={{ cursor: 'pointer', userSelect: 'none' }}>
+        {label} {directionIcon}
+        </th>
+    );  
+    };
 
-  const handleUploadMenu = async () => {
-    if (!menuFile) {
-      setMessage('Prosím vyber soubor s menu.');
-      return;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getOverviewData();
+
+        const formattedOrders = data.map(order => {
+          const [first, second] = order.FoodsInOrder.sort((a, b) => a.mealNumber - b.mealNumber);
+
+          return {
+            id: order.id,
+            date: order.date,
+            surname: order.user?.surname || '',
+            email: order.user?.email || '',
+            food1: first?.mealNumber || '',
+            food2: second?.mealNumber || '',
+            pickedFood1: first?.picked || false,
+            pickedFood2: second?.picked || false,
+            totalPrice: `${(first?.food?.cost || 0) + (second?.food?.cost || 0)} Kč`
+          };
+        });
+
+        setOrders(formattedOrders);
+        setFilteredOrders(formattedOrders);
+      } catch (error) {
+        console.error('Chyba při načítání dat:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const filtered = orders.filter(order =>
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredOrders(filtered);
+  }, [searchTerm, orders]);
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
     }
+    setSortConfig({ key, direction });
 
-    setLoading(true);
-    setMessage('');
+    const sorted = [...filteredOrders].sort((a, b) => {
+      if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+      if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
 
-    try {
-      const result = await parseAndUploadMenu(menuFile);
-      setMessage(`✅ Menu: ${result}`);
-    } catch (err) {
-      setMessage(`❌ Menu: ${err}`);
-    } finally {
-      setLoading(false);
-    }
+    setFilteredOrders(sorted);
   };
 
-  const handleUploadUsers = async () => {
-    if (!userFile) {
-      setMessage('Prosím vyber soubor s uživateli.');
-      return;
-    }
-
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const result = await uploadUsersFromExcel(userFile);
-      setMessage(`✅ Uživatele: ${result}`);
-    } catch (err) {
-      setMessage(`❌ Uživatele: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const goImport = () => {
-    navigate('/admin/import');
-  };
-
-  const goExport = () => {
-    navigate('/admin/export');
-  };
-
-  const goOverview = () => {
-    navigate('/admin/overview');
-  };
-
-  const goStorno = () => {
-    navigate('/admin/storno');
-  };
-
- 
+  const goImport = () => navigate('/admin/import');
+  const goExport = () => navigate('/admin/export');
+  const goOverview = () => navigate('/admin/overview');
+  const goStorno = () => navigate('/admin/storno');
 
   return (
-    <div className="admin-container">
+    <div className="admin-container-users">
       <div className="top-bar">
-        <button  onClick={goImport}>NAHRÁT EXCEL</button>
-        <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-        <button  onClick={goStorno}>STORNO OBJEDNÁVEK</button>
-        <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+        <button onClick={goImport}>NAHRÁT EXCEL</button>
+        <button onClick={goExport}>VYGENEROVAT EXCEL</button>
+        <button onClick={goStorno}>STORNO OBJEDNÁVEK</button>
+        <button onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
       </div>
 
-
-      <div className="logo-wrapper">
-        <img src="/images/excel.png" alt="Excel logo" className="excel-logo" />
+      <div className="filter">
+        <input
+          type="text"
+          placeholder="Hledat podle ID, emailu nebo příjmení..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: '8px 12px',
+            width: '100%',
+            maxWidth: '400px',
+            borderRadius: '6px',
+            border: '1px solid #ccc',
+            fontSize: '14px'
+          }}
+        />
       </div>
 
-      <div className="content-row">
-        <div className="excelform">
-          <h3>Nahrát menu (.xlsx)</h3>
-          <input type="file" accept=".xlsx" onChange={handleMenuChange} />
-          <button className="excelBtnSubmit" onClick={handleUploadMenu} disabled={loading}>
-            {loading ? 'Nahrávám...' : 'Nahrát Menu'}
-          </button>
-        </div>
-
-        <div className="excelform">
-          <h3>Nahrát seznam uživatelů (.xlsx)</h3>
-          <input type="file" accept=".xlsx" onChange={handleUserChange} />
-          <button className="excelBtnSubmit" onClick={handleUploadUsers} disabled={loading}>
-            {loading ? 'Nahrávám...' : 'Nahrát E-maily'}
-          </button>
-        </div>
-      </div>
-
-      {message && <p style={{ color: 'black', marginTop: '20px' }}>{message}</p>}
+      <table className="orders-table">
+          <thead>
+            <tr>
+              <SortableHeader label="ID objednávky" sortKey="id" sortConfig={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Datum" sortKey="date" sortConfig={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Příjmení" sortKey="surname" sortConfig={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
+              <th>Menu 1</th>
+              <th>Vyzvednuto</th>
+              <th>Menu 2</th>
+              <th>Vyzvednuto</th>
+              <SortableHeader label="Cena" sortKey="totalPrice" sortConfig={sortConfig} onSort={handleSort} />
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.map((order, index) => (
+              <tr key={index}>
+                <td>{order.id}</td>
+                <td>{order.date}</td>
+                <td>{order.surname}</td>
+                <td>{order.email}</td>
+                <td>{order.food1}</td>
+                <td>{order.pickedFood1 ? '✔️' : ''}</td>
+                <td>{order.food2}</td>
+                <td>{order.pickedFood2 ? '✔️' : ''}</td>
+                <td>{order.totalPrice}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
     </div>
   );
 }

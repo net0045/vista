@@ -7,6 +7,32 @@ export async function getAllFoods(): Promise<Food[]> {
     return data;
 }
 
+export async function getOverviewData(): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('orders')
+    .select(`
+      id,
+      date,
+      dateOfOrder,
+      user:User (
+        surname,
+        email
+      ),
+      FoodsInOrder (
+        mealNumber,
+        picked,
+        food:Food (
+          cost
+        )
+      )
+    `)
+    .order('date', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+
 export async function removeOrderAndFoodsInOrderByOrderId(orderId: string): Promise<void> {
   // 1. Smazat foodInOrder záznamy
   const { error: foodError } = await supabase
