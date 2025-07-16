@@ -14,6 +14,10 @@ import Signin from './Signin';
 import ProtectedRoute from './ProtectedRoute';
 import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
 import Admin from './Admin';
+import ExcelImport from './ExcelImport';
+import ExcelExport from './ExcelExport';
+import StornoOrders from './StornoOrders';
+import AdminOverview from './AdminOverview';
 
 
 function App() {
@@ -93,6 +97,10 @@ function App() {
       />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/admin/import" element={<ExcelImport />} />
+      <Route path="/admin/export" element={<ExcelExport />} />
+      <Route path="/admin/storno" element={<StornoOrders />} />
+      <Route path="/admin/overview" element={<AdminOverview />} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/menu" element={<Menu/>} />

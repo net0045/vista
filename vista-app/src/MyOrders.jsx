@@ -12,6 +12,7 @@ function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
   const fetchData = async () => {
     try {
       const token = getCookie('authToken');
@@ -79,13 +80,13 @@ function MyOrders() {
                   level="H"
                 />
                 <div className='orderInfo'>
-                  <p className='orderTitle'>Objednávka:</p>
+                  <p className='orderTitle'>ID objednávky: {order.id}</p>
                   <p className='orderDate'>
                     <span className='highlight'>Datum: </span>{order.date}
                   </p>
                   {order.foods.map((food, idx) => (
                     <p key={idx} className='orderMeal'>
-                      <span className='highlight'>Menu {idx + 1}: {food.mealNumber}</span>
+                      <span className='highlight'>{idx + 1}.Menu: {food.mealNumber}</span>
                     </p>
                   ))}
                   <p className='orderEmail'>

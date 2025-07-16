@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { parseAndUploadMenu } from './scripts/parseMenu';
 import { uploadUsersFromExcel } from './scripts/uploadUsersFromExcel';
 
-function Admin() {
+function ExcelImport() {
   const navigate = useNavigate();
   const [menuFile, setMenuFile] = useState(null);
   const [userFile, setUserFile] = useState(null);
@@ -84,12 +84,27 @@ function Admin() {
         <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
       </div>
 
+
       <div className="logo-wrapper">
         <img src="/images/excel.png" alt="Excel logo" className="excel-logo" />
       </div>
 
       <div className="content-row">
-        Na této URL bude login Form pro adminy
+        <div className="excelform">
+          <h3>Nahrát menu (.xlsx)</h3>
+          <input type="file" accept=".xlsx" onChange={handleMenuChange} />
+          <button className="excelBtnSubmit" onClick={handleUploadMenu} disabled={loading}>
+            {loading ? 'Nahrávám...' : 'Nahrát Menu'}
+          </button>
+        </div>
+
+        <div className="excelform">
+          <h3>Nahrát seznam uživatelů (.xlsx)</h3>
+          <input type="file" accept=".xlsx" onChange={handleUserChange} />
+          <button className="excelBtnSubmit" onClick={handleUploadUsers} disabled={loading}>
+            {loading ? 'Nahrávám...' : 'Nahrát E-maily'}
+          </button>
+        </div>
       </div>
 
       {message && <p style={{ color: 'black', marginTop: '20px' }}>{message}</p>}
@@ -97,4 +112,4 @@ function Admin() {
   );
 }
 
-export default Admin;
+export default ExcelImport;
