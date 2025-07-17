@@ -32,28 +32,15 @@ function getUpcomingWeekdays() {
     return [];
   }
 
-  let start = new Date();
+  // Začátek vždy od zítřka
+  const start = new Date(now);
+  start.setDate(now.getDate() + 1);
   start.setHours(0, 0, 0, 0);
-
-  // Neděle po 15:00 → začít od pondělí následujícího týdne
-  if (currentDay === 0 && currentHour >= 15) {
-    start.setDate(start.getDate() + 1); // pondělí
-  }
 
   for (let i = 0; i < 5; i++) {
     const current = new Date(start);
     current.setDate(start.getDate() + i);
-
     const day = current.getDay();
-    const hourCutoff = 21;
-
-    // Přeskočit dny, které již proběhly (např. pondělí po 21:00)
-    if (
-      current.toDateString() === now.toDateString() &&
-      currentHour >= hourCutoff
-    ) {
-      continue;
-    }
 
     if (day >= 1 && day <= 5) {
       const dayName = weekdays[day];        // CZ
