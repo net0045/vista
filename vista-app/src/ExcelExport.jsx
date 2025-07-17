@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Admin.css'; 
+import './Admin.css';
 import { useNavigate } from 'react-router-dom';
 import { getTomorrowOrders } from './api/adminApi';
 import * as XLSX from 'xlsx';
@@ -18,7 +18,7 @@ function ExcelExport() {
     setGenerating(true);
     try {
       const data = await getTomorrowOrders();
-
+      // First Excel: objednávky na zítřek
       const rows = data.map(order => {
         const [first, second] = order.FoodsInOrder.sort((a, b) => a.mealNumber - b.mealNumber);
 
@@ -34,12 +34,50 @@ function ExcelExport() {
         };
       });
 
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Objednávky');
+      const worksheet1 = XLSX.utils.json_to_sheet(rows);
+      const workbook1 = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook1, worksheet1, 'Objednávky');
 
-      const blob = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      saveAs(new Blob([blob]), 'objednavky_na_zitrek.xlsx');
+      const blob1 = XLSX.write(workbook1, { bookType: 'xlsx', type: 'array' });
+      saveAs(new Blob([blob1]), 'objednavky_na_zitrek.xlsx');
+
+      // Druhý Excel: agregace podle uživatelů
+      const mapUsersAndOrders = new Map();
+      data.forEach(order => {
+        const userId = order.user?.id;
+        const surname = order.user?.surname || '';
+        if (!userId || !surname) return;
+
+
+        if (!mapUsersAndOrders.has(userId)) {
+          mapUsersAndOrders.set(userId, {
+            'ID uživatele': userId,
+            'Příjmení': surname,
+            'Menu 1': 0,
+            'Menu 2': 0,
+            'Menu 3': 0,
+            'Menu 4': 0,
+            'Menu 5': 0
+          });
+        }
+
+        const userRecord = mapUsersAndOrders.get(userId);
+
+        order.FoodsInOrder.forEach(food => {
+          const menuKey = `Menu ${food.mealNumber}`;
+          if (userRecord[menuKey] !== undefined) {
+            userRecord[menuKey]++;
+          }
+        });
+      });
+
+      const rowsByUser = Array.from(mapUsersAndOrders.values());
+      const worksheet2 = XLSX.utils.json_to_sheet(rowsByUser);
+      const workbook2 = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook2, worksheet2, 'Souhrn');
+
+      const blob2 = XLSX.write(workbook2, { bookType: 'xlsx', type: 'array' });
+      saveAs(new Blob([blob2]), 'souhrn_uzivatelu.xlsx');
     } catch (err) {
       console.error('Chyba při generování Excelu:', err);
     } finally {
