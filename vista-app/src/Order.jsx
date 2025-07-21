@@ -324,13 +324,13 @@ function Order() {
 
             <div id='whatMeal'>
               <div className='whatMenu'>
-                <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
+                <p className='nadpis'>Jídlo číslo 1 <br /> <span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 1</span></p>
                 <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
               </div>
 
               {checked === true && (
                 <div className='whatMenu'>
-                  <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
+                  <p className='nadpis'>Jídlo číslo 2 <br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 2</span></p>
                   <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
                 </div>
               )}

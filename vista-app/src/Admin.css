@@ -55,27 +55,53 @@
   align-items: center;
 }
 
-.top-bar {
+.admin-navigation{
   width: 100%;
-  max-width: 1000px;
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
+  align-items: center;
+  justify-content: space-around;
   margin-top: 20px;
+  margin-bottom: 30px;
 }
 
-.top-bar button {
-  background-color: #effaffff;
-  border: none;
+.admin-backToAccButton{
   color: #f17300ff;
   padding: 8px 16px;
   width: 180px;
   border-radius: 8px;
   font-weight: 600;
   font-size: large;
-  
+  border-style: solid;
+  cursor: pointer;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.admin-backToAccButton:hover{
+  background-color: #f17300ff;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.top-bar {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.top-bar button {
+  background-color: #effaffff;
+  border: none;
+  color: #f17300ff;
+  width: 180px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: large;
+  border-style: solid;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 10px;
 }
 
 .top-bar button:hover {
