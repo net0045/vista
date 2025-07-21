@@ -145,7 +145,7 @@ function Login() {
             {isUserVerified ? (
                 <div className="form">
                     
-                    <div className="input-wrapper">
+                    
                         <input
                             className="input-bar"
                             type="email"
@@ -159,6 +159,7 @@ function Login() {
                             value={surname}
                             onChange={(e) => setSurname(e.target.value)}
                         />
+                        <div className="input-wrapper">
                         <input
                             className="input-bar"
                             type={showPassword ? "text" : "password"}
@@ -186,9 +187,8 @@ function Login() {
                                 <path d="M14.12 14.12L9.88 9.88" />
                             </svg>}
                         </span>
-                    </div>
 
-                    <div className="input-wrapper">
+                    
                         <input
                             className="input-bar"
                             type={showConfirmPassword ? "text" : "password"}
@@ -216,12 +216,12 @@ function Login() {
                                 <path d="M14.12 14.12L9.88 9.88" />
                             </svg>}
                         </span>
-                    </div>
-                    <div className="input-wrapper">
+                        </div>
+                    
                         <button type="submit" className="submit-button" onClick={handleSubmitPassword}>
                             Vytvořit heslo
                         </button>
-                    </div>
+              
                    
 
                     <p style={{ color: 'white' }}>{message}</p>

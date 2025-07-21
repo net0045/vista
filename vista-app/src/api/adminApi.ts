@@ -15,6 +15,7 @@ export async function getTomorrowOrders(): Promise<any[]> {
       id,
       date,
       user:User (
+        id,
         surname
       ),
       FoodsInOrder (
@@ -28,18 +29,18 @@ export async function getTomorrowOrders(): Promise<any[]> {
 
   if (error) throw error;
 
-  // formát - např. "3. 6. 2025"
+  // Získání zítřejšího data
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dateStr = `${tomorrow.getDate()}. ${tomorrow.getMonth() + 1}. ${tomorrow.getFullYear()}`;
 
+  // Porovnání s koncem stringu
   const filtered = (data || []).filter((order) =>
-    order.date.includes(dateStr)
+    order.date?.trim().endsWith(dateStr)
   );
 
   return filtered;
 }
-
 
 
 export async function getOverviewData(): Promise<any[]> {
