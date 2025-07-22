@@ -33,17 +33,23 @@ function getUpcomingWeekdays() {
     return [];
   }
 
+  let startOffset = 1;
+  if (currentDay >= 1 && currentDay <= 4 && currentHour >= 21) {
+    startOffset = 2;
+  }
+
   // Začátek vždy od zítřka
   const start = new Date(now);
-  start.setDate(now.getDate() + 1);
+  start.setDate(now.getDate() + startOffset);
   start.setHours(0, 0, 0, 0);
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const current = new Date(start);
     current.setDate(start.getDate() + i);
     const day = current.getDay();
 
     if (day >= 1 && day <= 5) {
+
       const dayName = weekdays[day];        // CZ
       const enName = dayNameEN(day);        // EN
       const d = current.getDate();
