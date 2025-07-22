@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Order.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
+import { createPaymentApiCall } from './api/paymentApi';
 import { v4 as uuidv4 } from 'uuid';
 import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
-import { getCurrentMenuId, getFoodIdByNumberAndMenuID } from './api/foodApi';
+import { getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 
@@ -228,6 +229,18 @@ function Order() {
 
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
+      
+      const orderPrice = await getPriceOfTheOrder(foodsInOrder);
+
+      // Vytvoření platby
+      const paymentResponse = await createPaymentApiCall("CZK", orderPrice, orderId);
+      const {redirectUrl} = await paymentResponse.json();
+      if (!redirectUrl) {
+        throw new Error('Chyba při vytváření URL na platbu.');
+      }
+      else{
+        window.location.href = redirectUrl;
+      }
 
       //záznam pro QrView
       const qrViewOrder = {

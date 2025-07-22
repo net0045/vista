@@ -139,6 +139,25 @@ export async function fetchAllergens() {
   return data;
 }
 
+export async function getPriceOfTheOrder(foodsInOrder) {
+  if (!foodsInOrder || foodsInOrder.length === 0) {
+    return 0;
+  }
+  const foodIds = foodsInOrder.map(food => food.id);
+  const { data, error } = await supabase
+    .from('Food')
+    .select('price')
+    .in('id', foodIds);
+
+  if (error) {
+    console.error('Chyba při získávání cen jídel:', error.message);
+    throw error;
+  }
+
+  const totalPrice = data.reduce((sum, food) => sum + food.price, 0);
+  return totalPrice*100; //V haléřích
+}
+
 export async function fetchMenuWithFoods() {
   // Získání nejnovějšího menu
   const { data: menus, error: menuError } = await supabase
