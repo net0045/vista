@@ -222,22 +222,23 @@ function Order() {
 
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
-
       const orderPrice = 12000;//await getPriceOfTheOrder(foodsInOrder);
+      
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
 
       // --- Realex HPP platba ---
       try {
+       
         const res = await fetch("/.netlify/functions/realex-hash", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: orderPrice,
+            amount: `${orderPrice}`, // Change to amount when ready
             currency: "EUR", // pokud support nastaví CZK, pak změň
             orderId: `ORD${Date.now()}`,//newOrder.id,
-            paymentMethod: "sofort", //Poté nějaký Checker
           }),
         });
+       
 
         const data = await res.json();
 

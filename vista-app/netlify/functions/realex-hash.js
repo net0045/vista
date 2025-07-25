@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 export async function handler(event) {
-  const { amount, currency, orderId, paymentMethod } = JSON.parse(event.body);
+  const { amount, currency, orderId } = JSON.parse(event.body);
 
   const merchantId = process.env.VITE_GP_MERCHANT_ID;
   const account = process.env.VITE_GP_ACCOUNT;
@@ -12,7 +12,7 @@ export async function handler(event) {
     .replace(/[-:.TZ]/g, "")
     .slice(0, 14);
 
-  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}.${paymentMethod}`; //Change testAmount and orderId to amount when ready
+  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}`; //Change testAmount and orderId to amount when ready
   const firstHash = crypto.createHash("sha1").update(dataToSign).digest("hex");
   const sha1hash = crypto.createHash("sha1").update(`${firstHash}.${secret}`).digest("hex");
 
