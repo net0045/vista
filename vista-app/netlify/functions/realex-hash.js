@@ -3,9 +3,9 @@ import crypto from "crypto";
 export async function handler(event) {
   const { amount, currency, orderId } = JSON.parse(event.body);
 
-  const merchantId = "dev579703007626245828";
-  const account = "internettest";
-  const secret = "xZqk2ejFII";
+  const merchantId = process.env.VITE_GP_MERCHANT_ID;
+  const account = "transaction_processing";
+  const secret = process.env.VITE_GP_APP_SECRET;
 
   const timestamp = new Date()
     .toISOString()

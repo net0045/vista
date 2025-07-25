@@ -4,8 +4,8 @@ import fetch from "node-fetch";
 export async function handler(event) {
   const { amount, currency, orderId } = JSON.parse(event.body);
 
-  const appId = "tvůj_APP_ID";
-  const appKey = "tvůj_APP_KEY";
+  const appId = process.env.GLOBALPAY_APP_ID;
+  const appKey = process.env.GLOBALPAY_APP_KEY;
 
   const auth = Buffer.from(`${appId}:${appKey}`).toString("base64");
 
