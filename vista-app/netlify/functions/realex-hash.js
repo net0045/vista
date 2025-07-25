@@ -42,7 +42,7 @@ export async function handler(event) {
       orderId,
       amount: testAmount, // Change to amount when ready
       currency,
-      sha1hash,
+      finalHash,
     }),
   };
 }
