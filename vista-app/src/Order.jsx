@@ -248,7 +248,7 @@ function Order() {
 
         const fields = {
           MERCHANT_ID: data.merchantId,
-          ACCOUNT: "transaction_processing",
+          ACCOUNT: "internet",
           ORDER_ID: data.orderId,
           AMOUNT: data.amount,
           CURRENCY: data.currency,

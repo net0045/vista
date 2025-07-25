@@ -4,7 +4,7 @@ export async function handler(event) {
   const { amount, currency, orderId } = JSON.parse(event.body);
 
   const merchantId = process.env.VITE_GP_MERCHANT_ID;
-  const account = "transaction_processing";
+  const account = "internet";
   const secret = process.env.VITE_GP_APP_SECRET;
 
   const timestamp = new Date()
@@ -17,6 +17,16 @@ export async function handler(event) {
     .createHash("sha1")
     .update(`${toHash}.${secret}`)
     .digest("hex");
+
+  console.log('HASH DEBUG:', {
+  merchantId,
+  account,
+  orderId,
+  amount,
+  currency,
+  timestamp,
+  sha1hash
+  });
 
   return {
     statusCode: 200,
