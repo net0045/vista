@@ -35,7 +35,7 @@ function getUpcomingWeekdays() {
 
   let startOffset = 1;
   if (currentDay >= 1 && currentDay <= 4 && currentHour >= 21) {
-    startOffset = 2;
+    startOffset = 3; //need to rework whole logic
   }
 
   // Začátek vždy od zítřka
@@ -248,7 +248,7 @@ function Order() {
 
         const fields = {
           MERCHANT_ID: data.merchantId,
-          ACCOUNT: "internet",
+          ACCOUNT: data.account,
           ORDER_ID: data.orderId,
           AMOUNT: data.amount,
           CURRENCY: data.currency,

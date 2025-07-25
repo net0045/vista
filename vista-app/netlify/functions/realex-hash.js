@@ -4,7 +4,7 @@ export async function handler(event) {
   const { amount, currency, orderId } = JSON.parse(event.body);
 
   const merchantId = process.env.VITE_GP_MERCHANT_ID;
-  const account = "internet";
+  const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
 
   const timestamp = new Date()
