@@ -24,9 +24,9 @@ function getUpcomingWeekdays() {
   const dates = [];
 
   // Pátek nebo sobota → nevracet nic
-  if (currentDay === 5 || currentDay === 6) {
+  /*if (currentDay === 5 || currentDay === 6) {
     return [];
-  }
+  }*/
 
   // Neděle před 15:00 → taky nic
   if (currentDay === 0 && currentHour < 15) {
@@ -104,9 +104,10 @@ function Order() {
 
 
   useEffect(() => {
-    setDates(getUpcomingWeekdays());
-    setOrderingDisabled(isOrderingDisabled());
-  }, []);
+  setDates(getUpcomingWeekdays());
+  // setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
+  setOrderingDisabled(false); // povolit objednávky kdykoliv
+}, []);
 
   useEffect(() => {
   if (!selectedDate) return;
@@ -187,34 +188,20 @@ function Order() {
       qrText: `${window.location.origin}/qr?id=${orderId}`
     };
 
-
     const menuId = await getCurrentMenuId();
     if (!menuId) {
       console.error('Aktuální menu nebylo nalezeno.');
       return alert('Menu nebylo nalezeno.');
     }
 
-
     const foodsInOrder = [];
-
     if (checked) {
       const foodId1 = await getFoodIdByNumberAndMenuID(value1, menuId);
       const foodId2 = await getFoodIdByNumberAndMenuID(value2, menuId);
-
       if (foodId1 && foodId2) {
         foodsInOrder.push(
-          {
-            id: uuidv4(),
-            foodId: foodId1,
-            orderId,
-            mealNumber: value1,
-          },
-          {
-            id: uuidv4(),
-            foodId: foodId2,
-            orderId,
-            mealNumber: value2,
-          }
+          { id: uuidv4(), foodId: foodId1, orderId, mealNumber: value1 },
+          { id: uuidv4(), foodId: foodId2, orderId, mealNumber: value2 }
         );
       } else {
         return alert('Nepodařilo se načíst jídla podle menu.');
@@ -235,70 +222,65 @@ function Order() {
 
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
-      
+
       const orderPrice = await getPriceOfTheOrder(foodsInOrder);
+      // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
+      const amount = Math.round(orderPrice);
 
-      // Vytvoření platby
-      const paymentResponse = await createPaymentApiCall("CZK", orderPrice, orderId);
-      const {redirectUrl} = await paymentResponse.json();
-      if (!redirectUrl) {
-        throw new Error('Chyba při vytváření URL na platbu.');
-      }
-      else{
-        window.location.href = redirectUrl;
-      }
-
-      //záznam pro QrView
-      const qrViewOrder = {
-        id: newOrder.id,
-        date: newOrder.date,
-        menu1: value1,
-        menu2: checked ? value2 : null,
-        email: newOrder.email,
-        surname: newOrder.surname,
-      };
-
-      // QR info (pro případné vykreslení QR obsahu i odkazu)
-      const qrContent =
-        `Objednávka:\nDatum: ${newOrder.date}\n` +
-        foodsInOrder.map((item, index) => `Menu ${index + 1}: ${item.mealNumber}\n`).join('') +
-        `E-mail: ${newOrder.email}` + `Příjmení: ${newOrder.surname}`;
-
-      qrViewOrder.qrContent = qrContent;
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));
-
-      try 
-      {
-        const amount = checked ? 1700 : 900;
-
-        const paymentResponse = await fetch('/.netlify/functions/create-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+      // --- Realex HPP platba ---
+      try {
+        const res = await fetch("/.netlify/functions/realex-hash", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount,
-            currency: 'CZK',
-            orderId: newOrder.id
-          })
+            amount: orderPrice,
+            currency: "EUR", // pokud support nastaví CZK, pak změň
+            orderId: newOrder.id,
+          }),
         });
 
-        const paymentData = await paymentResponse.json();
+        const data = await res.json();
 
-        if (paymentData.redirectUrl) {
-          window.location.href = paymentData.redirectUrl;
-        } else {
-          alert('Chyba při přesměrování na platbu.');
-          console.error('Chyba platby:', paymentData);
-        }
-      } catch (e) {
-        console.error('Chyba při odeslání platby:', e);
-        alert('Nepodařilo se přesměrovat na platbu.');
+        // vytvoření formuláře
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://pay.sandbox.realexpayments.com/pay";
+
+        const fields = {
+          MERCHANT_ID: data.merchantId,
+          ACCOUNT: "transaction_processing",
+          ORDER_ID: data.orderId,
+          AMOUNT: data.amount,
+          CURRENCY: data.currency,
+          TIMESTAMP: data.timestamp,
+          SHA1HASH: data.sha1hash,
+          AUTO_SETTLE_FLAG: 1,
+          COMMENT1: "Vista app objednávka", // volitelné
+        };
+
+        Object.entries(fields).forEach(([key, value]) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = key;
+          input.value = value;
+          form.appendChild(input);
+        });
+
+        document.body.appendChild(form);
+        form.submit();
+        return; // stop – přesměrování
+      } catch (err) {
+        console.error("Chyba při přípravě platby:", err);
+        alert("Nepodařilo se přesměrovat na platbu.");
       }
+
+
     } catch (err) {
       console.error('Chyba při ukládání do databáze:', err);
       alert('Ukládání selhalo. Zkuste to prosím znovu.');
     }
   };
+
 
   return (
     <>
