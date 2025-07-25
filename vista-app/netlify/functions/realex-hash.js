@@ -7,7 +7,7 @@ export async function handler(event) {
   const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
 
-  const testAmount = 120; // For testing purposes, later use amount but right now its returning 0 for some reason
+  const testAmount = '120'; // For testing purposes, later use amount but right now its returning 0 for some reason
 
   const timestamp = new Date()
     .toISOString()
