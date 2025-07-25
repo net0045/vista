@@ -8,14 +8,61 @@ import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } f
 import { getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
+const dayNameEN = (day) =>
+  ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
 
 function isOrderingDisabled() {
   const now = new Date();
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5 || (day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5 || day === 6 ||(day === 0 && hour < 15);
 }
+/*
+* Functional filter of the upcoming weekdays ->  later use this function in the Order component
+function getUpcomingWeekdays() {
+  const now = new Date();
+  const inputDay = now.getDay(); // 0 = neděle, ..., 6 = sobota
+  const inputHour = now.getHours();
+
+  /*if (isOrderingDisabled()) {
+    return [];
+  }
+  let maxDays = 5; // max 5 pracovních dní (po–pá)
+  let dayOffset = 1;
+
+  // Snížení počtu dní podle pozdní hodiny
+  if (inputHour >= 21) {
+    maxDays = maxDays - inputDay - 1;
+  } else {
+    maxDays = maxDays - inputDay;
+  }
+
+  // Pokud je už moc pozdě – omez zobrazené dny
+  while (dates.length < maxDays) {
+    const future = new Date(now);
+    future.setDate(now.getDate() + dayOffset);
+    future.setHours(0, 0, 0, 0);
+    const day = future.getDay();
+
+    const isTooLate =
+      (inputDay === 1 && inputHour >= 21 && day === 2) || // pondělí po 21:00 → vynechat úterý
+      (inputDay === 2 && inputHour >= 21 && day === 3) || // úterý po 21:00 → vynechat středu
+      (inputDay === 3 && inputHour >= 21 && day === 4) || // středa po 21:00 → vynechat čtvrtek
+      (inputDay === 0 && inputHour >= 21 && day === 1);   // neděle po 21:00 → vynechat pondělí
+
+    if (day >= 1 && day <= 5 && !isTooLate) {
+      dates.push({
+        label: `${weekdays[day]} / ${dayNameEN(day)}: ${future.getDate()}. ${future.getMonth() + 1}. ${future.getFullYear()}`,
+        date: future,
+      });
+    }
+
+    dayOffset++;
+  }
+
+  return dates;
+}*/
 
 function getUpcomingWeekdays() {
   const now = new Date();
@@ -66,12 +113,11 @@ function getUpcomingWeekdays() {
   return dates;
 }
 
-
-
 function dayNameEN(index) {
   const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return en[index];
 }
+
 
 async function storeDataToDatabase(order, foodsInOrder) {
   const successOrderStorage = await storeOrder(order);
@@ -228,18 +274,8 @@ function Order() {
 
       // --- Realex HPP platba ---
       try {
-       
-        const res = await fetch("/.netlify/functions/realex-hash", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: `${orderPrice}`, // Change to amount when ready
-            currency: "EUR", // pokud support nastaví CZK, pak změň
-            orderId: `ORD${Date.now()}`,//newOrder.id,
-          }),
-        });
-       
-
+        const orderId = `ORD${Date.now()}`; // unikátní ID objednávky
+        const res = await createPaymentApiCall(orderId, `${orderPrice}`, 'CZK');
         const data = await res.json();
 
         // vytvoření formuláře
@@ -247,7 +283,6 @@ function Order() {
         form.method = "POST";
         form.action = "https://pay.sandbox.realexpayments.com/pay";
 
-        //NEEDS update after debugging
         const fields = {
           MERCHANT_ID: data.merchantId,
           ACCOUNT: data.account,
