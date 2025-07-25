@@ -7,6 +7,8 @@ export async function handler(event) {
   const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
 
+  //Test methods.. 
+  const paymentMethod = 'sofort';
   const testAmount = 12000; // For testing purposes, later use amount but right now its returning 0 for some reason
 
   const timestamp = new Date()
@@ -14,9 +16,9 @@ export async function handler(event) {
     .replace(/[-:.TZ]/g, "")
     .slice(0, 14);
 
-  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${testAmount}.${currency}`; //Change testAmount to amount when ready
-  const fullData = `${dataToSign}.${secret}`;
-  const sha1hash = crypto.createHash("sha1").update(fullData).digest("hex");
+  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${testAmount}.${currency}.${paymentMethod}`; //Change testAmount to amount when ready
+  const firstHash = crypto.createHash("sha1").update(dataToSign).digest("hex");
+  const finalHash = crypto.createHash("sha1").update(`${firstHash}.${secret}`).digest("hex");
 
   console.log('HASH DEBUG:', {
   merchantId,
@@ -25,9 +27,10 @@ export async function handler(event) {
   amount: testAmount,
   currency,
   timestamp,
-  toHash: dataToSign,
-  fullHashInput: fullData,
-  sha1hash
+  dataToSign,
+  firstHash,
+  fullHashInput: `${firstHash}.${secret}`,
+  finalHash,
   });
 
   return {
