@@ -12,11 +12,9 @@ export async function handler(event) {
     .replace(/[-:.TZ]/g, "")
     .slice(0, 14);
 
-  const toHash = `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}`;
-  const sha1hash = crypto
-    .createHash("sha1")
-    .update(`${toHash}.${secret}`)
-    .digest("hex");
+  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}`;
+  const fullData = `${dataToSign}.${secret}`;
+  const sha1hash = crypto.createHash("sha1").update(fullData).digest("hex");
 
   console.log('HASH DEBUG:', {
   merchantId,
@@ -25,6 +23,8 @@ export async function handler(event) {
   amount,
   currency,
   timestamp,
+  toHash: `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}`,
+  fullHashInput: `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}.${secret}`,
   sha1hash
   });
 
