@@ -223,7 +223,7 @@ function Order() {
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
 
-      const orderPrice = 120;//await getPriceOfTheOrder(foodsInOrder);
+      const orderPrice = 12000;//await getPriceOfTheOrder(foodsInOrder);
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
 
       // --- Realex HPP platba ---
@@ -249,7 +249,7 @@ function Order() {
         const fields = {
           MERCHANT_ID: data.merchantId,
           ACCOUNT: data.account,
-          ORDER_ID: data.orderIdtest,
+          ORDER_ID: data.orderId,
           AMOUNT: data.amount,
           CURRENCY: data.currency,
           TIMESTAMP: data.timestamp,
