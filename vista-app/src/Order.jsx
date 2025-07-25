@@ -234,7 +234,7 @@ function Order() {
           body: JSON.stringify({
             amount: orderPrice,
             currency: "EUR", // pokud support nastaví CZK, pak změň
-            orderId: newOrder.id,
+            orderId: `ORD${Date.now()}`,//newOrder.id,
           }),
         });
 
