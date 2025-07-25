@@ -10,20 +10,21 @@ export async function handler(event) {
   //Test methods.. 
   const paymentMethod = 'sofort';
   const testAmount = 12000; // For testing purposes, later use amount but right now its returning 0 for some reason
+  const orderIdtest = `ORD${Date.now()}`;
 
   const timestamp = new Date()
     .toISOString()
     .replace(/[-:.TZ]/g, "")
     .slice(0, 14);
 
-  const dataToSign = `${timestamp}.${merchantId}.${orderId}.${testAmount}.${currency}.${paymentMethod}`; //Change testAmount to amount when ready
+  const dataToSign = `${timestamp}.${merchantId}.${orderIdtest}.${testAmount}.${currency}.${paymentMethod}`; //Change testAmount and orderId to amount when ready
   const firstHash = crypto.createHash("sha1").update(dataToSign).digest("hex");
   const finalHash = crypto.createHash("sha1").update(`${firstHash}.${secret}`).digest("hex");
 
   console.log('HASH DEBUG:', {
   merchantId,
   account,
-  orderId,
+  orderIdtest,
   amount: testAmount,
   currency,
   timestamp,
@@ -39,7 +40,7 @@ export async function handler(event) {
       timestamp,
       merchantId,
       account,
-      orderId,
+      orderIdtest,
       amount: testAmount, // Change to amount when ready
       currency,
       finalHash,
