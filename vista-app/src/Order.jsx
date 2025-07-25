@@ -223,7 +223,7 @@ function Order() {
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
 
-      const orderPrice = await getPriceOfTheOrder(foodsInOrder);
+      const orderPrice = 120;//await getPriceOfTheOrder(foodsInOrder);
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
       const amount = Math.round(orderPrice);
 
