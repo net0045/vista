@@ -268,8 +268,32 @@ function Order() {
       const orders = JSON.parse(localStorage.getItem('orders')) || [];
       localStorage.setItem('orders', JSON.stringify([...orders, qrViewOrder]));
 
-      alert('Objednávka byla uložena.');
-      navigate('/myorders');
+      try 
+      {
+        const amount = checked ? 1700 : 900;
+
+        const paymentResponse = await fetch('/.netlify/functions/create-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            currency: 'CZK',
+            orderId: newOrder.id
+          })
+        });
+
+        const paymentData = await paymentResponse.json();
+
+        if (paymentData.redirectUrl) {
+          window.location.href = paymentData.redirectUrl;
+        } else {
+          alert('Chyba při přesměrování na platbu.');
+          console.error('Chyba platby:', paymentData);
+        }
+      } catch (e) {
+        console.error('Chyba při odeslání platby:', e);
+        alert('Nepodařilo se přesměrovat na platbu.');
+      }
     } catch (err) {
       console.error('Chyba při ukládání do databáze:', err);
       alert('Ukládání selhalo. Zkuste to prosím znovu.');
@@ -343,13 +367,13 @@ function Order() {
 
             <div id='whatMeal'>
               <div className='whatMenu'>
-                <p className='nadpis'>Jídlo číslo 1 <br />Meal number 1</p>
+                <p className='nadpis'>Jídlo číslo 1 <br /> <span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 1</span></p>
                 <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
               </div>
 
               {checked === true && (
                 <div className='whatMenu'>
-                  <p className='nadpis'>Jídlo číslo 2 <br />Meal number 2</p>
+                  <p className='nadpis'>Jídlo číslo 2 <br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 2</span></p>
                   <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
                 </div>
               )}

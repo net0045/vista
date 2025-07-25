@@ -77,11 +77,16 @@ function Admin() {
 
   return (
     <div className="admin-container">
-      <div className="top-bar">
-        <button  onClick={goImport}>NAHRÁT EXCEL</button>
-        <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-        <button  onClick={goStorno}>STORNO OBJEDNÁVEK</button>
-        <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+      <div className='admin-navigation'>
+        <div>
+          <button className='admin-backToAccButton' onClick={() => navigate('/account')}>ZPĚT NA ÚČET</button>
+        </div>
+        <div className="top-bar">
+          <button  onClick={goImport}>NAHRÁT EXCEL</button>
+          <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
+          <button  onClick={goStorno}>STORNO OBJEDNÁVEK</button>
+          <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+        </div>
       </div>
 
       <div className="logo-wrapper">
