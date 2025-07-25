@@ -235,6 +235,7 @@ function Order() {
             amount: orderPrice,
             currency: "EUR", // pokud support nastaví CZK, pak změň
             orderId: `ORD${Date.now()}`,//newOrder.id,
+            paymentMethod: "sofort", //Poté nějaký Checker
           }),
         });
 

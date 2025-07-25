@@ -1,16 +1,11 @@
 import crypto from "crypto";
 
 export async function handler(event) {
-  const { amount, currency, orderId } = JSON.parse(event.body);
+  const { amount, currency, orderId, paymentMethod } = JSON.parse(event.body);
 
   const merchantId = process.env.VITE_GP_MERCHANT_ID;
   const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
-
-  //Test methods.. 
-  const paymentMethod = 'sofort';
-  const testAmount = 12000; // For testing purposes, later use amount but right now its returning 0 for some reason
-  const orderIdtest = `ORD${Date.now()}`;
 
   const timestamp = new Date()
     .toISOString()
