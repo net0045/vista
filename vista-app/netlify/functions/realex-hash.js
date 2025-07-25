@@ -7,6 +7,8 @@ export async function handler(event) {
   const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
 
+  const testAmount = 120; // For testing purposes, later use amount but right now its returning 0 for some reason
+
   const timestamp = new Date()
     .toISOString()
     .replace(/[-:.TZ]/g, "")
@@ -20,7 +22,7 @@ export async function handler(event) {
   merchantId,
   account,
   orderId,
-  amount,
+  testAmount,
   currency,
   timestamp,
   toHash: `${timestamp}.${merchantId}.${orderId}.${amount}.${currency}`,
@@ -35,7 +37,7 @@ export async function handler(event) {
       merchantId,
       account,
       orderId,
-      amount,
+      testAmount,
       currency,
       sha1hash,
     }),
