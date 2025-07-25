@@ -225,7 +225,6 @@ function Order() {
 
       const orderPrice = 120;//await getPriceOfTheOrder(foodsInOrder);
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
-      const amount = Math.round(orderPrice);
 
       // --- Realex HPP platba ---
       try {
@@ -246,10 +245,11 @@ function Order() {
         form.method = "POST";
         form.action = "https://pay.sandbox.realexpayments.com/pay";
 
+        //NEEDS update after debugging
         const fields = {
           MERCHANT_ID: data.merchantId,
           ACCOUNT: data.account,
-          ORDER_ID: data.orderId,
+          ORDER_ID: data.orderIdtest,
           AMOUNT: data.amount,
           CURRENCY: data.currency,
           TIMESTAMP: data.timestamp,

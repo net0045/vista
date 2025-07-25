@@ -19,7 +19,7 @@ export async function handler(event) {
 
   const dataToSign = `${timestamp}.${merchantId}.${orderIdtest}.${testAmount}.${currency}.${paymentMethod}`; //Change testAmount and orderId to amount when ready
   const firstHash = crypto.createHash("sha1").update(dataToSign).digest("hex");
-  const finalHash = crypto.createHash("sha1").update(`${firstHash}.${secret}`).digest("hex");
+  const sha1hash = crypto.createHash("sha1").update(`${firstHash}.${secret}`).digest("hex");
 
   console.log('HASH DEBUG:', {
   merchantId,
@@ -31,7 +31,7 @@ export async function handler(event) {
   dataToSign,
   firstHash,
   fullHashInput: `${firstHash}.${secret}`,
-  finalHash,
+  sha1hash,
   });
 
   return {
@@ -43,7 +43,7 @@ export async function handler(event) {
       orderIdtest,
       amount: testAmount, // Change to amount when ready
       currency,
-      finalHash,
+      sha1hash,
     }),
   };
 }
