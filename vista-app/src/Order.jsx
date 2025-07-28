@@ -292,6 +292,7 @@ function Order() {
           SHA1HASH: data.sha1hash,
           AUTO_SETTLE_FLAG: 1,
           COMMENT1: "Vista app objednávka", // volitelné
+          MERCHANT_RESPONSE_URL: `${window.location.origin}/.netlify/functions/payment-response`
         };
 
         Object.entries(fields).forEach(([key, value]) => {
