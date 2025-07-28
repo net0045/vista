@@ -23,7 +23,6 @@ export async function handler(event) {
     MERCHANT_ID,
     ORDER_ID,
     AMOUNT,
-    CURRENCY,
     TIMESTAMP,
     RESULT,
     MESSAGE,
@@ -31,6 +30,8 @@ export async function handler(event) {
     AUTHCODE,
     SHA1HASH
   } = result;
+
+  const CURRENCY = 'CZK';
 
   const secret = process.env.VITE_GP_APP_SECRET;
   console.log("🔐 Loaded secret:", !!secret); // Will log true if present
