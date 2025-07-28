@@ -44,29 +44,17 @@ export async function handler(event) {
   const successUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=success`;
   const failUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=fail`;
 
-  console.log("URLs:", {
-    successUrl,
-    failUrl
-  });
+ const redirectUrl = RESULT === "00" && isValid ? successUrl : failUrl;
 
+  console.log("📦 Redirecting to:", redirectUrl);
 
-  if (RESULT === "00") {
-    console.log("✅ Platba úspěšná... redirecting");
-    return {
-      statusCode: 302,
-      headers: {
-        Location: successUrl,
-      },
-      body: "",
-    };
-  } else {
-    console.log("Platba neúspěšná... redirecting");
-    return {
-      statusCode: 302,
-      headers: {
-        Location: failUrl,
-      },
-      body: "",
-    };
-  }
+  return {
+    statusCode: 302,
+    headers: {
+      Location: redirectUrl,
+      'Content-Type': 'text/html',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: `<html><head><meta http-equiv="refresh" content="0;url=${redirectUrl}" /></head><body>Redirecting to <a href="${redirectUrl}">${redirectUrl}</a>...</body></html>`
+  };
 }
