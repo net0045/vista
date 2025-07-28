@@ -11,6 +11,7 @@ import Order from './Order';
 import QrView from './QrView';
 import Verify from './Verify';
 import Signin from './Signin';
+import Payment from './Payment';
 import ProtectedRoute from './ProtectedRoute';
 import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
 import Admin from './Admin';
