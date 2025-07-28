@@ -23,9 +23,11 @@ export async function handler(event) {
   const SECRET = process.env.VITE_GP_APP_SECRET;
 
   // Dle oficiální dokumentace Realex pro response:
-  const toHash = `${TIMESTAMP}.${MERCHANT_ID}.${ORDER_ID}.${RESULT}.${MESSAGE}.${PASREF}.${CARDTYPE}`;
+  const toHash = `${TIMESTAMP}.${MERCHANT_ID}.${ORDER_ID}.${RESULT}.${MESSAGE}.${PASREF}`;
   const firstHash = crypto.createHash("sha1").update(toHash).digest("hex");
   const finalHash = crypto.createHash("sha1").update(`${firstHash}.${SECRET}`).digest("hex");
+
+  console.log("🔐 Result:", result);
 
   console.log("🔐 HPP Response Verification:");
   console.log("→ toHash:", toHash);
