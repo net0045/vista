@@ -49,12 +49,22 @@ export async function handler(event) {
   console.log("📦 Redirecting to:", redirectUrl);
 
   return {
-    statusCode: 302,
-    headers: {
-      Location: redirectUrl,
-      'Content-Type': 'text/html',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: `<html><head><meta http-equiv="refresh" content="0;url=${redirectUrl}" /></head><body>Redirecting to <a href="${redirectUrl}">${redirectUrl}</a>...</body></html>`
-  };
+  statusCode: 200,
+  headers: {
+    'Content-Type': 'text/html',
+    'Cache-Control': 'no-cache',
+    'Access-Control-Allow-Origin': '*',
+  },
+  body: `
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="0;url=${redirectUrl}" />
+        <title>Redirecting...</title>
+      </head>
+      <body>
+        <p>Redirecting to <a href="${redirectUrl}">${redirectUrl}</a></p>
+      </body>
+    </html>
+  `
+};
 }
