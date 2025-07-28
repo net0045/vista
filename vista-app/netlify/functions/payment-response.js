@@ -1,4 +1,3 @@
-// netlify/functions/payment-response.js
 import crypto from 'crypto';
 
 export async function handler(event) {
@@ -16,34 +15,30 @@ export async function handler(event) {
     RESULT,
     MESSAGE,
     PASREF,
-    CARDTYPE,
+    AUTHCODE,
     SHA1HASH
   } = result;
 
   const SECRET = process.env.VITE_GP_APP_SECRET;
 
-  // Dle oficiální dokumentace Realex pro response:
-  const toHash = `${TIMESTAMP}.${MERCHANT_ID}.${ORDER_ID}.${RESULT}.${MESSAGE}.${PASREF}.cards`;
+  const toHash = `${TIMESTAMP}.${MERCHANT_ID}.${ORDER_ID}.${RESULT}.${MESSAGE}.${PASREF}.${AUTHCODE}`;
   const firstHash = crypto.createHash("sha1").update(toHash).digest("hex");
   const finalHash = crypto.createHash("sha1").update(`${firstHash}.${SECRET}`).digest("hex");
 
-  console.log("🔐 Result:", result);
-
-  console.log("🔐 HPP Response Verification:");
+  console.log("🔐 Verifikace HPP Response:", result);
   console.log("→ toHash:", toHash);
   console.log("→ firstHash:", firstHash);
   console.log("→ finalHash:", finalHash);
   console.log("→ SHA1HASH from gateway:", SHA1HASH);
 
-  const isValid = SHA1HASH.toLowerCase() === finalHash.toLowerCase();
+  const isValid = SHA1HASH?.toLowerCase() === finalHash?.toLowerCase();
 
   if (!isValid) {
     return {
       statusCode: 400,
-      body: "❌ Neplatný podpis (hash).",
+      body: "❌ Neplatný podpis (hash nesouhlasí).",
     };
   }
-
 
   const successUrl = process.env.REDIRECT_SUCCESS_URL || `${event.headers.origin || 'https://example.com'}/success`;
   const failUrl = process.env.REDIRECT_FAILURE_URL || `${event.headers.origin || 'https://example.com'}/fail`;
