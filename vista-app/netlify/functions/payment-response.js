@@ -44,6 +44,11 @@ export async function handler(event) {
   const successUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=success`;
   const failUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=fail`;
 
+  console.log("URLs:", {
+    successUrl,
+    failUrl
+  });
+
 
   if (RESULT === "00") {
     console.log("✅ Platba úspěšná... redirecting");
