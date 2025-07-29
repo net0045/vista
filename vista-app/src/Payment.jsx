@@ -25,7 +25,7 @@ function Payment() {
     if (stat === 'success') {
       setSuccess('✅');
       setMessage('Platba proběhla úspěšně. Děkujeme!');
-      setENGMessage('The payment was successful. Thank you!');
+      setMessageENG('The payment was successful. Thank you!');
       setInfo('Objednávku máte v MOJE OBJEDNÁVKY');
       setInfoENG('You can find your order in MY ORDERS');
     } else if (stat === 'fail') {
