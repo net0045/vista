@@ -153,8 +153,10 @@ export async function getPriceOfTheOrder(foodsInOrder) {
     console.error('Chyba při získávání cen jídel:', error.message);
     throw error;
   }
+  console.log('Ceny jídel:', data);
 
   const totalPrice = data.reduce((sum, food) => sum + food.price, 0);
+  console.log('Price:', totalPrice);
   return totalPrice*100; //V haléřích
 }
 

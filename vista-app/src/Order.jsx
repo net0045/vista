@@ -267,13 +267,14 @@ function Order() {
 
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
-      const orderPrice = 12000;//await getPriceOfTheOrder(foodsInOrder);
+      const orderPrice = await getPriceOfTheOrder(foodsInOrder);
       
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
 
       // --- Realex HPP platba ---
       try {
-        const orderId = `ORD${Date.now()}`; // unikátní ID objednávky
+        const orderId = `${newOrder.id}`; // unikátní ID objednávky
+        //const orderId = `ORD${Date.now()}`; // unikátní ID objednávky
         const res = await createPaymentApiCall(orderId, `${orderPrice}`, 'CZK');
         const data = await res.json();
 

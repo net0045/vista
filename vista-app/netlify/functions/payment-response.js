@@ -46,7 +46,7 @@ export async function handler(event) {
 
  const redirectUrl = RESULT === "00" && isValid ? successUrl : failUrl;
 
-  console.log("📦 Redirecting to:", redirectUrl);
+  console.log(" Redirecting to:", redirectUrl);
 
   return {
   statusCode: 200,
