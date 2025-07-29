@@ -8,7 +8,7 @@ import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } f
 import { getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
-//const dayNameEN = (day) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
+const dayNameEN = (day) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
 
 function isOrderingDisabled() {
   const now = new Date();
@@ -17,14 +17,14 @@ function isOrderingDisabled() {
 
   return (day === 4 && hour >= 21) || day === 5 || day === 6 ||(day === 0 && hour < 15);
 }
-/*
-* Functional filter of the upcoming weekdays ->  later use this function in the Order component
+//Functional filter of the upcoming weekdays ->  later use this function in the Order component
 function getUpcomingWeekdays() {
   const now = new Date();
   const inputDay = now.getDay(); // 0 = neděle, ..., 6 = sobota
   const inputHour = now.getHours();
+  const dates = [];
 
-  /*if (isOrderingDisabled()) {
+  if (isOrderingDisabled()) {
     return [];
   }
   let maxDays = 5; // max 5 pracovních dní (po–pá)
@@ -61,18 +61,18 @@ function getUpcomingWeekdays() {
   }
 
   return dates;
-}*/
+}
 
-function getUpcomingWeekdays() {
+/*function getUpcomingWeekdays() {
   const now = new Date();
   const currentDay = now.getDay(); // 0 = neděle, ..., 6 = sobota
   const currentHour = now.getHours();
   const dates = [];
 
   // Pátek nebo sobota → nevracet nic
-  /*if (currentDay === 5 || currentDay === 6) {
+  if (currentDay === 5 || currentDay === 6) {
     return [];
-  }*/
+  }
 
   // Neděle před 15:00 → taky nic
   if (currentDay === 0 && currentHour < 15) {
@@ -115,7 +115,7 @@ function getUpcomingWeekdays() {
 function dayNameEN(index) {
   const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return en[index];
-}
+}*/
 
 
 async function storeDataToDatabase(order, foodsInOrder) {
@@ -136,6 +136,7 @@ function Order() {
   const [value2, setValue2] = useState('');
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [surnameToken, setSurnameToken] = useState('');
   const [emailToken, setEmailToken] = useState('');
@@ -148,26 +149,28 @@ function Order() {
   const [canOrderTwoMeals, setCanOrderTwoMeals] = useState(true);
 
 
-  useEffect(() => {
+useEffect(() => {
   setDates(getUpcomingWeekdays());
   // setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
   setOrderingDisabled(false); // povolit objednávky kdykoliv
 }, []);
 
   useEffect(() => {
-  if (!selectedDate) return;
+   
+      if (!selectedDate) return;
 
-  const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
-  if (!label) return;
+      const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+      if (!label) return;
 
-  const mealsAlready = usedDates.get(label) || 0;
-  setCanOrderTwoMeals(mealsAlready === 0);
-  if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
+      const mealsAlready = usedDates.get(label) || 0;
+      setCanOrderTwoMeals(mealsAlready === 0);
+      if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
+    
   }, [selectedDate, usedDates]);
 
-  // Kontrola tokenu při načtení
-  useEffect(() => {
-    const checkToken = async () => {
+useEffect(() => {
+  const checkToken = async () => {
+    try {
       const token = getCookie('authToken');
       if (!token) return;
 
@@ -188,11 +191,17 @@ function Order() {
         mealsPerDate.set(order.date, count + foods.length);
       }
 
-      setUsedDates(mealsPerDate); // např. Map { 'Úterý...': 2, 'Pátek...': 1 }
-    };
+      setUsedDates(mealsPerDate);
+    } catch (err) {
+      console.error('Chyba při kontrole tokenu nebo načítání objednávek:', err);
+    } finally {
+      setLoading(false); // ← tady nastavíš, že je vše hotové
+    }
+  };
 
-    checkToken();
-  }, []);
+  checkToken();
+}, []);
+
 
 
   const handleChange1 = (e) => {
@@ -324,6 +333,14 @@ function Order() {
     }
   };
 
+if (loading) {
+  return (
+    <div className="loadingSection">
+      <p className="loadingText">Vše se připravuje...</p>
+      <img src="images/loading.gif" alt="Načítání..." className="loading-img" />
+    </div>
+  );
+}
 
   return (
     <>

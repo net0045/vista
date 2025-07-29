@@ -26,7 +26,7 @@ export async function handler(event) {
   const finalHash = crypto.createHash("sha1").update(`${firstHash}.${SECRET}`).digest("hex");
 
   const isValid = SHA1HASH?.toLowerCase() === finalHash?.toLowerCase();
-  console.log("Result:", result);
+
   if (!isValid) {
     console.error("❌ Invalid hash:", {
       toHash,

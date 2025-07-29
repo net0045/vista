@@ -1,13 +1,12 @@
 export const createPaymentApiCall = async (orderId, amount, currency) => {
   try {
-    console.log("Creating payment for order:", orderId, "Amount:", amount, "Currency:", currency);
     const res = await fetch("/.netlify/functions/realex-hash", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: amount, // Change to amount when ready
-            currency: currency, // pokud support nastaví CZK, pak změň
-            orderId: orderId,//newOrder.id,
+            amount: amount, 
+            currency: currency, 
+            orderId: orderId,
           }),
         });
 
