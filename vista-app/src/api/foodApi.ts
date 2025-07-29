@@ -143,20 +143,18 @@ export async function getPriceOfTheOrder(foodsInOrder) {
   if (!foodsInOrder || foodsInOrder.length === 0) {
     return 0;
   }
-  const foodIds = foodsInOrder.map(food => food.id);
+  const foodIds = foodsInOrder.map(food => food.foodId);
   const { data, error } = await supabase
     .from('Food')
-    .select('price')
+    .select('cost')
     .in('id', foodIds);
 
   if (error) {
     console.error('Chyba při získávání cen jídel:', error.message);
     throw error;
   }
-  console.log('Ceny jídel:', data);
 
-  const totalPrice = data.reduce((sum, food) => sum + food.price, 0);
-  console.log('Price:', totalPrice);
+  const totalPrice = data.reduce((sum, food) => sum + food.cost, 0);
   return totalPrice*100; //V haléřích
 }
 

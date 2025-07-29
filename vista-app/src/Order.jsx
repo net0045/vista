@@ -267,8 +267,13 @@ function Order() {
 
     try {
       await storeDataToDatabase(newOrder, foodsInOrder);
-      const orderPrice = await getPriceOfTheOrder(foodsInOrder);
-      
+      const orderPrice = await getPriceOfTheOrder(foodsInOrder); //Předtím tam bylo = 12000
+
+      if (orderPrice === 0) {
+        alert('Nastala neočekávaná chyba s hodnotou objednávky. Prosím, zkuste to znovu a případně kontaktujte podporu.');
+        navigate('/account');
+      }
+
       // Realex očekává částku v centech – převedeme (např. 170 Kč = 17000)
 
       // --- Realex HPP platba ---

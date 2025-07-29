@@ -7,6 +7,14 @@ export async function handler(event) {
   const account = process.env.VITE_GP_ACCOUNT;
   const secret = process.env.VITE_GP_APP_SECRET;
 
+  console.log('Creating hash for payment:', {
+    merchantId,
+    account,
+    orderId,
+    amount,
+    currency,
+  });
+
   const timestamp = new Date()
     .toISOString()
     .replace(/[-:.TZ]/g, "")
