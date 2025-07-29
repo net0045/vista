@@ -26,7 +26,7 @@ export async function handler(event) {
   const finalHash = crypto.createHash("sha1").update(`${firstHash}.${SECRET}`).digest("hex");
 
   const isValid = SHA1HASH?.toLowerCase() === finalHash?.toLowerCase();
-
+  console.log("Result:", result);
   if (!isValid) {
     console.error("❌ Invalid hash:", {
       toHash,
@@ -44,7 +44,7 @@ export async function handler(event) {
   const successUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=success`;
   const failUrl = `${baseUrl}/payment?id=${ORDER_ID}&status=fail`;
 
- const redirectUrl = RESULT === "00" && isValid ? successUrl : failUrl;
+  const redirectUrl = RESULT === "00" && isValid ? successUrl : failUrl;
 
   console.log(" Redirecting to:", redirectUrl);
 

@@ -1,6 +1,7 @@
 import crypto from "crypto";
 
 export async function handler(event) {
+  console.log("Incoming body:", event.body);
   const { amount, currency, orderId } = JSON.parse(event.body);
 
   const merchantId = process.env.VITE_GP_MERCHANT_ID;
