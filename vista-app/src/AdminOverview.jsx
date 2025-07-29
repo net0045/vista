@@ -120,9 +120,9 @@ function AdminOverview() {
                 <SortableHeader label="Příjmení" sortKey="surname" sortConfig={sortConfig} onSort={handleSort} />
                 <SortableHeader label="Email" sortKey="email" sortConfig={sortConfig} onSort={handleSort} />
               <th>Menu 1</th>
-              <th>Vyzvednuto</th>
+              <th>Vyzvednuto 1</th>
               <th>Menu 2</th>
-              <th>Vyzvednuto</th>
+              <th>Vyzvednuto 2</th>
               <SortableHeader label="Cena" sortKey="totalPrice" sortConfig={sortConfig} onSort={handleSort} />
             </tr>
           </thead>
