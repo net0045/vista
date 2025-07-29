@@ -110,52 +110,46 @@ function Signin() {
     return (
         <div className="content">
             <div className="logo">
-                <h3>Vítej na stránce účtu!</h3>
-                <img
-                    src="/images/account-icon.png"
-                    alt="Icon Account"
-                    className="account-icon"
-                />
+                <h3>Vítej na stránce účtu! <br /> Welcome to the account page!</h3>
+                <img src="/images/account-icon.png" alt="Icon Account" className="account-icon"/>
             </div>
-            <div className="form">
-                <input
-                    className="input-bar"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <div className="input-wrapper">
-                    <input
-                        className="input-bar"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Vaše heslo"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <span
-                        className="eye-icon"
-                        onClick={() => setShowPassword(!showPassword)}
-                    >
-                        {showPassword ? <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                            stroke="#0071a9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            viewBox="0 0 24 24">
-                            <path d="M1 12s4-8 11-8 11 8 11 8
-                                -4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg> : <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
-                            stroke="#0071a9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            viewBox="0 0 24 24">
-                            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
-                                a20.86 20.86 0 0 1 5.17-5.88" />
-                            <path d="M1 1l22 22" />
-                            <path d="M9.53 9.53a3.5 3.5 0 0 0 4.95 4.95" />
-                            <path d="M14.12 14.12L9.88 9.88" />
-                        </svg>}
-                    </span>
+            <div className="form-signin">
+                <div className='inputs-signin'>
+                    <input className="input-bar-signin" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+                    <div className="input-wrapper-signin">
+                        <input
+                            className="input-bar-signin"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Heslo / Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <span
+                            className="eye-icon-signin"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                                stroke="#0071a9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                viewBox="0 0 24 24">
+                                <path d="M1 12s4-8 11-8 11 8 11 8
+                                    -4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg> : <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                                stroke="#0071a9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                viewBox="0 0 24 24">
+                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
+                                    a20.86 20.86 0 0 1 5.17-5.88" />
+                                <path d="M1 1l22 22" />
+                                <path d="M9.53 9.53a3.5 3.5 0 0 0 4.95 4.95" />
+                                <path d="M14.12 14.12L9.88 9.88" />
+                            </svg>}
+                        </span>
+                    </div>
                 </div>
+                
 
                 <button type="submit" className="submit-button" onClick={handleSubmitLogin} >
-                    Potvrdit
+                    Potvrdit / Submit
                 </button>
 
                 <p style={{ color: 'white' }}>{message}</p>

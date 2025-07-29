@@ -47,12 +47,13 @@
 }
 
 
-  .form {
+  .form-login {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
+    width: 90%;
+    gap: 10px;
   }
 
   .login-container {
@@ -66,14 +67,14 @@
     animation: glow 1s infinite alternate; /* Add glow animation */
   }
 
-  .input-bar {
-    width: 90%;
+  .input-bar-login {
+    width: 100%;
     padding: 10px;
-    margin: 10px 0;
     border: 1px solid;
     border-color: #0071a9ff;
     border-radius: 10px;
     font-size: 1rem;
+    text-align: center;
   }
   
   .submit-button {
@@ -85,32 +86,19 @@
     border: none;
     border-radius: 10px;
     font-size: 1rem;
-    transition: background-color 0.3s ease;
   }
   
-  .submit-button:hover {
-    background-color: #eac435ff;
-  }
-.input-wrapper-email {
+
+
+
+.input-wrapper-login {
   position: relative;
   width: 100%;
-  margin: 2px 0;
   display: flex;
   align-items: center;
-}
-.input-wrapper {
-  position: relative;
-  width: 90%;
-  margin: 2px 0;
-  display: flex;
-  align-items: center;
+  gap: 10px;
 }
 
-.input-wrapper .input-bar {
-  width: 100%;
-  padding-right: 40px; /* rezerva na očko */
-  padding-left: 10px;
-}
 
 .eye-icon {
   position: absolute;
@@ -119,7 +107,6 @@
   transform: translateY(-50%);
   font-size: 1.2rem;
   color: #0071a9ff;
-  cursor: pointer;
   user-select: none;
   line-height: 1;
 }

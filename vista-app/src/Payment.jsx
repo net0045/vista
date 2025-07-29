@@ -35,14 +35,16 @@ function Payment() {
       setInfo('ZKUSTE TO PROSÍM ZNOVU');
       setInfoENG('PLEASE TRY AGAIN');
     } else {
-      setMessage('⚠️ Stav platby není známý.');
+      setSuccess('⚠️');
+      setMessage('Stav platby není známý.');
+      setMessageENG('The payment status is unknown.');
     }
   }, [params]);
 
   return (
     <div className="content">
       <div className="payment-status">
-        <h2>Stav platby</h2>
+        <h2>Stav platby <br /> Payment status</h2>
         <div className='no-yes'>{success}</div>
         <p>{message}</p>
         <p className='eng-message'>{messageENG}</p>
