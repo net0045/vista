@@ -84,7 +84,7 @@ function Admin() {
         <div className="top-bar">
           <button  onClick={goImport}>NAHRÁT EXCEL</button>
           <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-          <button  onClick={goStorno}>STORNO OBJEDNÁVEK</button>
+
           <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
         </div>
       </div>

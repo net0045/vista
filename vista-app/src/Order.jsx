@@ -413,12 +413,12 @@ if (loading) {
                 <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
               </div>
 
-              {checked === true && (
+              <div className={`second-meal-container ${checked ? 'show' : ''}`}>
                 <div className='whatMenu'>
                   <p className='nadpis'>Jídlo číslo 2 <br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 2</span></p>
                   <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
                 </div>
-              )}
+              </div>
             </div>
 
             <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>

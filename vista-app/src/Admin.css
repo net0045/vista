@@ -65,21 +65,23 @@
 }
 
 .admin-backToAccButton{
-  color: #f17300ff;
+  color: white;
   padding: 8px 16px;
   width: 180px;
   border-radius: 8px;
   font-weight: 600;
   font-size: large;
   border-style: solid;
+  border-color: rgb(255, 255, 255);
   cursor: pointer;
-  background-color: transparent;
+  background-color: #f17300ff;
   transition: all 0.2s ease;
 }
 
 .admin-backToAccButton:hover{
-  background-color: #f17300ff;
-  color: white;
+  background-color: transparent;
+  color: #0071a9ff;
+  border-color: #0071a9ff;
   transition: all 0.2s ease;
 }
 
@@ -284,7 +286,8 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .orders-table tbody tr:hover {
-  background-color: #f9f9f9;
+  background-color: #f17300ff;
+  transition: 0.3s;
 }
 
 .orders-table tbody td {
@@ -313,4 +316,39 @@ input[type="file"]::file-selector-button:hover {
   align-items: center;
   width: 80%;
   margin: 20px auto;
+}
+
+
+
+.btn-action {
+  border: none;
+  border-radius: 7px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100px;
+  border-style: solid;
+  transition: 0.3s;
+}
+
+.btn-action:hover{
+  background-color: transparent;
+  border-style: solid;
+  transition: 0.3s;
+}
+
+.btn-storno {
+  background-color: red;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.btn-zaplatit {
+  background-color: #34d50cff;
+  color: white;
+}
+
+.status-zaplaceno {
+  color: #34d50cff;
+  font-weight: bold;
 }

@@ -2,11 +2,10 @@ import { supabase } from '../lib/supabaseClient'
 import { Food } from '../types/Food'; 
 
 export async function getAllFoods(): Promise<Food[]> {
-    const { data, error } = await supabase.from('Food').select('*');
-    if (error) throw error;
-    return data;
+  const { data, error } = await supabase.from('Food').select('*');
+  if (error) throw error;
+  return data;
 }
-
 
 export async function getTomorrowOrders(): Promise<any[]> {
   const { data, error } = await supabase
@@ -29,19 +28,17 @@ export async function getTomorrowOrders(): Promise<any[]> {
 
   if (error) throw error;
 
-  // Získání zítřejšího data
+  // Zítřejší datum
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dateStr = `${tomorrow.getDate()}. ${tomorrow.getMonth() + 1}. ${tomorrow.getFullYear()}`;
 
-  // Porovnání s koncem stringu
   const filtered = (data || []).filter((order) =>
     order.date?.trim().endsWith(dateStr)
   );
 
   return filtered;
 }
-
 
 export async function getOverviewData(): Promise<any[]> {
   const { data, error } = await supabase
@@ -50,6 +47,7 @@ export async function getOverviewData(): Promise<any[]> {
       id,
       date,
       dateOfOrder,
+      ispaid,
       user:User (
         surname,
         email
@@ -68,9 +66,8 @@ export async function getOverviewData(): Promise<any[]> {
   return data;
 }
 
-
 export async function removeOrderAndFoodsInOrderByOrderId(orderId: string): Promise<void> {
-  // 1. Smazat foodInOrder záznamy
+  // 1. Smazat FoodsInOrder
   const { error: foodError } = await supabase
     .from('FoodsInOrder')
     .delete()
@@ -80,7 +77,7 @@ export async function removeOrderAndFoodsInOrderByOrderId(orderId: string): Prom
     throw new Error(`Chyba při mazání jídel v objednávce: ${foodError.message}`);
   }
 
-  // 2. Smazat samotnou objednávku
+  // 2. Smazat objednávku
   const { error: orderError } = await supabase
     .from('orders')
     .delete()
@@ -88,5 +85,16 @@ export async function removeOrderAndFoodsInOrderByOrderId(orderId: string): Prom
 
   if (orderError) {
     throw new Error(`Chyba při mazání objednávky: ${orderError.message}`);
+  }
+}
+
+export async function setOrderPaidById(orderId: string): Promise<void> {
+  const { error } = await supabase
+    .from('orders')
+    .update({ ispaid: true })
+    .eq('id', orderId);
+
+  if (error) {
+    throw new Error(`Chyba při označení objednávky jako zaplacené: ${error.message}`);
   }
 }

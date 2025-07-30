@@ -23,14 +23,14 @@ function ExcelExport() {
         const [first, second] = order.FoodsInOrder.sort((a, b) => a.mealNumber - b.mealNumber);
 
         return {
-          'ID objednávky': order.id,
-          'Datum': order.date,
+          //'ID objednávky': order.id,
+          //'Datum': order.date,
           'Příjmení': order.user?.surname || '',
           'Číslo Menu 1': first?.mealNumber || '',
-          'Menu 1': first?.food?.item || '',
+          //'Menu 1': first?.food?.item || '',
           'Číslo Menu 2': second?.mealNumber || '',
-          'Menu 2': second?.food?.item || '',
-          'Cena celkem': (first?.food?.cost || 0) + (second?.food?.cost || 0)
+          //'Menu 2': second?.food?.item || '',
+          //'Cena celkem': (first?.food?.cost || 0) + (second?.food?.cost || 0)
         };
       });
 
@@ -87,11 +87,16 @@ function ExcelExport() {
 
   return (
     <div className="admin-container-export">
-      <div className="top-bar">
-        <button onClick={goImport}>NAHRÁT EXCEL</button>
-        <button onClick={goExport}>VYGENEROVAT EXCEL</button>
-        <button onClick={goStorno}>STORNO OBJEDNÁVEK</button>
-        <button onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+      <div className='admin-navigation'>
+        <div>
+          <button className='admin-backToAccButton' onClick={() => navigate('/account')}>ZPĚT NA ÚČET</button>
+        </div>
+        <div className="top-bar">
+          <button  onClick={goImport}>NAHRÁT EXCEL</button>
+          <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
+
+          <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+        </div>
       </div>
 
       <div className="logo-wrapper">

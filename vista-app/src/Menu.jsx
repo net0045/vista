@@ -118,7 +118,7 @@ function Menu() {
         )}
       </div>
 
-      <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/><span style={{fontStyle: 'italic'}}>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</span></p>
+      <p id='info'>Kterékoliv z jídel lze objednat každý den v průběhu týdne. Uvedená cena obsahuje polévku dle denní nabídky.<br/><span style={{fontStyle: 'italic', fontWeight: 'normal'}}>Any of these meals can be ordered everyday during the week. Mentioned prices include the soup of the day.</span></p>
 
       <p className='nadpis'>Hlavní chody / Main courses</p>
       <div className='mainCourses'>

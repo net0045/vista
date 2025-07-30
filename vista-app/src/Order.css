@@ -50,7 +50,7 @@
   background-color: white;
   padding: 15px 20px;
   border-radius: 15px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 1);
   display: flex;
   align-items: center;
   gap: 15px;
@@ -115,4 +115,18 @@ input[type="checkbox"] {
 
 #orderButton:hover {
   background-color: #eac435ff;
+}
+
+.second-meal-container {
+  opacity: 0;
+  transform: translateY(-40px);
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.second-meal-container.show {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 200px;
 }
