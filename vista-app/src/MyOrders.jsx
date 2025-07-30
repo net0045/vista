@@ -3,7 +3,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import './MyOrders.css';
 import { useNavigate } from 'react-router-dom';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
-import { getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
+import { getPaidOrdersForUser, getFoodsInOrder } from './api/orderApi';
 
 function MyOrders() {
   const navigate = useNavigate();
@@ -12,36 +12,37 @@ function MyOrders() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = getCookie('authToken');
+        if (!token) return;
 
-  const fetchData = async () => {
-    try {
-      const token = getCookie('authToken');
-      if (!token) return;
+        const payload = await verifyToken(token, getSecretKey());
+        if (!payload?.userId || !payload?.email) return;
 
-      const payload = await verifyToken(token, getSecretKey());
-      if (!payload?.userId || !payload?.email) return;
+        setEmail(payload.email);
 
-      setEmail(payload.email);
+        // Načíst jen zaplacené objednávky uživatele
+        const paidOrders = await getPaidOrdersForUser(payload.userId);
 
-      const realOrders = await getAllOrdersForUser(payload.userId); //TODO PAK ZMĚNIT NA ZAPLACENÉ OBJEDNÁVKY
+        // K těmto objednávkám stáhnout jídla
+        const ordersWithFoods = await Promise.all(
+          paidOrders.map(async (order) => {
+            const foods = await getFoodsInOrder(order.id);
+            return { ...order, foods };
+          })
+        );
 
-      const ordersWithFoods = await Promise.all(
-        realOrders.map(async (order) => {
-          const foods = await getFoodsInOrder(order.id);
-          return { ...order, foods };
-        })
-      );
+        setOrders(ordersWithFoods);
+      } catch (err) {
+        console.error('Chyba při načítání objednávek:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setOrders(ordersWithFoods);
-    } catch (err) {
-      console.error('Chyba při načítání objednávek:', err);
-    } finally {
-      setLoading(false); 
-    }
-  };
-
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   return (
     <>
