@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import './Payment.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
+import { changePaymentStatus } from './api/paymentApi';
+import { removeOrderAndFoodsInOrderByOrderId } from './api/adminApi';
 
 function Payment() {
   const [params] = useSearchParams();
@@ -14,6 +16,8 @@ function Payment() {
   const [info, setInfo] = useState('');
   const [infoENG, setInfoENG] = useState('');
   const [success, setSuccess] = useState('');
+
+
 
   useEffect(() => {
     const id = params.get('id');
@@ -28,12 +32,30 @@ function Payment() {
       setMessageENG('The payment was successful. Thank you!');
       setInfo('Objednávku máte v MOJE OBJEDNÁVKY');
       setInfoENG('You can find your order in MY ORDERS');
+      const markAsPaid = async () => {
+        try {
+          await changePaymentStatus(id);
+          alert('Platba byla úspěšně zpracována. Děkujeme za objednávku!');
+        } catch (err) {
+          console.error('Chyba při aktualizaci objednávky:', err);
+        }
+      };
+      markAsPaid();
     } else if (stat === 'fail') {
       setSuccess('❌');
       setMessage('Platba byla zamítnuta nebo přerušena.');
       setMessageENG('The payment was declined or interrupted.');
       setInfo('ZKUSTE TO PROSÍM ZNOVU');
       setInfoENG('PLEASE TRY AGAIN');
+      const removeOrder = async () => {
+        try {
+          await removeOrderAndFoodsInOrderByOrderId(id);
+          alert('Objednávka byla zrušena kvůli neúspěšné platbě.');
+        } catch (err) {
+          console.error('Chyba při rušení objednávky:', err);
+        }
+      };
+      removeOrder();
     } else {
       setSuccess('⚠️');
       setMessage('Stav platby není známý.');
