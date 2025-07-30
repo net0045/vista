@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import './Payment.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
-import { changePaymentStatus } from './api/paymentApi';
-import { removeOrderAndFoodsInOrderByOrderId } from './api/adminApi';
+
+import { removeOrderAndFoodsInOrderByOrderId, setOrderPaidById } from './api/adminApi';
 
 function Payment() {
   const [params] = useSearchParams();
@@ -34,7 +34,7 @@ function Payment() {
       setInfoENG('You can find your order in MY ORDERS');
       const markAsPaid = async () => {
         try {
-          await changePaymentStatus(id);
+          await setOrderPaidById(id);
           alert('Platba byla úspěšně zpracována. Děkujeme za objednávku!');
         } catch (err) {
           console.error('Chyba při aktualizaci objednávky:', err);
