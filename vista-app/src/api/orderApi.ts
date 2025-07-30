@@ -132,3 +132,41 @@ export const storeFoodsInOrder = async (foodsInOrder: any[]) => {
     }
 }
 
+export const checkUnpaidOrders = async (userId: string) => {
+    try {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('userId', userId)
+            .eq('ispaid', false);
+
+        if (error) {
+            throw error;
+        }
+
+        return data.length > 0; // Vrátí true, pokud existují neuhrazené objednávky
+    } catch (error) {
+        console.error('Chyba při kontrole neuhrazených objednávek:', error);
+        return false;
+    }
+}
+
+export const listUnpaidOrders = async (userId: string) => {
+    try {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('userId', userId)
+            .eq('ispaid', false);
+
+        if (error) {
+            throw error;
+        }
+
+        return data; // list nezaplacených objednávek
+    } catch (error) {
+        console.error('Chyba při kontrole neuhrazených objednávek:', error);
+        return false;
+    }
+}
+

@@ -4,7 +4,7 @@ import './Order.css';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { createPaymentApiCall } from './api/paymentApi';
 import { v4 as uuidv4 } from 'uuid';
-import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder } from './api/orderApi';
+import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder, checkUnpaidOrders, } from './api/orderApi';
 import { getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
@@ -148,6 +148,8 @@ function Order() {
 
   const [canOrderTwoMeals, setCanOrderTwoMeals] = useState(true);
 
+  const [showUnpaidModal, setShowUnpaidModal] = useState(false);
+
 
 useEffect(() => {
   setDates(getUpcomingWeekdays());
@@ -182,6 +184,9 @@ useEffect(() => {
       setSurnameToken(payload.surname);
 
       const orders = await getAllOrdersForUser(payload.userId);
+
+      const unpaid = await checkUnpaidOrders(payload.userId);
+      setShowUnpaidModal(unpaid);
 
       const mealsPerDate = new Map();
 
@@ -349,6 +354,18 @@ if (loading) {
       </div>
 
       <div id='page'>
+         {showUnpaidModal && (
+            <div className="modal-backdrop">
+              <div className="modal">
+                <p className="modal-text">
+                  ⚠️<strong> Máš neuhrazenou objednávku. </strong>⚠️<br />
+                  ID nalezneš na stránce <strong>Moje objednávky</strong>.<br />
+                  Zajdi prosím vyřešit osobně na recepci.
+                </p>
+                <button className="modal-button" onClick={() => setShowUnpaidModal(false)}>Zavřít</button>
+              </div>
+            </div>
+          )}
         {orderingDisabled ? (
           <p style={{ fontSize: '18px', color: 'gray', fontStyle: 'italic' }}>
             <br /><br />Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.<br /><br />
