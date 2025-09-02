@@ -87,47 +87,51 @@ function Admin() {
   }, [showPopup]);
 
   return (
-    <div className="admin-container">
-      <div className="admin-navigation">
-        <div>
-          <button
-            className="admin-backToAccButton"
-            onClick={() => navigate('/account')}
-          >
-            ZPĚT NA ÚČET
-          </button>
+    <div className="admin-container admin-login-page">
+      <div className='admin-login-container'>
+        <div className="admin-navigation">
+          <div>
+            <button
+              className="admin-backToAccButton"
+              onClick={() => navigate('/account')}
+            >
+              ZPĚT NA ÚČET
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="content-row">
-        <div className="admin-signin">
-          <input
-            className="input-bar-signin"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="input-bar-signin"
-            placeholder="Heslo / Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        <div className="content-row">
+          <div className="admin-signin">
+            <input
+              style={{marginBottom: '10px', marginTop: '25%'}}
+              className="input-bar-signin"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              className="input-bar-signin"
+              placeholder="Heslo / Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <button
-            type="submit"
-            className="submit-button"
-            onClick={handleSubmitLogin}
-          >
-            Potvrdit / Submit
-          </button>
+            <button
+              style={{marginTop: '20%'}}
+              type="submit"
+              className="submit-button"
+              onClick={handleSubmitLogin}
+            >
+              Potvrdit / Submit
+            </button>
 
-          {showPopup && (
-            <div className={`message-popup ${messageType}`}>
-              {message}
-            </div>
-          )}
+            {showPopup && (
+              <div className={`message-popup ${messageType}`}>
+                {message}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
