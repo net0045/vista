@@ -30,7 +30,7 @@ function Account() {
     useEffect(() => {
         const checkToken = async () => {
             const token = getCookie('authToken');
-            if (!token) return;
+            if (!token) return; 
 
             const payload = await verifyToken(token, getSecretKey());
             if (!payload) {
@@ -38,7 +38,6 @@ function Account() {
                 return;
             }
 
-            
             if (payload.email && payload.verified) {
                 setEmail(payload.email);
                 setIsUserVerified(payload.verified);

@@ -53,7 +53,7 @@ function Signin() {
                     surname: userData.surname, 
                 };
                 const token = await createToken(payloadToken);
-                document.cookie = `authToken=${token}; path=/; secure; samesite=strict`; // Uložení tokenu do cookie
+                document.cookie = `authToken=${token}; path=/; secure; samesite=strict`;
                 showMessage('Přihlášení proběhlo úspěšně! Budete přesměrováni na váš účet.', 'success');
 
                 setTimeout(() => {

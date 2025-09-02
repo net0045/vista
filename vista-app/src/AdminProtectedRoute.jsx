@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 
-function ProtectedRoute({ children }) {
+function AdminProtectedRoute({ children }) {
   const [authorized, setAuthorized] = useState(null); // null = loading
 
   useEffect(() => {
@@ -14,7 +14,7 @@ function ProtectedRoute({ children }) {
       }
 
       const payload = await verifyToken(token, getSecretKey());
-      if (!payload || !payload.verified || !payload.isPassword) {
+      if (!payload || !payload.verified || !payload.isPassword || payload.admin !== true) {
         setAuthorized(false);
         return;
       }
@@ -31,4 +31,4 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-export default ProtectedRoute;
+export default AdminProtectedRoute;

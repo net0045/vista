@@ -19,6 +19,7 @@ import ExcelImport from './ExcelImport';
 import ExcelExport from './ExcelExport';
 
 import AdminOverview from './AdminOverview';
+import AdminProtectedRoute from './AdminProtectedRoute';
 
 
 function App() {
@@ -98,10 +99,9 @@ function App() {
       />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/import" element={<ExcelImport />} />
-      <Route path="/admin/export" element={<ExcelExport />} />
-
-      <Route path="/admin/overview" element={<AdminOverview />} />
+      <Route path="/admin/import" element={<AdminProtectedRoute><ExcelImport /></AdminProtectedRoute>} />
+      <Route path="/admin/export" element={<AdminProtectedRoute><ExcelExport /></AdminProtectedRoute>} />
+      <Route path="/admin/overview" element={<AdminProtectedRoute><AdminOverview /></AdminProtectedRoute>} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
       <Route path="/menu" element={<Menu/>} />

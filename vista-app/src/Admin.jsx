@@ -1,103 +1,135 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Admin.css'; 
 import { useNavigate } from 'react-router-dom';
-import { parseAndUploadMenu } from './scripts/parseMenu';
-import { uploadUsersFromExcel } from './scripts/uploadUsersFromExcel';
+import bcrypt from 'bcryptjs';
+import { getUserByEmail, getUserHashedPassword } from './api/userApi';
+import { createToken, getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 
 function Admin() {
   const navigate = useNavigate();
-  const [menuFile, setMenuFile] = useState(null);
-  const [userFile, setUserFile] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [messageType, setMessageType] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleMenuChange = (e) => {
-    setMenuFile(e.target.files[0]);
+  const showMessage = (text, type = 'info') => {
+    setMessage(text);
+    setMessageType(type);
+    setShowPopup(true);
   };
 
-  const handleUserChange = (e) => {
-    setUserFile(e.target.files[0]);
-  };
-
-  const handleUploadMenu = async () => {
-    if (!menuFile) {
-      setMessage('Prosím vyber soubor s menu.');
+  const handleSubmitLogin = async () => {
+    if (!email || !password) {
+      showMessage('Vyplňte prosím všechny údaje.', 'warning');
       return;
     }
 
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const result = await parseAndUploadMenu(menuFile);
-      setMessage(`✅ Menu: ${result}`);
-    } catch (err) {
-      setMessage(`❌ Menu: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUploadUsers = async () => {
-    if (!userFile) {
-      setMessage('Prosím vyber soubor s uživateli.');
+    if (!email.includes('@')) {
+      showMessage('Zadejte platný email.', 'warning');
       return;
     }
 
-    setLoading(true);
-    setMessage('');
+    const storedUserHashedPassword = await getUserHashedPassword(email);
+    if (!storedUserHashedPassword) {
+      showMessage('Nastala neočekávaná chyba při kontrole hesel. Zkontrolujte své údaje.', 'error');
+      return;
+    }
 
     try {
-      const result = await uploadUsersFromExcel(userFile);
-      setMessage(`✅ Uživatele: ${result}`);
+      const isMatch = await bcrypt.compare(password, storedUserHashedPassword);
+      const userData = await getUserByEmail(email);
+      if (userData) {
+        setUser(userData);
+      }
+
+      if (isMatch) {
+        const payloadToken = {
+          userId: userData.id,
+          email: email,
+          verified: true,
+          isPassword: true,
+          admin: userData.admin,
+          surname: userData.surname,
+        };
+
+        if (userData.admin) {
+          showMessage('Přihlášení proběhlo úspěšně! Máte práva ADMIN.', 'success');
+          setTimeout(() => {
+            navigate('/admin/import');
+          }, 1500);
+        } else {
+          showMessage('Nemáte práva ADMIN.', 'error');
+          setTimeout(() => {
+            navigate('/account');
+          }, 1500);
+        }
+
+        const token = await createToken(payloadToken);
+        document.cookie = `authToken=${token}; path=/; secure; samesite=strict`;
+        
+      } else {
+        showMessage('Nesprávné heslo nebo email. Zkuste to znovu.', 'warning');
+      }
     } catch (err) {
-      setMessage(`❌ Uživatele: ${err}`);
-    } finally {
-      setLoading(false);
+      console.error('[HASH] Chyba při hashování hesla:', err.message);
     }
   };
 
-  const goImport = () => {
-    navigate('/admin/import');
-  };
-
-  const goExport = () => {
-    navigate('/admin/export');
-  };
-
-  const goOverview = () => {
-    navigate('/admin/overview');
-  };
-
-  const goStorno = () => {
-    navigate('/admin/storno');
-  };
-
- 
+  useEffect(() => {
+    if (showPopup) {
+      const timer = setTimeout(() => {
+        setShowPopup(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPopup]);
 
   return (
     <div className="admin-container">
-      <div className='admin-navigation'>
+      <div className="admin-navigation">
         <div>
-          <button className='admin-backToAccButton' onClick={() => navigate('/account')}>ZPĚT NA ÚČET</button>
+          <button
+            className="admin-backToAccButton"
+            onClick={() => navigate('/account')}
+          >
+            ZPĚT NA ÚČET
+          </button>
         </div>
-        <div className="top-bar">
-          <button  onClick={goImport}>NAHRÁT EXCEL</button>
-          <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-
-          <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
-        </div>
-      </div>
-
-      <div className="logo-wrapper">
-        <img src="/images/excel.png" alt="Excel logo" className="excel-logo" />
       </div>
 
       <div className="content-row">
-        Na této URL bude login Form pro adminy
-      </div>
+        <div className="admin-signin">
+          <input
+            className="input-bar-signin"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="input-bar-signin"
+            placeholder="Heslo / Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-      {message && <p style={{ color: 'black', marginTop: '20px' }}>{message}</p>}
+          <button
+            type="submit"
+            className="submit-button"
+            onClick={handleSubmitLogin}
+          >
+            Potvrdit / Submit
+          </button>
+
+          {showPopup && (
+            <div className={`message-popup ${messageType}`}>
+              {message}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

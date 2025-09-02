@@ -84,6 +84,15 @@
   border-color: #0071a9ff;
   transition: all 0.2s ease;
 }
+.content-row {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  max-width: 1000px;
+  width: 100%;
+  margin-top: 50px;
+}
 
 .top-bar {
   width: 100%;
@@ -111,15 +120,7 @@
   color: #0071a9ff;
 }
 
-.content-row {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  flex-wrap: nowrap;
-  max-width: 1000px;
-  width: 100%;
-  margin-top: 50px;
-}
+
 
 .excelform {
   background: #ffffff;
