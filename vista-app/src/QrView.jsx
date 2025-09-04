@@ -103,7 +103,6 @@ function QrView() {
     return (
       <div className="qrCard">
         <h2>Objednávka nenalezena</h2>
-        <img src="/images/nuh.png" alt="Confirmed" className="orderImage" />
         <p>Zkuste QR kód naskenovat znovu.</p>
       </div>
     );
@@ -112,8 +111,7 @@ function QrView() {
   if (status === 'used') {
     return (
       <div className="qrCard">
-        <h2>✅ Objednávka byla již vyzvednuta</h2>
-        <img src="/images/collected.png" alt="Confirmed" className="orderImage" />
+        <h2>Objednávka byla vyzvednuta</h2>
         <p><strong>Date:</strong> {order?.date}</p>
       </div>
     );
@@ -122,7 +120,6 @@ function QrView() {
   return (
     <div className="qrCard">
       <h2>✅ Potvrzení objednávky</h2>
-      <img src="/images/success.png" alt="Confirmed" className="orderImage" />
       <p><strong>Date:</strong> {order?.date}</p>
 
       {!pickedMenus.menu1 && (

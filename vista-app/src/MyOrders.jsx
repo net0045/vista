@@ -105,7 +105,7 @@ function MyOrders() {
 
           <p id='warningText'>
             NEZAŠKRTÁVEJTE VYZVEDNUTO!<br />
-            Přišli byste tím o objednávku<br /><br />
+            Přišli byste tím o objednávku.<br /><br />
             DO NOT CHECK "VYZVEDNUTO"!<br />
             You would lose your order.
           </p>
@@ -117,9 +117,9 @@ function MyOrders() {
             </div>
           ) : orders.length === 0 ? (
             <div className="emptySection">
-              <p className='emptyText'>Asi nemáš hlad, bo tu nic nemáš</p>
-              <p className='emptyText'>Zkus zčekovat týdenní meníčko, třeba si vybereš nějakej gáblik</p>
-              <button id='menuButton' onClick={() => navigate('/menu')}>MENU</button>
+              <p className='emptyText'>Nemáš zaplacené žádné objednávky.</p>
+              <p className='emptyText'>Zkontroluj týdenní menu a vyber si gáblik.</p>
+              <button id='menuButton' onClick={() => navigate('/menu')}><b>MENU</b></button>
             </div>
           ) : (
             orders.map(order => (

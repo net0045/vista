@@ -99,6 +99,23 @@
   gap: 10px;
 }
 
+.info-text-container
+{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.login-buttons{
+  padding: 10px;
+  background-color: #f17300ff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  width: 200px;
+}
 
 .eye-icon {
   position: absolute;

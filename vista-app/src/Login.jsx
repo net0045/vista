@@ -226,12 +226,8 @@ function Login() {
                         <p style={{ color: 'white' }}>{message}</p>
                     </div>
                     <div className='info-text-container'>
-                        <p className="info-text">
-                            Máš ověřený účet? <a href="/signin">ZDE</a> se můžeš přihlásit.
-                        </p>
-                        <p className='info-text'>
-                            Klikni <a href="/menu">SEM</a> jestli se chceš rychle podívat na menu.
-                        </p>
+                        <button className='login-buttons' onClick={() => navigate('/signin')}><b>Přihlásit se / Log in</b></button>
+                        <button className='login-buttons' onClick={() => navigate('/menu')}><b>MENU</b></button>
                     </div>
                 </div>
                
