@@ -5,7 +5,7 @@ import { getCookie, verifyToken, getSecretKey } from './lib/jwtHandler';
 import { createPaymentApiCall } from './api/paymentApi';
 import { v4 as uuidv4 } from 'uuid';
 import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder, checkUnpaidOrders, } from './api/orderApi';
-import { getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
+import { fetchCurrentWeekMenuWithFoods, getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 const dayNameEN = (day) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
@@ -150,12 +150,29 @@ function Order() {
 
   const [showUnpaidModal, setShowUnpaidModal] = useState(false);
 
+  const [priceByMeal, setPriceByMeal] = useState({});
   const [totalPrice, setTotalPrice] = useState(0);
-
-  const PRICE_BY_MEAL = { 1: 80, 2: 95, 3: 95, 4: 150, 5: 150 };
 
   const formatCzk = (amount) =>
     new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(amount);
+
+
+
+useEffect(() => {
+  (async () => {
+    try {
+      const { data } = await fetchCurrentWeekMenuWithFoods();
+      const map = {};
+      (data?.mains || []).forEach((meal, idx) => {
+        map[idx + 1] = Number(meal?.cost) || 0; // číslo menu = index + 1
+      });
+      setPriceByMeal(map);
+    } catch (e) {
+      console.error('Nešlo načíst ceny menu:', e);
+      setPriceByMeal({});
+    }
+  })();
+}, []);
 
 
 useEffect(() => {
@@ -252,8 +269,8 @@ useEffect(() => {
   const n2 = Number(v2);
   let total = 0;
 
-  if (PRICE_BY_MEAL[n1]) total += PRICE_BY_MEAL[n1];
-  if (twoMeals && PRICE_BY_MEAL[n2]) total += PRICE_BY_MEAL[n2];
+  if (priceByMeal[n1]) total += priceByMeal[n1];
+  if (twoMeals && priceByMeal[n2]) total += priceByMeal[n2];
 
   setTotalPrice(total);
 };
@@ -476,7 +493,7 @@ if (loading) {
               </div>
             </div>
 
-            <p className='nadpis' style={{ marginTop: '30px' }}>Celková cena: <strong>{formatCzk(totalPrice)}</strong></p>
+            <p className='nadpis' style={{ marginTop: '30px' }}>Cena / Price: <strong>{formatCzk(totalPrice)}</strong></p>
 
             <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>
           </>
