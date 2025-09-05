@@ -150,6 +150,28 @@ function Order() {
 
   const [showUnpaidModal, setShowUnpaidModal] = useState(false);
 
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  const PRICE_BY_MEAL = { 1: 80, 2: 95, 3: 95, 4: 150, 5: 150 };
+
+  const formatCzk = (amount) =>
+    new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK', maximumFractionDigits: 0 }).format(amount);
+
+
+useEffect(() => {
+  if (!selectedDate) return;
+
+  const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+  if (!label) return;
+
+  const mealsAlready = usedDates.get(label) || 0;
+  setCanOrderTwoMeals(mealsAlready === 0);
+  if (mealsAlready >= 1) {
+    setChecked(false);
+    recomputeTotal(value1, value2, false);
+  }
+}, [selectedDate, usedDates]); // + máš už ve tvém kódu
+
 
 useEffect(() => {
   setDates(getUpcomingWeekdays());
@@ -213,6 +235,7 @@ useEffect(() => {
     const val = e.target.value;
     if (/^[1-5]?$/.test(val)) {
       setValue1(val);
+      recomputeTotal(val, value2, checked);
     }
   };
 
@@ -220,8 +243,20 @@ useEffect(() => {
     const val = e.target.value;
     if (/^[1-5]?$/.test(val)) {
       setValue2(val);
+      recomputeTotal(value1, val, checked);
     }
   };
+
+  const recomputeTotal = (v1, v2, twoMeals) => {
+  const n1 = Number(v1);
+  const n2 = Number(v2);
+  let total = 0;
+
+  if (PRICE_BY_MEAL[n1]) total += PRICE_BY_MEAL[n1];
+  if (twoMeals && PRICE_BY_MEAL[n2]) total += PRICE_BY_MEAL[n2];
+
+  setTotalPrice(total);
+};
 
   const handleOrder = async () => {
     const selectedDate = document.querySelector('input[name="day"]:checked');
@@ -387,7 +422,10 @@ if (loading) {
                     name="howMany"
                     checked={checked}
                     disabled={!canOrderTwoMeals}
-                    onChange={(e) => setChecked(e.target.checked)}
+                    onChange={(e) => {
+                      setChecked(e.target.checked);
+                      recomputeTotal(value1, value2, e.target.checked);
+                    }}
                   />
                   <span style={{ color: '#f17300ff' }}>Ano / Yes</span>
                 </label>
@@ -437,6 +475,8 @@ if (loading) {
                 </div>
               </div>
             </div>
+
+            <p className='nadpis' style={{ marginTop: '30px' }}>Celková cena: <strong>{formatCzk(totalPrice)}</strong></p>
 
             <button id='orderButton' onClick={handleOrder}>OBJEDNAT / ORDER</button>
           </>

@@ -15,45 +15,66 @@ function MyOrders() {
   const [showUnpaidOrders, setShowUnpaidOrders] = useState(false);
   const [showUnpaidModal, setShowUnpaidModal] = useState(false);
 
+
+  const [totalSpent, setTotalSpent] = useState(0);
+
+  const getFoodCost = (food) =>
+    Number((food?.food && food.food.cost != null ? food.food.cost : food?.cost) || 0);
+
+  const formatCzk = (amount) =>
+    new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(amount);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = getCookie('authToken');
-        if (!token) return;
+  const fetchData = async () => {
+    try {
+      const token = getCookie('authToken');
+      if (!token) return;
 
-        const payload = await verifyToken(token, getSecretKey());
-        if (!payload?.userId || !payload?.email) return;
+      const payload = await verifyToken(token, getSecretKey());
+      if (!payload?.userId || !payload?.email) return;
 
-        setEmail(payload.email);
+      setEmail(payload.email);
 
-        //Kontola nezaplacených objednávek
-        const unpaid = await checkUnpaidOrders(payload.userId);
-        setHasUnpaidOrder(unpaid);
-        setShowUnpaidModal(unpaid);
+      // 1) flag + modal na nezaplacené
+      const unpaidFlag = await checkUnpaidOrders(payload.userId);
+      setHasUnpaidOrder(unpaidFlag);
+      setShowUnpaidModal(unpaidFlag);
 
-        // Načíst jen zaplacené objednávky uživatele
-        const paidOrders = await getPaidOrdersForUser(payload.userId);
+      // 2) ZAPLACENÉ objednávky + jejich jídla
+      const paidOrders = await getPaidOrdersForUser(payload.userId);
+      const ordersWithFoods = await Promise.all(
+        paidOrders.map(async (order) => {
+          const foods = await getFoodsInOrder(order.id);
+          return { ...order, foods };
+        })
+      );
+      setOrders(ordersWithFoods);
 
-        // K těmto objednávkám stáhnout jídla
-        const ordersWithFoods = await Promise.all(
-          paidOrders.map(async (order) => {
-            const foods = await getFoodsInOrder(order.id);
-            return { ...order, foods };
-          })
-        );
+      // 3) NEZAPLACENÉ objednávky – seznam + jejich jídla
+      const unpaidList = await listUnpaidOrders(payload.userId);
+      const unpaidWithFoods = await Promise.all(
+        (unpaidList || []).map(async (order) => {
+          const foods = await getFoodsInOrder(order.id);
+          return { ...order, foods };
+        })
+      );
+      setUnpaidOrders(unpaidWithFoods);
 
-        setUnpaidOrders(await listUnpaidOrders(payload.userId));
+      // 4) Celková částka = zaplacené + nezaplacené
+      const totalPaid = ordersWithFoods.reduce(
+        (sum, o) => sum + (o.foods || []).reduce((s, f) => s + getFoodCost(f), 0),
+        0
+      );
+      setTotalSpent(totalPaid);
+    } catch (err) {
+      console.error('Chyba při načítání objednávek:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setOrders(ordersWithFoods);
-      } catch (err) {
-        console.error('Chyba při načítání objednávek:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   return (
     <>
@@ -102,6 +123,8 @@ function MyOrders() {
               )}
             </div>
           )}
+
+          <p>Celkem za tento týden: <br /><strong>{formatCzk(totalSpent)}</strong></p>
 
           <p id='warningText'>
             NEZAŠKRTÁVEJTE VYZVEDNUTO!<br />

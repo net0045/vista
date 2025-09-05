@@ -77,8 +77,8 @@
     text-align: center;
   }
   
-  .submit-button {
-    width: 90%;
+  .submit-login-button {
+    width: 230px;
     padding: 10px;
     margin: 10px 0;
     background-color: #0071a9ff;
@@ -88,8 +88,6 @@
     font-size: 1rem;
   }
   
-
-
 
 .input-wrapper-login {
   position: relative;

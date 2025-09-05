@@ -54,13 +54,13 @@ function Signin() {
                 };
                 const token = await createToken(payloadToken);
                 document.cookie = `authToken=${token}; path=/; secure; samesite=strict`;
-                showMessage('Přihlášení proběhlo úspěšně! Budete přesměrováni na váš účet.', 'success');
+                showMessage('Přihlášení proběhlo úspěšně!', 'success');
 
                 setTimeout(() => {
                     navigate('/account');
                 }, 1500);
             } else {
-                showMessage('Nesprávné heslo nebo email. Zkuste to znovu.', 'warning');
+                showMessage('Nesprávné heslo nebo email.', 'warning');
             }
         } catch (err) {
             console.error('[HASH] Chyba při hashování hesla:', err.message);

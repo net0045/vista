@@ -220,7 +220,7 @@ function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <button type="submit" className="submit-button" onClick={handleSubmit}>
+                        <button type="submit" className="submit-login-button" onClick={handleSubmit}>
                             Potvrdit / Submit
                         </button>
                         <p style={{ color: 'white' }}>{message}</p>

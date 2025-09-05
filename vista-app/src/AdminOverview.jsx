@@ -25,6 +25,52 @@ function AdminOverview() {
     );  
   };
 
+  const isDeleteButtonVisible = () => {
+    const now = new Date();
+    const day = now.getDay(); 
+    const hour = now.getHours();
+    const minutes = now.getMinutes();
+
+    if (day === 5 && (hour > 20 || (hour === 16 && minutes >= 0))) {
+      return true;
+    }
+
+    if (day === 6) {
+      return true;
+    }
+
+    if (day === 0 && (hour < 16 || (hour === 16 && minutes <= 59))) {
+      return true;
+    }
+
+    return false;
+  };
+
+
+    const handleDeleteAllOrders = async () => {
+    if (!window.confirm("Opravdu chcete smazat všechny objednávky?")) {
+      return;
+    }
+
+    try {
+      // smažeme každou objednávku z databáze
+      for (const order of orders) {
+        await removeOrderAndFoodsInOrderByOrderId(order.id);
+      }
+
+      // vyprázdníme stav
+      setOrders([]);
+      setFilteredOrders([]);
+
+      alert("Všechny objednávky byly úspěšně smazány.");
+    } catch (error) {
+      console.error("Chyba při mazání všech objednávek:", error);
+      alert("Chyba: nepodařilo se smazat všechny objednávky!");
+    }
+  };
+
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -155,6 +201,12 @@ function AdminOverview() {
             fontSize: '14px'
           }}
         />
+
+        {isDeleteButtonVisible() && (
+          <button className='delete-orders' onClick={handleDeleteAllOrders}>
+            SMAZAT VŠECHNY OBJEDNÁVKY
+          </button>
+        )}
       </div>
 
       <table className="orders-table">
