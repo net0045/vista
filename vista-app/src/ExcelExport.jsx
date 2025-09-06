@@ -12,7 +12,9 @@ function ExcelExport() {
   const goImport = () => navigate('/admin/import');
   const goExport = () => navigate('/admin/export');
   const goOverview = () => navigate('/admin/overview');
-  const goStorno = () => navigate('/admin/storno');
+  const goSpecialDates = () => {
+    navigate('/admin/specialdates');
+  };
 
   const handleGenerateExcel = async () => {
     setGenerating(true);
@@ -96,6 +98,7 @@ function ExcelExport() {
           <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
 
           <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+          <button  onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
         </div>
       </div>
 

@@ -66,6 +66,34 @@ export async function getOverviewData(): Promise<any[]> {
   return data;
 }
 
+export async function addSpecialDate(date: string): Promise<void> {
+  const { error } = await supabase
+    .from('SpecialDates')
+    .insert([{ date }]);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function listSpecialDates(): Promise<{ date: string }[]> {
+  const { data, error } = await supabase
+    .from('SpecialDates')
+    .select('date')      
+    .order('date', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function deleteSpecialDate(date: string): Promise<void> {
+  const { error } = await supabase
+    .from('SpecialDates')
+    .delete()
+    .eq('date', date);   // ✅ porovnáváme se sloupcem "date"
+  if (error) throw error;
+}
+
+
 export async function removeOrderAndFoodsInOrderByOrderId(orderId: string): Promise<void> {
   // 1. Smazat FoodsInOrder
   const { error: foodError } = await supabase

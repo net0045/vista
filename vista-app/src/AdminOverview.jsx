@@ -170,7 +170,9 @@ function AdminOverview() {
   const goImport = () => navigate('/admin/import');
   const goExport = () => navigate('/admin/export');
   const goOverview = () => navigate('/admin/overview');
-  const goStorno = () => navigate('/admin/storno');
+  const goSpecialDates = () => {
+    navigate('/admin/specialdates');
+  };
 
   return (
     <div className="admin-container-users">
@@ -181,8 +183,8 @@ function AdminOverview() {
         <div className="top-bar">
           <button  onClick={goImport}>NAHRÁT EXCEL</button>
           <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-          
           <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+          <button  onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
         </div>
       </div>
 

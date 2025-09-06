@@ -28,6 +28,7 @@ function Menu() {
   const now = new Date();
   const currentDay = now.getDay();
   const currentHour = now.getHours();
+  const isClosedNow = currentDay === 6 || (currentDay === 0 && currentHour < 15);
 
  useEffect(() => {
     const checkToken = async () => {
@@ -46,6 +47,10 @@ function Menu() {
   useEffect(() => {
     const loadMenu = async () => {
       try {
+        if (isClosedNow) {
+          setLoading(false);
+          return;
+        }
 
         let baseDate = new Date(now);
 

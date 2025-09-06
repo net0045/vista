@@ -24,7 +24,7 @@ function Account() {
     };
 
     const navigateToAdmin = () => {
-        navigate('/admin');
+        navigate('/admin/overview');
     };
 
     useEffect(() => {

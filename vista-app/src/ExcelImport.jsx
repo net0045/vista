@@ -69,8 +69,8 @@ function ExcelImport() {
     navigate('/admin/overview');
   };
 
-  const goStorno = () => {
-    navigate('/admin/storno');
+  const goSpecialDates = () => {
+    navigate('/admin/specialdates');
   };
 
  
@@ -86,6 +86,7 @@ function ExcelImport() {
           <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
 
           <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+          <button  onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
         </div>
       </div>
 

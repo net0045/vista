@@ -63,60 +63,6 @@ function getUpcomingWeekdays() {
   return dates;
 }
 
-/*function getUpcomingWeekdays() {
-  const now = new Date();
-  const currentDay = now.getDay(); // 0 = neděle, ..., 6 = sobota
-  const currentHour = now.getHours();
-  const dates = [];
-
-  // Pátek nebo sobota → nevracet nic
-  if (currentDay === 5 || currentDay === 6) {
-    return [];
-  }
-
-  // Neděle před 15:00 → taky nic
-  if (currentDay === 0 && currentHour < 15) {
-    return [];
-  }
-
-  let startOffset = 1;
-  if (currentDay >= 1 && currentDay <= 4 && currentHour >= 21) {
-    startOffset = 3; //need to rework whole logic
-  }
-
-  // Začátek vždy od zítřka
-  const start = new Date(now);
-  start.setDate(now.getDate() + startOffset);
-  start.setHours(0, 0, 0, 0);
-
-  for (let i = 0; i < 4; i++) {
-    const current = new Date(start);
-    current.setDate(start.getDate() + i);
-    const day = current.getDay();
-
-    if (day >= 1 && day <= 5) {
-
-      const dayName = weekdays[day];        // CZ
-      const enName = dayNameEN(day);        // EN
-      const d = current.getDate();
-      const m = current.getMonth() + 1;
-      const y = current.getFullYear();
-
-      dates.push({
-        label: `${dayName} / ${enName}: ${d}. ${m}. ${y}`,
-        date: current,
-      });
-    }
-  }
-
-  return dates;
-}
-
-function dayNameEN(index) {
-  const en = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return en[index];
-}*/
-
 
 async function storeDataToDatabase(order, foodsInOrder) {
   const successOrderStorage = await storeOrder(order);
@@ -192,8 +138,8 @@ useEffect(() => {
 
 useEffect(() => {
   setDates(getUpcomingWeekdays());
-  // setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
-  setOrderingDisabled(false); // povolit objednávky kdykoliv
+  setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
+  //setOrderingDisabled(false); // povolit objednávky kdykoliv
 }, []);
 
   useEffect(() => {

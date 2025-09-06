@@ -20,6 +20,7 @@ import ExcelExport from './ExcelExport';
 
 import AdminOverview from './AdminOverview';
 import AdminProtectedRoute from './AdminProtectedRoute';
+import AddSpecialDate from './AddSpecialDate';
 
 
 function App() {
@@ -101,6 +102,7 @@ function App() {
       <Route path="/admin" element={<Admin />} />
       <Route path="/admin/import" element={<AdminProtectedRoute><ExcelImport /></AdminProtectedRoute>} />
       <Route path="/admin/export" element={<AdminProtectedRoute><ExcelExport /></AdminProtectedRoute>} />
+      <Route path="/admin/specialdates" element={<AdminProtectedRoute><AddSpecialDate /></AdminProtectedRoute>} />
       <Route path="/admin/overview" element={<AdminProtectedRoute><AdminOverview /></AdminProtectedRoute>} />
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
