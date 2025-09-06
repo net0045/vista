@@ -34,12 +34,12 @@
   border-radius: 12px;
   background: #fff;
   overflow: hidden;
-  transition: box-shadow .2s ease, border-color .2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 .message-card.unread {
   border-color: #ff4d4f33;
-  box-shadow: 0 0 0 3px #ff4d4f1a;
+  box-shadow: 0 2px 8px rgba(242, 2, 2, 0.5);
 }
 
 .message-card .accordion-header {

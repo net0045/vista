@@ -1,4 +1,3 @@
-// src/AdminMessage.jsx
 import React, { useState } from 'react';
 import './Admin.css';
 import { useNavigate } from 'react-router-dom';
@@ -94,11 +93,12 @@ function AdminMessage() {
             Nadpis max {TITLE_MAX} znaků, text max {CONTENT_MAX} znaků.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', alignItems: 'center'
+           }}>
+            <label style={{width:'100%', alignItems:'center', textAlign:'center'}}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Nadpis</div>
               <input
-                className="stornoInput"
+                className="message-title-input"
                 placeholder="Např. Údržba jídelny v pátek"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -110,11 +110,10 @@ function AdminMessage() {
               </div>
             </label>
 
-            <label>
+            <label style={{width:'90%'}}>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Text zprávy</div>
               <textarea
-                className="stornoInput"
-                style={{ minHeight: 160, resize: 'vertical', lineHeight: '1.4' }}
+                className="message-content-input"
                 placeholder={'Např. V pátek 20. 9. bude jídelna mimo provoz z důvodu plánované údržby.\nDěkujeme za pochopení.'}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
