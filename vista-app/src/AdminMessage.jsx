@@ -25,68 +25,37 @@ function AdminMessage() {
     setContent('');
   };
 
-  // Pomocná: bezpečně přečte text/JSON chyby z fetch
-  const readErrorText = async (res) => {
-    try {
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('application/json')) {
-        const j = await res.json();
-        // j může být string/objekt
-        if (typeof j === 'string') return j;
-        if (j?.error) return j.error;
-        if (j?.message) return j.message;
-        return JSON.stringify(j);
-      }
-      return await res.text();
-    } catch {
-      return `HTTP ${res.status}`;
-    }
-  };
-
   const createMessage = async () => {
     setInfo('');
     const t = title.trim();
     const c = content.trim();
 
-    if (!t || !c) {
-      setInfo('❌ Vyplňte prosím nadpis i text zprávy.');
-      return;
-    }
-    if (t.length > TITLE_MAX) {
-      setInfo(`❌ Nadpis je příliš dlouhý (max ${TITLE_MAX} znaků).`);
-      return;
-    }
-    if (c.length > CONTENT_MAX) {
-      setInfo(`❌ Text je příliš dlouhý (max ${CONTENT_MAX} znaků).`);
-      return;
-    }
+    if (!t || !c) { setInfo('❌ Vyplňte prosím nadpis i text zprávy.'); return; }
+    if (t.length > TITLE_MAX) { setInfo(`❌ Nadpis je příliš dlouhý (max ${TITLE_MAX} znaků).`); return; }
+    if (c.length > CONTENT_MAX) { setInfo(`❌ Text je příliš dlouhý (max ${CONTENT_MAX} znaků).`); return; }
 
     setSaving(true);
     try {
-      const res = await fetch('/.netlify/functions/create-message', {
+      const token = document.cookie.split('; ')
+        .find(x => x.startsWith('authToken='))?.split('=')[1];
+
+      const res = await fetch('/.netlify/functions/createMessage', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // pošli cookie s authToken
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${decodeURIComponent(token)}` } : {}),
+        },
         body: JSON.stringify({ title: t, content: c }),
       });
 
-      if (!res.ok) {
-        const msg = await readErrorText(res);
-        if (res.status === 401) {
-          throw new Error('Nejste přihlášen nebo je token neplatný.');
-        }
-        if (res.status === 403) {
-          throw new Error('Nemáte oprávnění (nejste admin).');
-        }
-        throw new Error(msg || `HTTP ${res.status}`);
-      }
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || 'Request failed');
 
-      // úspěch
       setInfo('✅ Zpráva byla úspěšně vytvořena.');
       resetForm();
-      // případně: navigate('/messages');
     } catch (e) {
-      setInfo(`❌ Nepodařilo se vytvořit zprávu. ${e.message || ''}`.trim());
+      console.error('[CreateMessage] failed:', e);
+      setInfo(`❌ Nepodařilo se vytvořit zprávu. ${e?.message ?? ''}`.trim());
     } finally {
       setSaving(false);
     }
@@ -146,9 +115,7 @@ function AdminMessage() {
               <textarea
                 className="stornoInput"
                 style={{ minHeight: 160, resize: 'vertical', lineHeight: '1.4' }}
-                placeholder={
-                  'Např. V pátek 20. 9. bude jídelna mimo provoz z důvodu plánované údržby.\nDěkujeme za pochopení.'
-                }
+                placeholder={'Např. V pátek 20. 9. bude jídelna mimo provoz z důvodu plánované údržby.\nDěkujeme za pochopení.'}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onKeyDown={onKeyDown}
@@ -160,20 +127,10 @@ function AdminMessage() {
             </label>
 
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <button
-                className="stornoBtn"
-                style={{ width: 180 }}
-                onClick={createMessage}
-                disabled={saving}
-              >
+              <button className="stornoBtn" style={{ width: 180 }} onClick={createMessage} disabled={saving}>
                 {saving ? 'Ukládám…' : 'Odeslat zprávu'}
               </button>
-              <button
-                className="stornoBtn"
-                style={{ width: 140, background: '#ccc', borderColor: '#bbb', color: '#222' }}
-                onClick={resetForm}
-                disabled={saving}
-              >
+              <button className="stornoBtn" style={{ width: 140, background: '#ccc', borderColor: '#bbb', color: '#222' }} onClick={resetForm} disabled={saving}>
                 Vyčistit
               </button>
               <span style={{ fontSize: 12, opacity: 0.75 }}>
@@ -191,20 +148,12 @@ function AdminMessage() {
                     <h3 className="message-title">{title.trim() || 'Bez názvu'}</h3>
                     <div className="message-meta">
                       <time className="message-date">
-                        {new Date().toLocaleString('cs-CZ', {
-                          year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        {new Date().toLocaleString('cs-CZ', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                       </time>
                     </div>
                   </header>
                   <div className="message-body">
-                    {(content.trim() || '').split('\n').map((line, i) => (
-                      <p key={i}>{line}</p>
-                    ))}
+                    {(content.trim() || '').split('\n').map((line, i) => <p key={i}>{line}</p>)}
                   </div>
                 </article>
               </div>

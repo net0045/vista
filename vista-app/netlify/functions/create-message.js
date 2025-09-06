@@ -1,53 +1,69 @@
+// netlify/functions/createMessage.js
 import { createClient } from '@supabase/supabase-js';
 import { verifyToken, getSecretKey } from '../../src/lib/jwtHandler.js';
 
 const supabase = createClient(
-  process.env.VITE_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE // !! service role, NE anon key
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY // service role – NIKDY nedávat do frontendu
 );
 
+const json = (statusCode, bodyObj) => ({
+  statusCode,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  },
+  body: JSON.stringify(bodyObj),
+});
+
 export async function handler(event) {
+  if (event.httpMethod === 'OPTIONS') return json(200, { ok: true });
+  if (event.httpMethod !== 'POST') return json(405, { error: 'Method Not Allowed' });
+
   try {
-    if (event.httpMethod !== 'POST') {
-      return { statusCode: 405, body: 'Method Not Allowed' };
-    }
-
     const { title, content } = JSON.parse(event.body || '{}');
-    if (!title?.trim() || !content?.trim()) {
-      return { statusCode: 400, body: 'Missing title/content' };
-    }
+    if (!title?.trim() || !content?.trim()) return json(400, { error: 'Missing title/content' });
+    if (title.length > 120) return json(400, { error: 'Title too long' });
+    if (content.length > 5000) return json(400, { error: 'Content too long' });
 
-    // vezmi tvůj app JWT z cookie/hlavičky
-    const token = event.headers.cookie?.match(/authToken=([^;]+)/)?.[1]
-               || event.headers.authorization?.replace(/^Bearer\s+/i, '');
-    if (!token) return { statusCode: 401, body: 'No auth token' };
+    // token z cookie / Authorization
+    const rawCookie = event.headers.cookie || '';
+    const cookieMatch = rawCookie.match(/(?:^|;\s*)authToken=([^;]+)/);
+    const token =
+      (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null) ||
+      (event.headers.authorization || '').replace(/^Bearer\s+/i, '');
 
+    if (!token) return json(401, { error: 'No auth token' });
+
+    // ověření tvého app JWT
     const payload = await verifyToken(token, getSecretKey());
     if (!payload?.email || payload?.verified !== true) {
-      return { statusCode: 401, body: 'Invalid token' };
+      return json(401, { error: 'Invalid token' });
     }
 
-    // ověření admina v DB
+    // Ověření admina – tabulka se jmenuje přesně "Users"
     const { data: usr, error: uerr } = await supabase
-      .from('User')
+      .from('Users')        // ⚠️ přesný název s velkým písmenem
       .select('admin')
       .eq('email', payload.email)
       .single();
 
-    if (uerr) return { statusCode: 500, body: `User check failed: ${uerr.message}` };
-    if (!usr?.admin) return { statusCode: 403, body: 'Not admin' };
+    if (uerr) return json(500, { error: `User check failed: ${uerr.message}` });
+    if (!usr?.admin) return json(403, { error: 'Not admin' });
 
-    // INSERT zprávy (service role obejde RLS)
+    // INSERT zprávy – tabulka "Messages"
     const { data, error } = await supabase
-      .from('Messages')
+      .from('Messages')     // ⚠️ přesný název s velkým písmenem
       .insert([{ title: title.trim(), content: content.trim() }])
       .select()
       .single();
 
-    if (error) return { statusCode: 500, body: `Insert failed: ${error.message}` };
+    if (error) return json(500, { error: `Insert failed: ${error.message}` });
 
-    return { statusCode: 200, body: JSON.stringify(data) };
+    return json(200, { ok: true, message: data });
   } catch (e) {
-    return { statusCode: 500, body: e.message || 'Server error' };
+    return json(500, { error: e.message || 'Server error' });
   }
 }
