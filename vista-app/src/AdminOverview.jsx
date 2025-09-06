@@ -170,9 +170,8 @@ function AdminOverview() {
   const goImport = () => navigate('/admin/import');
   const goExport = () => navigate('/admin/export');
   const goOverview = () => navigate('/admin/overview');
-  const goSpecialDates = () => {
-    navigate('/admin/specialdates');
-  };
+  const goSpecialDates = () => navigate('/admin/specialdates');
+  const goMessage = () => navigate('/admin/message');
 
   return (
     <div className="admin-container-users">
@@ -181,10 +180,11 @@ function AdminOverview() {
           <button className='admin-backToAccButton' onClick={() => navigate('/account')}>ZPĚT NA ÚČET</button>
         </div>
         <div className="top-bar">
-          <button  onClick={goImport}>NAHRÁT EXCEL</button>
-          <button  onClick={goExport}>VYGENEROVAT EXCEL</button>
-          <button  onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
-          <button  onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
+          <button onClick={goImport}>NAHRÁT EXCEL</button>
+          <button onClick={goExport}>VYGENEROVAT EXCEL</button>
+          <button onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
+          <button onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
+          <button onClick={goMessage}>ZPRÁVA</button>
         </div>
       </div>
 

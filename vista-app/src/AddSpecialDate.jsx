@@ -94,6 +94,7 @@ function AddSpecialDate() {
   const goExport = () => navigate('/admin/export');
   const goOverview = () => navigate('/admin/overview');
   const goSpecialDates = () => navigate('/admin/specialdates');
+  const goMessage = () => navigate('/admin/message');
 
   return (
     <div className="admin-container-storno">
@@ -106,6 +107,7 @@ function AddSpecialDate() {
           <button onClick={goExport}>VYGENEROVAT EXCEL</button>
           <button onClick={goOverview}>SEZNAM OBJEDNÁVEK</button>
           <button onClick={goSpecialDates}>SPECIÁLNÍ DNY</button>
+          <button onClick={goMessage}>ZPRÁVA</button>
         </div>
       </div>
 

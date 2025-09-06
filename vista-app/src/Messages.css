@@ -1,0 +1,13 @@
+.info-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 2px solid var(--saffron, #eac435);
+  background: var(--alice-white, #effaff);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.info-banner__text { font-weight: 600; }
+.info-banner__actions .btn { padding: 8px 14px; }
