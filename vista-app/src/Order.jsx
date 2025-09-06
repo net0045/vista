@@ -6,6 +6,7 @@ import { createPaymentApiCall } from './api/paymentApi';
 import { v4 as uuidv4 } from 'uuid';
 import { storeOrder, storeFoodsInOrder, getAllOrdersForUser, getFoodsInOrder, checkUnpaidOrders, } from './api/orderApi';
 import { fetchCurrentWeekMenuWithFoods, getCurrentMenuId, getFoodIdByNumberAndMenuID, getPriceOfTheOrder } from './api/foodApi';
+import { listSpecialDatesInRange } from './api/adminApi';
 
 const weekdays = ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'];
 const dayNameEN = (day) => ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day];
@@ -17,6 +18,40 @@ function isOrderingDisabled() {
 
   return (day === 4 && hour >= 21) || day === 5 || day === 6 ||(day === 0 && hour < 15);
 }
+
+// YYYY-MM-DD
+const toYMD = (d) => {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+// Pondělí objednacího týdne (So/Ne ⇒ příští pondělí, jinak aktuální pondělí)
+function getOrderWeekStart(base = new Date()) {
+  const d = new Date(base);
+  const day = d.getDay(); // 0=Ne..6=So
+  const monday = new Date(d);
+
+  if (day === 6) {          // sobota
+    monday.setDate(d.getDate() + 2);
+  } else if (day === 0) {   // neděle
+    monday.setDate(d.getDate() + 1);
+  } else {                  // Po–Pá
+    monday.setDate(d.getDate() - ((day + 6) % 7));
+  }
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
+function getOrderWeekRange(base = new Date()) {
+  const monday = getOrderWeekStart(base);
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  friday.setHours(23, 59, 59, 999);
+  return { monday, friday };
+}
+
 //Functional filter of the upcoming weekdays ->  later use this function in the Order component
 function getUpcomingWeekdays() {
   const now = new Date();
@@ -83,6 +118,7 @@ function Order() {
   const [dates, setDates] = useState([]);
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [blockedSet, setBlockedSet] = useState(new Set());
 
   const [surnameToken, setSurnameToken] = useState('');
   const [emailToken, setEmailToken] = useState('');

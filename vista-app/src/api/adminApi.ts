@@ -85,6 +85,18 @@ export async function listSpecialDates(): Promise<{ date: string }[]> {
   return data ?? [];
 }
 
+export async function listSpecialDatesInRange(fromYMD, toYMD) {
+  const { data, error } = await supabase
+    .from('SpecialDates')
+    .select('date')
+    .gte('date', fromYMD)
+    .lte('date', toYMD)
+    .order('date', { ascending: true });
+
+  if (error) throw error;
+  return (data ?? []).map(r => r.date);
+}
+
 export async function deleteSpecialDate(date: string): Promise<void> {
   const { error } = await supabase
     .from('SpecialDates')
