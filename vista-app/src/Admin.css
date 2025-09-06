@@ -207,12 +207,19 @@
   padding: 10px 25px;
   font-size: 15px;
   font-weight: 600;
-  border: none;
+  border: solid;
+  border-color: #ff1500;
   border-radius: 8px;
   background-color: #ff1500;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.stornoBtn:hover{
+  color: black;
+  background-color: transparent;
+  transition: 0.2s;
 }
 
 .excelform p {
@@ -238,7 +245,7 @@
 
 .stornoInput {
   width: 60%;
-  
+  text-align: center;
 }
 
 input {
