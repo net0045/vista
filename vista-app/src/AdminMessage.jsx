@@ -133,31 +133,8 @@ function AdminMessage() {
               <button className="stornoBtn" style={{ width: 140, background: '#ccc', borderColor: '#bbb', color: '#222' }} onClick={resetForm} disabled={saving}>
                 Vyčistit
               </button>
-              <span style={{ fontSize: 12, opacity: 0.75 }}>
-                Tip: <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> + <kbd>Enter</kbd> pro odeslání
-              </span>
             </div>
-
             {info && <p style={{ marginTop: 6 }}>{info}</p>}
-
-            {(title.trim() || content.trim()) && (
-              <div style={{ marginTop: 16 }}>
-                <h2>Náhled</h2>
-                <article className="message-card">
-                  <header className="message-header">
-                    <h3 className="message-title">{title.trim() || 'Bez názvu'}</h3>
-                    <div className="message-meta">
-                      <time className="message-date">
-                        {new Date().toLocaleString('cs-CZ', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                      </time>
-                    </div>
-                  </header>
-                  <div className="message-body">
-                    {(content.trim() || '').split('\n').map((line, i) => <p key={i}>{line}</p>)}
-                  </div>
-                </article>
-              </div>
-            )}
           </div>
         </div>
       </div>

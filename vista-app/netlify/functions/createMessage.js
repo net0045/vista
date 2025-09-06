@@ -1,10 +1,9 @@
-// netlify/functions/createMessage.js
 import { createClient } from '@supabase/supabase-js';
-import { verifyToken, getSecretKey } from '../../src/lib/jwtHandler.js';
+import { verifyToken } from '../../src/lib/jwtHandler.js'; // jen verifyToken
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // service role – NIKDY nedávat do frontendu
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 const json = (statusCode, bodyObj) => ({
@@ -37,15 +36,20 @@ export async function handler(event) {
 
     if (!token) return json(401, { error: 'No auth token' });
 
-    // ověření tvého app JWT
-    const payload = await verifyToken(token, getSecretKey());
+    // 🔐 Secret pro backend: z process.env.APP_JWT_SECRET (stejná hodnota jako VITE_JWT_SECRET ve frontendu)
+    const appSecret = process.env.APP_JWT_SECRET;
+    if (!appSecret) return json(500, { error: 'APP_JWT_SECRET is not set on the server' });
+    const secretBytes = new TextEncoder().encode(appSecret);
+
+    // ověř JWT (použijeme náš secretBytes)
+    const payload = await verifyToken(token, secretBytes);
     if (!payload?.email || payload?.verified !== true) {
       return json(401, { error: 'Invalid token' });
     }
 
-    // Ověření admina – tabulka se jmenuje přesně "Users"
+    // ověření admina
     const { data: usr, error: uerr } = await supabase
-      .from('Users')        // ⚠️ přesný název s velkým písmenem
+      .from('User')   // podle tvé DB
       .select('admin')
       .eq('email', payload.email)
       .single();
@@ -53,9 +57,9 @@ export async function handler(event) {
     if (uerr) return json(500, { error: `User check failed: ${uerr.message}` });
     if (!usr?.admin) return json(403, { error: 'Not admin' });
 
-    // INSERT zprávy – tabulka "Messages"
+    // INSERT zprávy
     const { data, error } = await supabase
-      .from('Messages')     // ⚠️ přesný název s velkým písmenem
+      .from('Messages')  // podle tvé DB
       .insert([{ title: title.trim(), content: content.trim() }])
       .select()
       .single();
