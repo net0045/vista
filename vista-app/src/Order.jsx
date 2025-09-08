@@ -16,7 +16,7 @@ function isOrderingDisabled() {
   const day = now.getDay();
   const hour = now.getHours();
 
-  return (day === 4 && hour >= 21) || day === 5 || day === 6 ||(day === 0 && hour < 15);
+  return (day === 4 && hour >= 21) || day === 5 || day === 6 || (day === 0 && hour < 15);
 }
 
 // YYYY-MM-DD
@@ -140,93 +140,120 @@ function Order() {
 
 
 
-useEffect(() => {
-  (async () => {
-    try {
-      const { data } = await fetchCurrentWeekMenuWithFoods();
-      const map = {};
-      (data?.mains || []).forEach((meal, idx) => {
-        map[idx + 1] = Number(meal?.cost) || 0; // číslo menu = index + 1
-      });
-      setPriceByMeal(map);
-    } catch (e) {
-      console.error('Nešlo načíst ceny menu:', e);
-      setPriceByMeal({});
-    }
-  })();
-}, []);
+  useEffect(() => {
+    (async () => {
+      try {
 
+        const { data } = await fetchCurrentWeekMenuWithFoods();
+        const map = {};
+        (data?.mains || []).forEach((meal, idx) => {
+          map[idx + 1] = Number(meal?.cost) || 0; // číslo menu = index + 1
+        });
+        setPriceByMeal(map);
+      } catch (e) {
+        console.error('Nešlo načíst ceny menu:', e);
+        setPriceByMeal({});
+      }
+    })();
+  }, []);
 
-useEffect(() => {
-  if (!selectedDate) return;
+  // 3) NAČTI BLOKOVANÉ DNY PRO OBJEDNACÍ TÝDEN (Po–Pá)
+  useEffect(() => {
+    (async () => {
+      try {
+        const { monday, friday } = getOrderWeekRange(new Date());
+        const fromYmd = toYMD(monday);
+        const toYmd = toYMD(friday);
 
-  const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
-  if (!label) return;
+        // očekává [{ date: 'YYYY-MM-DD' }, ...]
+        const rows = await listSpecialDatesInRange(fromYmd, toYmd);
+        const blocked = new Set((rows ?? []).map(r => r.date));
+        setBlockedSet(blocked);
+      } catch (e) {
+        console.error('Nepodařilo se načíst SpecialDates:', e);
+        setBlockedSet(new Set());
+      }
+    })();
+  }, []);
 
-  const mealsAlready = usedDates.get(label) || 0;
-  setCanOrderTwoMeals(mealsAlready === 0);
-  if (mealsAlready >= 1) {
-    setChecked(false);
-    recomputeTotal(value1, value2, false);
-  }
-}, [selectedDate, usedDates]); // + máš už ve tvém kódu
+  // 4) Pojistka: pokud by byl vybraný blokovaný den, zruš ho
+  useEffect(() => {
+    if (!selectedDate) return;
+    const iso = selectedDate; // ukládáš ISO .toISOString()
+    const isBlocked = blockedSet.has(toYMD(new Date(iso)));
+    if (isBlocked) setSelectedDate(null);
+  }, [blockedSet, selectedDate]);
 
-
-useEffect(() => {
-  setDates(getUpcomingWeekdays());
-  setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
-  //setOrderingDisabled(false); // povolit objednávky kdykoliv
-}, []);
 
   useEffect(() => {
-   
-      if (!selectedDate) return;
+    if (!selectedDate) return;
+    const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+    if (!label) return;
 
-      const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
-      if (!label) return;
-
-      const mealsAlready = usedDates.get(label) || 0;
-      setCanOrderTwoMeals(mealsAlready === 0);
-      if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
-    
+    const mealsAlready = usedDates.get(label) || 0;
+    setCanOrderTwoMeals(mealsAlready === 0);
+    if (mealsAlready >= 1) {
+      setChecked(false);
+      recomputeTotal(value1, value2, false);
+    }
   }, [selectedDate, usedDates]);
 
-useEffect(() => {
-  const checkToken = async () => {
-    try {
-      const token = getCookie('authToken');
-      if (!token) return;
 
-      const payload = await verifyToken(token, getSecretKey());
-      if (!payload?.email || !payload?.verified || !payload?.userId || !payload?.surname) return;
+  useEffect(() => {
+    setDates(getUpcomingWeekdays());
+    setOrderingDisabled(isOrderingDisabled()); // dočasně povoleno
+    //setOrderingDisabled(false); // povolit objednávky kdykoliv
+  }, []);
 
-      setEmailToken(payload.email);
-      setUserId(payload.userId);
-      setSurnameToken(payload.surname);
+  useEffect(() => {
 
-      const orders = await getAllOrdersForUser(payload.userId);
+    if (!selectedDate) return;
 
-      const unpaid = await checkUnpaidOrders(payload.userId);
-      setShowUnpaidModal(unpaid);
+    const label = dates.find(d => d.date.toISOString() === selectedDate)?.label;
+    if (!label) return;
 
-      const mealsPerDate = new Map();
+    const mealsAlready = usedDates.get(label) || 0;
+    setCanOrderTwoMeals(mealsAlready === 0);
+    if (mealsAlready >= 1) setChecked(false); // automaticky zruší zaškrtnutí, pokud by tam zůstalo
 
-      for (const order of orders) {
-        const foods = await getFoodsInOrder(order.id);
-        const count = mealsPerDate.get(order.date) || 0;
-        mealsPerDate.set(order.date, count + foods.length);
+  }, [selectedDate, usedDates]);
+
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = getCookie('authToken');
+        if (!token) return;
+
+        const payload = await verifyToken(token, getSecretKey());
+        if (!payload?.email || !payload?.verified || !payload?.userId || !payload?.surname) return;
+
+        setEmailToken(payload.email);
+        setUserId(payload.userId);
+        setSurnameToken(payload.surname);
+
+        const orders = await getAllOrdersForUser(payload.userId);
+
+        const unpaid = await checkUnpaidOrders(payload.userId);
+        setShowUnpaidModal(unpaid);
+
+        const mealsPerDate = new Map();
+
+        for (const order of orders) {
+          const foods = await getFoodsInOrder(order.id);
+          const count = mealsPerDate.get(order.date) || 0;
+          mealsPerDate.set(order.date, count + foods.length);
+        }
+
+        setUsedDates(mealsPerDate);
+      } catch (err) {
+        console.error('Chyba při kontrole tokenu nebo načítání objednávek:', err);
+      } finally {
+        setLoading(false); // ← tady nastavíš, že je vše hotové
       }
+    };
 
-      setUsedDates(mealsPerDate);
-    } catch (err) {
-      console.error('Chyba při kontrole tokenu nebo načítání objednávek:', err);
-    } finally {
-      setLoading(false); // ← tady nastavíš, že je vše hotové
-    }
-  };
-
-  checkToken();
-}, []);
+    checkToken();
+  }, []);
 
 
 
@@ -247,15 +274,15 @@ useEffect(() => {
   };
 
   const recomputeTotal = (v1, v2, twoMeals) => {
-  const n1 = Number(v1);
-  const n2 = Number(v2);
-  let total = 0;
+    const n1 = Number(v1);
+    const n2 = Number(v2);
+    let total = 0;
 
-  if (priceByMeal[n1]) total += priceByMeal[n1];
-  if (twoMeals && priceByMeal[n2]) total += priceByMeal[n2];
+    if (priceByMeal[n1]) total += priceByMeal[n1];
+    if (twoMeals && priceByMeal[n2]) total += priceByMeal[n2];
 
-  setTotalPrice(total);
-};
+    setTotalPrice(total);
+  };
 
   const handleOrder = async () => {
     const selectedDate = document.querySelector('input[name="day"]:checked');
@@ -372,14 +399,14 @@ useEffect(() => {
     }
   };
 
-if (loading) {
-  return (
-    <div className="loadingSection">
-      <p className="loadingText">Vše se připravuje...</p>
-      <img src="images/loading.gif" alt="Načítání..." className="loading-img" />
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div className="loadingSection">
+        <p className="loadingText">Vše se připravuje...</p>
+        <img src="images/loading.gif" alt="Načítání..." className="loading-img" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -388,18 +415,18 @@ if (loading) {
       </div>
 
       <div id='page'>
-         {showUnpaidModal && (
-            <div className="modal-backdrop">
-              <div className="modal">
-                <p className="modal-text">
-                  ⚠️<strong> Máš neuhrazenou objednávku. </strong>⚠️<br />
-                  ID nalezneš na stránce <strong>Moje objednávky</strong>.<br />
-                  Zajdi prosím vyřešit osobně na recepci.
-                </p>
-                <button className="modal-button" onClick={() => setShowUnpaidModal(false)}>Zavřít</button>
-              </div>
+        {showUnpaidModal && (
+          <div className="modal-backdrop">
+            <div className="modal">
+              <p className="modal-text">
+                ⚠️<strong> Máš neuhrazenou objednávku. </strong>⚠️<br />
+                ID nalezneš na stránce <strong>Moje objednávky</strong>.<br />
+                Zajdi prosím vyřešit osobně na recepci.
+              </p>
+              <button className="modal-button" onClick={() => setShowUnpaidModal(false)}>Zavřít</button>
             </div>
-          )}
+          </div>
+        )}
         {orderingDisabled ? (
           <p style={{ fontSize: '18px', color: 'gray', fontStyle: 'italic' }}>
             <br /><br />Objednávky jsou nyní uzavřeny. Zkuste to znovu v neděli po 15:00.<br /><br />
@@ -407,12 +434,12 @@ if (loading) {
           </p>
         ) : (
           <>
-            <p className='nadpis'>Chcete si objednat dvě jídla?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Do you want to order two meals?</span></p>
+            <p className='nadpis'>Chcete si objednat dvě jídla?<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>Do you want to order two meals?</span></p>
             <div id="howManyCheck">
               {selectedDate && !canOrderTwoMeals ? (
                 <p style={{ fontSize: '14px', color: 'gray' }}>
-                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další. <br/>
-                  <span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 1 meal for this day, you can order only one more.</span>
+                  Na tento den už máte 1 jídlo, můžete objednat jen jedno další. <br />
+                  <span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>You already have 1 meal for this day, you can order only one more.</span>
                 </p>
               ) : (
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -432,19 +459,24 @@ if (loading) {
             </div>
 
 
-            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>What date would you like to order food for?</span></p>
+            <p className='nadpis'>Na jaké datum si chcete jídlo objednat?<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>What date would you like to order food for?</span></p>
             <div id='whatDateRB'>
               {dates.map((item, index) => {
                 const mealCount = usedDates.get(item.label) || 0;
                 const isUsed = mealCount >= 2;
 
+                const ymd = toYMD(item.date);
+                const isBlocked = blockedSet.has(ymd);
+                const disabled = isUsed || isBlocked;
+
                 return (
                   <div key={index}>
-                    {!isUsed ? (
+                    {!disabled ? (
                       <label className='rb'>
                         <input
                           type="radio"
                           name="day"
+                          value={item.date.toISOString()}               // ⬅️ přidané
                           onChange={() => setSelectedDate(item.date.toISOString())}
                           style={{ margin: 0 }}
                         />
@@ -453,7 +485,12 @@ if (loading) {
                     ) : (
                       <div className='rb' style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                         <p style={{ fontSize: '18px', color: 'gray', margin: 0 }}>{item.label}</p>
-                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>Na tento den už máte 2 jídla<br/><span style={{fontStyle:'italic', fontWeight:'normal'}}>You already have 2 meals for this day.</span></p>
+                        <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>
+                          {isBlocked
+                            ? <>Tento den je zablokován (speciální den).<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>This day is blocked (special day).</span></>
+                            : <>Na tento den už máte 2 jídla.<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>You already have 2 meals for this day.</span></>
+                          }
+                        </p>
                       </div>
                     )}
                   </div>
@@ -463,13 +500,13 @@ if (loading) {
 
             <div id='whatMeal'>
               <div className='whatMenu'>
-                <p className='nadpis'>Jídlo číslo 1 <br /> <span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 1</span></p>
+                <p className='nadpis'>Jídlo číslo 1 <br /> <span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>Meal number 1</span></p>
                 <input type="text" inputMode="numeric" value={value1} onChange={handleChange1} required />
               </div>
 
               <div className={`second-meal-container ${checked ? 'show' : ''}`}>
                 <div className='whatMenu'>
-                  <p className='nadpis'>Jídlo číslo 2 <br /><span style={{fontStyle:'italic', fontWeight:'normal'}}>Meal number 2</span></p>
+                  <p className='nadpis'>Jídlo číslo 2 <br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>Meal number 2</span></p>
                   <input type="text" inputMode="numeric" value={value2} onChange={handleChange2} required />
                 </div>
               </div>
