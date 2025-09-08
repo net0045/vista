@@ -8,7 +8,8 @@
 }
 
 .account-button-menu,
-.account-button-orders {
+.account-button-orders,
+.account-button-messages {
   width: 80%;
   padding: 15px;
   margin: 5px 0;
@@ -74,6 +75,13 @@
 .account-button-orders {
   background-color: #b2dfdbff;
   color: #0071a9ff;
+  font-weight: bold;
+  border-style: none;
+}
+
+.account-button-messages{
+  background-color: #eac435ff;
+  color: white;
   font-weight: bold;
   border-style: none;
 }

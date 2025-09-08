@@ -60,12 +60,7 @@ function MyOrders() {
       );
       setUnpaidOrders(unpaidWithFoods);
 
-      // 4) Celková částka = zaplacené + nezaplacené
-      const totalPaid = ordersWithFoods.reduce(
-        (sum, o) => sum + (o.foods || []).reduce((s, f) => s + getFoodCost(f), 0),
-        0
-      );
-      setTotalSpent(totalPaid);
+     
     } catch (err) {
       console.error('Chyba při načítání objednávek:', err);
     } finally {
@@ -123,8 +118,6 @@ function MyOrders() {
               )}
             </div>
           )}
-
-          <p>Celkem za tento týden: <br /><strong>{formatCzk(totalSpent)}</strong></p>
 
           <p id='warningText'>
             NEZAŠKRTÁVEJTE VYZVEDNUTO!<br />

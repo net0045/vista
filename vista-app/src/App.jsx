@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -17,18 +16,18 @@ import { verifyToken, getSecretKey, getCookie } from './lib/jwtHandler';
 import Admin from './Admin';
 import ExcelImport from './ExcelImport';
 import ExcelExport from './ExcelExport';
-
 import AdminOverview from './AdminOverview';
 import AdminProtectedRoute from './AdminProtectedRoute';
 import AddSpecialDate from './AddSpecialDate';
-
+import Messages from './Messages';
+import AdminMessage from './AdminMessage';
 
 function App() {
   const [progress, setProgress] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
-   useEffect(() => {
+  useEffect(() => {
     const checkToken = async () => {
       const token = getCookie('authToken');
 
@@ -74,7 +73,6 @@ function App() {
       return () => clearInterval(interval);
     }
   }, [location.pathname, navigate]);
-   
 
   return (
     <Routes>
@@ -100,19 +98,20 @@ function App() {
       />
       <Route path="/login" element={<Login />} />
       <Route path="/admin" element={<Admin />} />
-      <Route path="/admin/import" element={<AdminProtectedRoute><ExcelImport /></AdminProtectedRoute>} />
-      <Route path="/admin/export" element={<AdminProtectedRoute><ExcelExport /></AdminProtectedRoute>} />
-      <Route path="/admin/specialdates" element={<AdminProtectedRoute><AddSpecialDate /></AdminProtectedRoute>} />
-      <Route path="/admin/overview" element={<AdminProtectedRoute><AdminOverview /></AdminProtectedRoute>} />
+      <Route path="/admin/import" element={<AdminProtectedRoute><ExcelImport /></AdminProtectedRoute>}/>
+      <Route path="/admin/export" element={<AdminProtectedRoute><ExcelExport /></AdminProtectedRoute>}/>
+      <Route path="/admin/specialdates" element={<AdminProtectedRoute><AddSpecialDate /></AdminProtectedRoute>}/>
+      <Route path="/admin/overview" element={<AdminProtectedRoute><AdminOverview /></AdminProtectedRoute>}/>
+      <Route path="/admin/message" element={<AdminProtectedRoute><AdminMessage /></AdminProtectedRoute>}/>
       <Route path="/signin" element={<Signin />} />
       <Route path="/verify" element={<Verify />} />
-      <Route path="/menu" element={<Menu/>} />
+      <Route path="/menu" element={<Menu />} />
       <Route path="/qr" element={<QrView />} />
       <Route path="/payment" element={<Payment />} />
-      <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-      
-      <Route path="/myorders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-      <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
+      <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>}/>
+      <Route path="/myorders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>}/>
+      <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>}/>
+      <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>}/>
     </Routes>
   );
 }

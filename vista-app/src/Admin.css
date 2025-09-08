@@ -207,12 +207,19 @@
   padding: 10px 25px;
   font-size: 15px;
   font-weight: 600;
-  border: none;
+  border: solid;
+  border-color: #ff1500;
   border-radius: 8px;
   background-color: #ff1500;
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.stornoBtn:hover{
+  color: black;
+  background-color: transparent;
+  transition: 0.2s;
 }
 
 .excelform p {
@@ -238,7 +245,30 @@
 
 .stornoInput {
   width: 60%;
-  
+  text-align: center;
+}
+
+.message-title-input{
+  width: 97%;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+
+}
+
+.message-content-input {
+  width: 90%;          /* aby to bylo stejně široké jako nadpis */
+  height: 200px;        /* pevná výška – nastav si, kolik chceš */
+  resize: none;         
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.4;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: white;
+  color: black;
+  font-family: 'Segoe UI', sans-serif;
+  border-style: solid;
+  border-width: 2px;
 }
 
 input {

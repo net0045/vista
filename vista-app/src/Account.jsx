@@ -24,7 +24,11 @@ function Account() {
     };
 
     const navigateToAdmin = () => {
-        navigate('/admin/overview');
+        navigate('/admin');
+    };
+
+    const navigateToMessages = () => {
+        navigate('/messages');
     };
 
     useEffect(() => {
@@ -86,6 +90,10 @@ function Account() {
                 <button className="account-button-orders" onClick={navigateToOrders}>
                     Moje Objednávky <br />
                     <span className='weekly-menu-my-orders'>My Orders</span>
+                </button>
+                <button className="account-button-messages" onClick={navigateToMessages}>
+                    Zprávy <br />
+                    <span className='weekly-menu-my-orders'>Messages</span>
                 </button>
             </div>
         </div>
