@@ -158,17 +158,16 @@ function Order() {
   }, []);
 
   // 3) NAČTI BLOKOVANÉ DNY PRO OBJEDNACÍ TÝDEN (Po–Pá)
-  useEffect(() => {
+ useEffect(() => {
     (async () => {
       try {
         const { monday, friday } = getOrderWeekRange(new Date());
         const fromYmd = toYMD(monday);
         const toYmd = toYMD(friday);
 
-        // očekává [{ date: 'YYYY-MM-DD' }, ...]
-        const rows = await listSpecialDatesInRange(fromYmd, toYmd);
-        const blocked = new Set((rows ?? []).map(r => r.date));
-        setBlockedSet(blocked);
+       // skutečně vrací ['YYYY-MM-DD', ...]
+       const datesYmd = await listSpecialDatesInRange(fromYmd, toYmd);
+       setBlockedSet(new Set(datesYmd ?? []));
       } catch (e) {
         console.error('Nepodařilo se načíst SpecialDates:', e);
         setBlockedSet(new Set());
@@ -476,7 +475,7 @@ function Order() {
                         <input
                           type="radio"
                           name="day"
-                          value={item.date.toISOString()}               // ⬅️ přidané
+                          value={item.date.toISOString()}              
                           onChange={() => setSelectedDate(item.date.toISOString())}
                           style={{ margin: 0 }}
                         />
@@ -487,7 +486,7 @@ function Order() {
                         <p style={{ fontSize: '18px', color: 'gray', margin: 0 }}>{item.label}</p>
                         <p style={{ color: 'red', fontSize: '15px', marginTop: '4px' }}>
                           {isBlocked
-                            ? <>Tento den je zablokován (speciální den).<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>This day is blocked (special day).</span></>
+                            ? <>Na tento den nelze objednávat menu.<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>Cannot order on this day.</span></>
                             : <>Na tento den už máte 2 jídla.<br /><span style={{ fontStyle: 'italic', fontWeight: 'normal' }}>You already have 2 meals for this day.</span></>
                           }
                         </p>
